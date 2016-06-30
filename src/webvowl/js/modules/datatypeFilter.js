@@ -6,7 +6,7 @@ module.exports = function () {
 	var filter = {},
 		nodes,
 		properties,
-		enabled = false,
+		enabled = true,
 		filteredNodes,
 		filteredProperties;
 
