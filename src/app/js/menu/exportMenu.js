@@ -182,6 +182,10 @@ module.exports = function (graph) {
 			d3.event.preventDefault();
 			return;
 		}
+		
+		if(graph.options().exportWithGraphChanges()) {
+			exportableJsonText = JSON.stringify(graph.applyGraphChangesToData());
+		}
 
 		var i; // an index variable for the for-loops
 
