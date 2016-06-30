@@ -777,6 +777,26 @@ module.exports = function (graphContainerSelector) {
 		return graph;
 	};
 
+	graph.applyGraphChangesToData = function () {
+		var data = options.data();
+		var classAttribute = data.classAttribute;
+		
+		nodeElements.each(function(node) {
+            if (classAttribute) {
+				// Look for an attribute with the same id and apply position changes
+				for (var i = 0; i < classAttribute.length; i++) {
+					var attribute = classAttribute[i];
+					if (node.id() === attribute.id) {
+						attribute.x = node.x;
+						attribute.y = node.y;
+						break;
+					}
+				}
+			}
+		});
+
+		return data;
+	};
 
 	return graph;
 };
