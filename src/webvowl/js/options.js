@@ -12,7 +12,7 @@ module.exports = function () {
 		width = 800,
 		selectionModules = [],
 		filterModules = [],
-		minMagnification = 0.01,
+		minMagnification = 0.95,
 		maxMagnification = 4,
 		compactNotation = false,
 		// some filters
