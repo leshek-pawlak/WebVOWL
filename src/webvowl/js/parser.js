@@ -173,6 +173,16 @@ module.exports = function (graph) {
 		var combinations = [];
 		var prototypeMap = createLowerCasePrototypeMap(nodePrototypeMap);
 
+		function setDefinedPosition(element, node){
+			if(typeof element.x !== "undefined") {
+				node.x = element.x;
+			}
+
+			if(typeof element.y !== "undefined") {
+				node.y = element.y;
+			}
+		}
+
 		if (baseObjects) {
 			baseObjects.forEach(function (element) {
 				var matchingAttribute;
@@ -210,6 +220,8 @@ module.exports = function (graph) {
 						.union(element.union)
 						.iri(element.iri)
 						.backgroundColor(element.backgroundColor);
+					
+					setDefinedPosition(element, node);
 
 					if (element.pos) {
 						node.y = element.pos[1];
