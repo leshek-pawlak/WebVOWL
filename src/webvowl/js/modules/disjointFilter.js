@@ -5,8 +5,7 @@ module.exports = function () {
 	var filter = {},
 		nodes,
 		properties,
-	// According to the specification enabled by default
-		enabled = true,
+		enabled = false,
 		filteredNodes,
 		filteredProperties;
 
