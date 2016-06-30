@@ -208,10 +208,12 @@ module.exports = function (graph) {
 						.label(element.label)
 						// .type(element.type) Ignore, because we predefined it
 						.union(element.union)
-						.iri(element.iri);
+						.iri(element.iri)
+						.backgroundColor(element.backgroundColor);
+
 					if (element.pos) {
-						node.x = element.pos[0];
 						node.y = element.pos[1];
+						node.x = element.pos[0];
 						node.px = node.x;
 						node.py = node.y;
 					}
