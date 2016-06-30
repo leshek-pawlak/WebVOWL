@@ -20,7 +20,7 @@ module.exports = function (graph) {
 			searchMenu.hideSearchEntries();
 		});
 		pauseButton = d3.select("#pause-button")
-			.datum({paused: false})
+			.datum({paused: true})
 			.on("click", function (d) {
 				graph.paused(!d.paused);
 				d.paused = !d.paused;
@@ -60,7 +60,7 @@ module.exports = function (graph) {
 
 	pauseMenu.reset = function () {
 		// resuming
-		pauseMenu.setPauseValue(false);
+		pauseMenu.setPauseValue(true);
 	};
 
 
