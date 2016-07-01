@@ -783,7 +783,7 @@ module.exports = function (graphContainerSelector) {
 		if(data) {
 
 			nodeElements.each(function(node) {
-				if (classAttribute) {
+				if (classAttribute && node.pinned()) {
 					// Look for an attribute with the same id and apply position changes
 					for (var i = 0; i < classAttribute.length; i++) {
 						var attribute = classAttribute[i];
