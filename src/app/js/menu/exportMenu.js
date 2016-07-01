@@ -184,7 +184,7 @@ module.exports = function (graph) {
 		}
 		
 		if(graph.options().exportWithGraphChanges()) {
-			exportableJsonText = JSON.stringify(graph.applyGraphChangesToData());
+			exportableJsonText = JSON.stringify(graph.addGraphChanges(JSON.parse(exportableJsonText)));
 		}
 
 		var i; // an index variable for the for-loops
