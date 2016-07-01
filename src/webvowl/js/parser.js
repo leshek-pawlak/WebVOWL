@@ -174,11 +174,10 @@ module.exports = function (graph) {
 		var prototypeMap = createLowerCasePrototypeMap(nodePrototypeMap);
 
 		function setDefinedPosition(element, node){
-			if(typeof element.x !== "undefined") {
+			if(typeof element.x !== "undefined" && typeof element.y !== "undefined") {
+				node.pinned(true);
+				
 				node.x = element.x;
-			}
-
-			if(typeof element.y !== "undefined") {
 				node.y = element.y;
 			}
 		}
