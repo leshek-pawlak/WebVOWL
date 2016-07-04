@@ -265,13 +265,15 @@ module.exports = function (graphContainerSelector) {
 		});
 
 		// Set cardinality positions
-		cardinalityElements.attr("transform", function (property) {
-			var label = property.link().label(),
-				pos = math.calculateIntersection(label, property.range(), CARDINALITY_HDISTANCE),
-				normalV = math.calculateNormalVector(label, property.domain(), CARDINALITY_VDISTANCE);
+		if(options.cardinalityVisible()) {
+			cardinalityElements.attr("transform", function (property) {
+				var label = property.link().label(),
+					pos = math.calculateIntersection(label, property.range(), CARDINALITY_HDISTANCE),
+					normalV = math.calculateNormalVector(label, property.domain(), CARDINALITY_VDISTANCE);
 
-			return "translate(" + (pos.x + normalV.x) + "," + (pos.y + normalV.y) + ")";
-		});
+				return "translate(" + (pos.x + normalV.x) + "," + (pos.y + normalV.y) + ")";
+			});
+		}
 
         updateHaloRadius();
 	}
@@ -704,7 +706,9 @@ module.exports = function (graphContainerSelector) {
 
 		// Last container -> elements of this container overlap others
 		linkContainer = graphContainer.append("g").classed("linkContainer", true);
-		cardinalityContainer = graphContainer.append("g").classed("cardinalityContainer", true);
+		if(options.cardinalityVisible()) {
+			cardinalityContainer = graphContainer.append("g").classed("cardinalityContainer", true);
+		}
 		labelContainer = graphContainer.append("g").classed("labelContainer", true);
 		nodeContainer = graphContainer.append("g").classed("nodeContainer", true);
 
@@ -754,19 +758,21 @@ module.exports = function (graphContainerSelector) {
 		});
 
 		// Draw cardinalities
-		cardinalityElements = cardinalityContainer.selectAll(".cardinality")
-			.data(properties).enter()
-			.append("g")
-			.classed("cardinality", true);
+		if(options.cardinalityVisible()) {
+			cardinalityElements = cardinalityContainer.selectAll(".cardinality")
+				.data(properties).enter()
+				.append("g")
+				.classed("cardinality", true);
 
-		cardinalityElements.each(function (property) {
-			var success = property.drawCardinality(d3.select(this));
+			cardinalityElements.each(function (property) {
+				var success = property.drawCardinality(d3.select(this));
 
-			// Remove empty groups without a label.
-			if (!success) {
-				d3.select(this).remove();
-			}
-		});
+				// Remove empty groups without a label.
+				if (!success) {
+					d3.select(this).remove();
+				}
+			});
+		}
 
 		// Draw links
 		linkGroups = linkContainer.selectAll(".link")
