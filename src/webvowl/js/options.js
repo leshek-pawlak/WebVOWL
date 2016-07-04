@@ -28,7 +28,8 @@ module.exports = function () {
 		ontologyMenu,
 		sidebar,
 		navigationMenu,
-		scaleNodesByIndividuals = false;
+		scaleNodesByIndividuals = false,
+		cardinalityVisible = true;
 
 
 	options.sidebar= function(s){
@@ -194,6 +195,12 @@ module.exports = function () {
 	options.literalFilter=function (p) {
 		if (!arguments.length) return literalFilter;
 		literalFilter=p;
+		return options;
+	};
+
+	options.cardinalityVisible = function (p) {
+		if (!arguments.length) return cardinalityVisible;
+		cardinalityVisible = p;
 		return options;
 	};
 
