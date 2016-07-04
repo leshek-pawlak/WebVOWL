@@ -204,5 +204,23 @@ module.exports = function () {
 		return options;
 	};
 
+	options.rewriteFrom = function (otherOptions) {
+		rewriteFrom(otherOptions, options);
+	};
+
+	function rewriteFrom(srcOptions, destOptions) {
+		var srcKeys = Object.keys(srcOptions);
+		var i;
+		var optionKey;
+
+		for(i = 0; i < srcKeys.length; i++) {
+			optionKey = srcKeys[i];
+
+			if(typeof destOptions[optionKey] === 'function') {
+				destOptions[optionKey](srcOptions[optionKey]);
+			}
+		}
+	}
+
 	return options;
 };
