@@ -188,6 +188,20 @@
 <script src="js/d3.min.js"></script>
 <script src="js/webvowl.js"></script>
 <script src="js/webvowl.app.js"></script>
-<script>window.onload = webvowl.app().initialize;</script>
+<script>
+	(function () {
+		var app = webvowl.app();
+
+		var oReq = new XMLHttpRequest();
+		oReq.open('get', 'options.json', true);
+		oReq.onload = function reqListener () {
+			var options = JSON.parse(this.responseText);
+			app.overrideOptions(options);
+		};
+		oReq.send();
+
+		window.onload = app.initialize;
+	})();
+</script>
 </body>
 </html>
