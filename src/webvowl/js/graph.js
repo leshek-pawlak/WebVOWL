@@ -1015,10 +1015,10 @@ module.exports = function (graphContainerSelector) {
 	graph.addGraphChanges = function (data) {
 		var classAttribute = data.classAttribute;
 
-		if(data) {
-
+		if(data && classAttribute) {
+			
 			nodeElements.each(function(node) {
-				if (classAttribute && node.pinned()) {
+				if (node.pinned()) {
 					// Look for an attribute with the same id and apply position changes
 					for (var i = 0; i < classAttribute.length; i++) {
 						var attribute = classAttribute[i];
