@@ -24,7 +24,8 @@ module.exports = {
 	},
 	plugins: [
 		new CopyWebpackPlugin([
-			{context: "src/app", from: "data/**/*"}
+			{context: "src/app", from: "data/**/*"},
+			{context: "src/app", from: "options.json"}
 		]),
 		new ExtractTextPlugin("css/[name].css"),
 		new webpack.ProvidePlugin({
