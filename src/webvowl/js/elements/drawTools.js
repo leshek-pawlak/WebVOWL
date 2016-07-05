@@ -79,7 +79,7 @@ module.exports = (function () {
 
 		pinGroupElement.append("circle")
 			.classed("class pin feature", true)
-			.attr("r", 12)
+			.attr("r", 7)
 			.on("click", function () {
 				if (onClick) {
 					onClick();
