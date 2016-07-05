@@ -783,28 +783,48 @@ module.exports = function (graphContainerSelector) {
 	};
 
 	graph.addGraphChanges = function (data) {
-		var classAttribute = data.classAttribute;
+		var classAttributes;
+		var datatypeAttributes;
 
-		if(data && classAttribute) {
-			
-			nodeElements.each(function(node) {
+		if(data) {
+
+			classAttributes = data.classAttribute;
+			datatypeAttributes = data.datatypeAttribute;
+
+			nodeElements.each(function (node) {
 				if (node.pinned()) {
+
 					// Look for an attribute with the same id and apply position changes
-					for (var i = 0; i < classAttribute.length; i++) {
-						var attribute = classAttribute[i];
-						if (node.id() === attribute.id) {
-							attribute.x = node.x;
-							attribute.y = node.y;
-							break;
-						}
+					if(!findMatchingAttributeAndRewritePosition(node, classAttributes)) {
+						findMatchingAttributeAndRewritePosition(node, datatypeAttributes);
 					}
+
 				}
 			});
-
 		}
 		
 		return data;
 	};
+
+	function findMatchingAttributeAndRewritePosition(node, attributes) {
+		var attribute;
+		var i;
+
+		if(!attributes) {
+			return false;
+		}
+
+		for (i = 0; i < attributes.length; i++) {
+			attribute = attributes[i];
+			if (node.id() === attribute.id) {
+				attribute.x = node.x;
+				attribute.y = node.y;
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	return graph;
 };
