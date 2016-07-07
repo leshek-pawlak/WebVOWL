@@ -4,5 +4,6 @@
   "datatypeDistance": 120,
   "minMagnification": 0.5,
   "maxMagnification": 4,
-  "paused": true
+  "paused": true,
+  "datatypeFilterEnabled": false
 }
