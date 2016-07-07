@@ -72,6 +72,7 @@ module.exports = (function () {
 	};
 
 	tools.drawPin = function(container, dx, dy, onClick) {
+		var pinR = 7;
 		var pinGroupElement = container
 			.append("g")
 			.classed("hidden-in-export", true)
@@ -79,7 +80,7 @@ module.exports = (function () {
 
 		pinGroupElement.append("circle")
 			.classed("class pin feature", true)
-			.attr("r", 7)
+			.attr("r", pinR)
 			.on("click", function () {
 				if (onClick) {
 					onClick();
@@ -90,8 +91,8 @@ module.exports = (function () {
 		pinGroupElement.append("line")
 			.attr("x1", 0)
 			.attr("x2", 0)
-			.attr("y1", 12)
-			.attr("y2", 16);
+			.attr("y1", pinR)
+			.attr("y2", pinR + 4);
 
 		return pinGroupElement;
 	};
