@@ -265,7 +265,7 @@ module.exports = function (graphContainerSelector) {
 		});
 
 		// Set cardinality positions
-		if(options.cardinalityVisible()) {
+		if(isCardinalityEnabled()) {
 			cardinalityElements.attr("transform", function (property) {
 				var label = property.link().label(),
 					pos = math.calculateIntersection(label, property.range(), CARDINALITY_HDISTANCE),
@@ -516,6 +516,10 @@ module.exports = function (graphContainerSelector) {
 			.append("g");
 	}
 
+	function isCardinalityEnabled(){
+		return options && options.cardinalityVisible() && options.cardinalityPlacement() === "CLASS";
+	}
+
 	/** search functionality **/
 	graph.getUpdateDictionary = function () {
 		return parser.getDictionary();
@@ -706,7 +710,7 @@ module.exports = function (graphContainerSelector) {
 
 		// Last container -> elements of this container overlap others
 		linkContainer = graphContainer.append("g").classed("linkContainer", true);
-		if(options.cardinalityVisible()) {
+		if(isCardinalityEnabled()) {
 			cardinalityContainer = graphContainer.append("g").classed("cardinalityContainer", true);
 		}
 		labelContainer = graphContainer.append("g").classed("labelContainer", true);
@@ -737,7 +741,7 @@ module.exports = function (graphContainerSelector) {
 			.call(dragBehaviour);
 
 		labelGroupElements.each(function (label) {
-			var success = label.draw(d3.select(this));
+			var success = label.draw(d3.select(this), options);
 			// Remove empty groups without a label.
 			if (!success) {
 				d3.select(this).remove();
@@ -758,7 +762,7 @@ module.exports = function (graphContainerSelector) {
 		});
 
 		// Draw cardinalities
-		if(options.cardinalityVisible()) {
+		if(isCardinalityEnabled()) {
 			cardinalityElements = cardinalityContainer.selectAll(".cardinality")
 				.data(properties).enter()
 				.append("g")
