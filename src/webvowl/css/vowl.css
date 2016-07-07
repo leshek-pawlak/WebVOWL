@@ -63,6 +63,11 @@ marker path {
     cursor: pointer;
 }
 
+circle.pin {
+    fill: white;
+}
+
+
 @-webkit-keyframes pulseAnimation {
     0% {
         -webkit-transform: scale(1.5);
