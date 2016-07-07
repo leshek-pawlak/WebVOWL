@@ -5,6 +5,6 @@
   "minMagnification": 0.5,
   "maxMagnification": 4,
   "paused": true,
-  "datatypeFilterEnabled": false,
+  "datatypeFilterEnabled": true,
   "objectPropertyFilterEnabled": false
 }
