@@ -172,14 +172,14 @@ module.exports = (function () {
 
 
 		// Reused functions TODO refactor
-		this.draw = function (labelGroup) {
+		this.draw = function (labelGroup, options) {
 			function attachLabel(property) {
 				var labelContainer = labelGroup.append("g")
 					.datum(property)
 					.classed("label", true)
 					.attr("id", property.id());
 
-				property.drawLabel(labelContainer);
+				property.drawLabel(labelContainer, options);
 
 				return labelContainer;
 			}
@@ -239,17 +239,42 @@ module.exports = (function () {
 			if (that.backgroundColor()) {
 				rect.style("fill", that.backgroundColor());
 			}
+
+			return rect;
 		};
-		this.drawLabel = function (labelContainer) {
-			this.addRect(labelContainer);
+		this.drawLabel = function (labelContainer, options) {
+
+			function prepareCardinalityText(isEnabled){
+				var preparedCardinalityText;
+
+				if(!isEnabled) {
+					return null;
+				}
+
+				preparedCardinalityText = that.generateCardinalityText();
+
+				if(preparedCardinalityText) {
+					preparedCardinalityText = " [" + preparedCardinalityText + "]"
+				}
+
+				return preparedCardinalityText;
+			}
+
+			var rect = this.addRect(labelContainer);
+			var cardinalityText = prepareCardinalityText(options && options.cardinalityVisible() && options.cardinalityPlacement() === "LABEL");
 
 			var equivalentsString = that.equivalentsString();
-			var suffixForFollowingEquivalents = equivalentsString ? "," : "";
-
 			var textElement = new CenteringTextElement(labelContainer, this.backgroundColor());
-			textElement.addText(this.labelForCurrentLanguage(), "", suffixForFollowingEquivalents);
 			textElement.addEquivalents(equivalentsString);
+			textElement.addText(this.labelForCurrentLanguage(), null, cardinalityText);
 			textElement.addSubText(this.indicationString());
+			this.addEquivalentsToLabel(textElement);
+
+			if(cardinalityText) {
+				rect.attr("width", that.width() + cardinalityText.length * 5);
+				rect.attr("x", -(that.width() + cardinalityText.length * 5)/ 2);
+			}
+
 		};
 
 		this.equivalentsString = function () {
