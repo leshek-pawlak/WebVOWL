@@ -29,6 +29,7 @@ module.exports = function () {
 		sidebar,
 		navigationMenu,
 		scaleNodesByIndividuals = false,
+		paused = true,
 		cardinalityVisible = true,
 		cardinalityPlacement = "LABEL";
 
@@ -196,6 +197,12 @@ module.exports = function () {
 	options.literalFilter=function (p) {
 		if (!arguments.length) return literalFilter;
 		literalFilter=p;
+		return options;
+	};
+
+	options.paused = function (p) {
+		if (!arguments.length) return paused;
+		paused = p;
 		return options;
 	};
 
