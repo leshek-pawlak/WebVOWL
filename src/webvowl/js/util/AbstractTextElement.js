@@ -11,7 +11,7 @@ function AbstractTextElement(container, backgroundColor) {
 	};
 }
 
-AbstractTextElement.prototype.LINE_DISTANCE = 1;
+AbstractTextElement.prototype.LINE_DISTANCE = 10;
 AbstractTextElement.prototype.CSS_CLASSES = {
 	default: "text",
 	subtext: "subtext",
