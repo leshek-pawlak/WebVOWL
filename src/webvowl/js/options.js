@@ -29,7 +29,8 @@ module.exports = function () {
 		sidebar,
 		navigationMenu,
 		scaleNodesByIndividuals = false,
-		cardinalityVisible = true;
+		cardinalityVisible = true,
+		cardinalityPlacement = "LABEL";
 
 
 	options.sidebar= function(s){
@@ -201,6 +202,12 @@ module.exports = function () {
 	options.cardinalityVisible = function (p) {
 		if (!arguments.length) return cardinalityVisible;
 		cardinalityVisible = p;
+		return options;
+	};
+
+	options.cardinalityPlacement = function (p) {
+		if (!arguments.length) return cardinalityPlacement;
+		cardinalityPlacement = p;
 		return options;
 	};
 

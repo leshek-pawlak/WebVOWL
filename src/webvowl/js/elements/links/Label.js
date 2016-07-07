@@ -35,8 +35,8 @@ Label.prototype.actualRadius = function () {
 	return this.property().actualRadius();
 };
 
-Label.prototype.draw = function (container) {
-	return this.property().draw(container);
+Label.prototype.draw = function (container, options) {
+	return this.property().draw(container, options);
 };
 
 Label.prototype.inverse = function () {
