@@ -477,6 +477,32 @@ a#pause-button:not(.paused)::before {
 #aboutMenu > a::before {
 	content: "\00A9";
 }
+
+.addButton::before {
+	content: "\002B";
+}
+
+.predefinedLabelFilterContainer {
+	overflow-y: auto;
+	max-height: 120px;
+}
+
+.addPredefinedLabelContainer {
+	border-top: 1px dashed darkblue;
+	border-bottom: 1px dashed darkblue;
+	margin: auto 5px;
+	padding: 5px 0;
+}
+
+.addPredefinedLabelContainer .predefinedLabelInput {
+	display: inline-block;
+	width: 80%;
+}
+
+.addPredefinedLabelContainer .addButton {
+	width: 15%;
+}
+
 #detailsArea {
 	bottom: 0;
 	color: #bdc3c7;
