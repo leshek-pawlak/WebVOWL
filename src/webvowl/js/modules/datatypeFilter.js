@@ -1,12 +1,12 @@
 var elementTools = require("../util/elementTools")();
 var filterTools = require("../util/filterTools")();
 
-module.exports = function () {
+module.exports = function (options) {
 
 	var filter = {},
 		nodes,
 		properties,
-		enabled = true,
+		enabled = options.datatypeFilterEnabled(),
 		filteredNodes,
 		filteredProperties;
 
