@@ -218,7 +218,8 @@ module.exports = function (graph) {
 						// .type(element.type) Ignore, because we predefined it
 						.union(element.union)
 						.iri(element.iri)
-						.backgroundColor(element.backgroundColor);
+						.backgroundColor(element.backgroundColor)
+						.tags(element.tags);
 					
 					setDefinedPosition(element, node);
 

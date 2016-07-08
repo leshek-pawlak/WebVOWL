@@ -19,6 +19,7 @@ module.exports = (function () {
 			description,
 			equivalentBase,
 			visualAttributes = [],
+			tags,
 		// Style attributes
 			focused = false,
 			indications = [],
@@ -138,6 +139,11 @@ module.exports = (function () {
 			return this;
 		};
 
+		this.tags = function (p) {
+			if (!arguments.length) return tags;
+			tags = p;
+			return this;
+		};
 
 		this.commentForCurrentLanguage = function () {
 			return languageTools.textInLanguage(this.comment(), graph.language());

@@ -12,7 +12,7 @@ module.exports = function (graph) {
 		nodeDegreeContainer = d3.select("#nodeDegreeFilteringOption"),
 		graphDegreeLevel,
 		degreeSlider,
-		addedPredefinedLabelFilter;
+		addedTagFilter;
 
 
 	/** some getter function  **/
@@ -32,7 +32,7 @@ module.exports = function (graph) {
 	 * @param setOperatorFilter filter for all set operators with properties
 	 * @param nodeDegreeFilter filters nodes by their degree
 	 */
-	filterMenu.setup = function (datatypeFilter, objectPropertyFilter, subclassFilter, disjointFilter, setOperatorFilter, nodeDegreeFilter) {
+	filterMenu.setup = function (datatypeFilter, objectPropertyFilter, subclassFilter, disjointFilter, setOperatorFilter, nodeDegreeFilter, tagFilter) {
 		var menuEntry= d3.select("#filterOption");
 		menuEntry.on("mouseover",function(){
 			var searchMenu=graph.options().searchMenu();
@@ -48,7 +48,7 @@ module.exports = function (graph) {
 		addFilterItem(disjointFilter, "disjoint", "Class disjointness", "#disjointFilteringOption");
 		addFilterItem(setOperatorFilter, "setoperator", "Set operators", "#setOperatorFilteringOption");
 
-		addedPredefinedLabelFilter = addPredefinedLabelFilter(predefinedLabelFilter, "predefinedLabel", "Predefined label", "#predefinedLabelFilteringOption");
+		addedTagFilter = addTagFilter(tagFilter, "tag", "Tags", "#tagFilteringOption");
 
 		addNodeDegreeFilter(nodeDegreeFilter, nodeDegreeContainer);
 
@@ -88,89 +88,89 @@ module.exports = function (graph) {
 			.text(pluralNameOfFilteredItems);
 	}
 
-	function addPredefinedLabelFilter(filter, identifier, pluralNameOfFilteredItems, selector) {
+	function addTagFilter(filter, identifier, pluralNameOfFilteredItems, selector) {
 
-		function addOrRemoveLabelFromFilter(label, isAdd){
-			filter[isAdd? "addLabel" : "removeLabel"](label);
+		function addOrRemoveTagFromFilter(label, shouldAdd){
+			filter[shouldAdd? "addTag" : "removeTag"](label);
 			graph.update();
 		}
 
-		function addNextPredefinedLabelCheckbox(labelId, label){
-			var predefinedLabelCheckbox;
-			var predefinedLabelContainer;
+		function addNextTagCheckbox(tagId, tag){
+			var tagCheckbox;
+			var checkboxContainer;
 
-			predefinedLabelContainer = predefinedLabelFilterContainer
+			checkboxContainer = mainTagCheckboxContainer
 				.append("div")
 				.classed("checkboxContainer", true);
 
-			predefinedLabelCheckbox = predefinedLabelContainer
+			tagCheckbox = checkboxContainer
 				.append("input")
-				.classed("predefinedLabelFilterCheckbox", true)
-				.attr("id", labelId)
+				.classed("tagFilterCheckbox", true)
+				.attr("id", tagId)
 				.attr("type", "checkbox")
 				.on("click", function () {
-					var isEnabled = predefinedLabelCheckbox.property("checked");
-					addOrRemoveLabelFromFilter(label, isEnabled);
+					var isEnabled = tagCheckbox.property("checked");
+					addOrRemoveTagFromFilter(tag, isEnabled);
 				});
 
-			predefinedLabelContainer
+			checkboxContainer
 				.append("label")
-				.attr("for", labelId)
-				.text(label);
+				.attr("for", tagId)
+				.text(tag);
 
-			return predefinedLabelCheckbox;
+			return tagCheckbox;
 		}
 
-		var predefinedLabelFilterContainer;
-		var addPredefinedLabelContainer;
-		var predefinedLabelInput;
-		var addLabelBtn;
+		var mainTagCheckboxContainer;
+		var addTagContainer;
+		var newTagInput;
+		var addTagBtn;
 
 		addFilterItem(filter, identifier, pluralNameOfFilteredItems, selector);
 
-		addPredefinedLabelContainer = d3.select(selector)
+		addTagContainer = d3.select(selector)
 			.append("div")
-			.classed("addPredefinedLabelContainer", true);
+			.classed("addTagContainer", true);
 
-		predefinedLabelInput = addPredefinedLabelContainer
+		newTagInput = addTagContainer
 			.append("input")
-			.classed("predefinedLabelInput", true)
+			.classed("newTagInput", true)
 			.attr("type", "text");
 
-		addLabelBtn = addPredefinedLabelContainer
+		addTagBtn = addTagContainer
 			.append("button")
-			.classed("addButton", true);
+			.classed("addTagBtn", true);
 
-		predefinedLabelFilterContainer = d3.select(selector)
+		mainTagCheckboxContainer = d3.select(selector)
 			.append("div")
-			.classed("predefinedLabelFilterContainer", true);
+			.classed("mainTagCheckboxContainer", true);
 
 
 
-		addLabelBtn.on("click", function() {
-			var label = predefinedLabelInput.property("value");
-			var labelId = label + "predefinedLabelCheckbox";
-			var predefinedLabelCheckbox = d3.select("#" + labelId);
+		addTagBtn.on("click", function() {
+			var tag = newTagInput.property("value");
+			var tagId = tag + "tagCheckbox";
+			var tagCheckbox = d3.select("#" + tagId);
 
-			if(!filter.enabled() || !label) {
+			if(!filter.enabled() || !tag) {
 				return true;
 			}
 
-			label = String.prototype.toLowerCase.apply(label);
-			predefinedLabelInput.property("value", "");
+			tag = String.prototype.toLowerCase.apply(tag);
+			newTagInput.property("value", "");
 
-			if(predefinedLabelCheckbox.empty()) {
-				predefinedLabelCheckbox = addNextPredefinedLabelCheckbox(labelId, label);
+			if(tagCheckbox.empty()) {
+				tagCheckbox = addNextTagCheckbox(tagId, tag);
 			}
 
-			addOrRemoveLabelFromFilter(label, true);
-			predefinedLabelCheckbox.property("checked", true);
+			addOrRemoveTagFromFilter(tag, true);
+			tagCheckbox.property("checked", true);
 		});
 
 		return {
 			reset: function () {
 				filter.reset();
-				predefinedLabelFilterContainer.html("");
+				mainTagCheckboxContainer.html("");
 			}
 		}
 	}
@@ -274,7 +274,7 @@ module.exports = function (graph) {
 			}
 		});
 
-		addedPredefinedLabelFilter.reset();
+		addedTagFilter.reset();
 		
 		setSliderValue(degreeSlider, 0);
 		degreeSlider.on("change")();
