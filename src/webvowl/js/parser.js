@@ -302,7 +302,8 @@ module.exports = function (graph) {
 						.subproperties(element.subproperty)
 						.superproperties(element.superproperty)
 						// .type(element.type) Ignore, because we predefined it
-						.iri(element.iri);
+						.iri(element.iri)
+						.backgroundColor(element.backgroundColor);
 
 					// adding property position
 					if (element.pos) {
