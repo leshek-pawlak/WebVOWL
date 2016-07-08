@@ -30,20 +30,20 @@ module.exports = function () {
     };
 
     function removeTags() {
-        var filteredData = filterTools.filterNodesAndTidy(nodes, properties, hasNoTag);
+        var filteredData = filterTools.filterNodesAndTidy(nodes, properties, hasTag);
 
         nodes = filteredData.nodes;
         properties = filteredData.properties;
     }
 
-    function hasNoTag(node) {
+    function hasTag(node) {
         var nodeTags = node.tags();
 
-        if(_.isEmpty(nodeTags)) return true;
+        if(_.isEmpty(nodeTags)) return false;
 
         nodeTags = _.invokeMap(nodeTags, String.prototype.toLowerCase);
 
-        return _.isEmpty(_.intersection(tags, nodeTags));
+        return !_.isEmpty(_.intersection(tags, nodeTags));
 
     }
 
