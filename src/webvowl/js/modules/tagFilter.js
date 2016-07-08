@@ -1,4 +1,4 @@
-var _ = require("lodash/array");
+var _ = require("lodash");
 var filterTools = require("../util/filterTools")();
 
 module.exports = function () {
@@ -9,7 +9,7 @@ module.exports = function () {
         enabled = false,
         filteredNodes,
         filteredProperties,
-        predefinedLabels = [];
+        tags = [];
 
 
     /**
@@ -22,31 +22,28 @@ module.exports = function () {
         properties = untouchedProperties;
 
         if (this.enabled()) {
-            removeWithPredefinedLabels();
+            removeTags();
         }
 
         filteredNodes = nodes;
         filteredProperties = properties;
     };
 
-    function removeWithPredefinedLabels() {
-        var filteredData = filterTools.filterNodesAndTidy(nodes, properties, hasNoPredefinedLabel);
+    function removeTags() {
+        var filteredData = filterTools.filterNodesAndTidy(nodes, properties, hasNoTag);
 
         nodes = filteredData.nodes;
         properties = filteredData.properties;
     }
 
-    function hasNoPredefinedLabel(node) {
-        var nodeLabel = node.labelForCurrentLanguage();
+    function hasNoTag(node) {
+        var nodeTags = node.tags();
 
-        if(!nodeLabel) return false;
+        if(_.isEmpty(nodeTags)) return true;
 
-        nodeLabel = String.prototype.toLowerCase.apply(nodeLabel);
+        nodeTags = _.invokeMap(nodeTags, String.prototype.toLowerCase);
 
-        return predefinedLabels.filter(function (label) {
-                return label ===  nodeLabel;
-        })
-        .length === 0;
+        return _.isEmpty(_.intersection(tags, nodeTags));
 
     }
 
@@ -56,29 +53,29 @@ module.exports = function () {
         return filter;
     };
 
-    filter.addLabel = function(label) {
-        if(!label) return;
+    filter.addTag = function(tag) {
+        if(!tag) return;
 
-        var label = String.prototype.toLowerCase.apply(label);
+        var tag = String.prototype.toLowerCase.apply(tag);
 
-        if(_.indexOf(predefinedLabels, label) === -1) {
-            predefinedLabels.push(label);
+        if(_.indexOf(tags, tag) === -1) {
+            tags.push(tag);
         }
 
     };
 
-    filter.removeLabel = function (label) {
-        if(!label) return;
+    filter.removeTag = function (tagToRemove) {
+        if(!tagToRemove) return;
 
-        var label = String.prototype.toLowerCase.apply(label);
+        var tagToRemove = String.prototype.toLowerCase.apply(tagToRemove);
 
-        _.remove(predefinedLabels, function (predefinedLabel) {
-            return predefinedLabel ===  label;
+        _.remove(tags, function (tag) {
+            return tag ===  tagToRemove;
         });
     };
 
     filter.reset = function () {
-      predefinedLabels = [];
+      tags = [];
     };
     // Functions a filter must have
     filter.filteredNodes = function () {
