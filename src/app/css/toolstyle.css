@@ -490,28 +490,28 @@ a#pause-button:not(.paused)::before {
 	content: "\00A9";
 }
 
-.addButton::before {
+.addTagBtn::before {
 	content: "\002B";
 }
 
-.predefinedLabelFilterContainer {
+.mainTagCheckboxContainer {
 	overflow-y: auto;
 	max-height: 120px;
 }
 
-.addPredefinedLabelContainer {
+.addTagContainer {
 	border-top: 1px dashed darkblue;
 	border-bottom: 1px dashed darkblue;
 	margin: auto 5px;
 	padding: 5px 0;
 }
 
-.addPredefinedLabelContainer .predefinedLabelInput {
+.addTagContainer .newTagInput {
 	display: inline-block;
 	width: 80%;
 }
 
-.addPredefinedLabelContainer .addButton {
+.addTagContainer .addTagBtn {
 	width: 15%;
 }
 

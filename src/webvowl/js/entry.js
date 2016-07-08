@@ -29,7 +29,7 @@ webvowl.modules.selectionDetailsDisplayer = require("./modules/selectionDetailsD
 webvowl.modules.setOperatorFilter = require("./modules/setOperatorFilter");
 webvowl.modules.statistics = require("./modules/statistics");
 webvowl.modules.subclassFilter = require("./modules/subclassFilter");
-webvowl.modules.predefinedLabelFilter = require("./modules/predefinedLabelFilter");
+webvowl.modules.tagFilter = require("./modules/tagFilter");
 
 
 webvowl.nodes = {};
