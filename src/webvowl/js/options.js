@@ -33,7 +33,7 @@ module.exports = function () {
 		datatypeFilterEnabled = true,
 		objectPropertyFilterEnabled = false,
 		cardinalityVisible = true,
-		cardinalityPlacement = "LABEL";
+		cardinalityPlacement = "PROPERTY";
 
 
 	options.sidebar= function(s){

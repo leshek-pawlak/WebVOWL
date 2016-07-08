@@ -261,7 +261,7 @@ module.exports = (function () {
 			}
 
 			var rect = this.addRect(labelContainer);
-			var cardinalityText = prepareCardinalityText(options && options.cardinalityVisible() && options.cardinalityPlacement() === "LABEL");
+			var cardinalityText = prepareCardinalityText(options && options.cardinalityVisible() && options.cardinalityPlacement() === "PROPERTY");
 
 			var equivalentsString = that.equivalentsString();
 			var textElement = new CenteringTextElement(labelContainer, this.backgroundColor());
