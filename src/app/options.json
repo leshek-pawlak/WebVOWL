@@ -1,5 +1,6 @@
 {
   "cardinalityVisible": true,
+  "cardinalityPlacement": "LABEL",
   "classDistance": 200,
   "datatypeDistance": 120,
   "minMagnification": 0.5,
