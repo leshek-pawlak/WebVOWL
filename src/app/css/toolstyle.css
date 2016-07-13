@@ -489,30 +489,12 @@ a#pause-button:not(.paused)::before {
 #aboutMenu > a::before {
 	content: "\00A9";
 }
-
-.addTagBtn::before {
-	content: "\002B";
+#segmentsOption > a::before {
+	content: "\25A4";
 }
 
-.mainTagCheckboxContainer {
-	overflow-y: auto;
-	max-height: 120px;
-}
-
-.addTagContainer {
-	border-top: 1px dashed darkblue;
-	border-bottom: 1px dashed darkblue;
-	margin: auto 5px;
-	padding: 5px 0;
-}
-
-.addTagContainer .newTagInput {
-	display: inline-block;
-	width: 80%;
-}
-
-.addTagContainer .addTagBtn {
-	width: 15%;
+#tagFilteringOption {
+	border-bottom: 2px solid black;
 }
 
 #detailsArea {

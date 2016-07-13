@@ -48,8 +48,6 @@ module.exports = function (graph) {
 		addFilterItem(disjointFilter, "disjoint", "Class disjointness", "#disjointFilteringOption");
 		addFilterItem(setOperatorFilter, "setoperator", "Set operators", "#setOperatorFilteringOption");
 
-		addedTagFilter = addTagFilter(tagFilter, "tag", "Tags", "#tagFilteringOption");
-
 		addNodeDegreeFilter(nodeDegreeFilter, nodeDegreeContainer);
 
 	};
@@ -86,93 +84,6 @@ module.exports = function (graph) {
 		filterContainer.append("label")
 			.attr("for", identifier + "FilterCheckbox")
 			.text(pluralNameOfFilteredItems);
-	}
-
-	function addTagFilter(filter, identifier, pluralNameOfFilteredItems, selector) {
-
-		function addOrRemoveTagFromFilter(label, shouldAdd){
-			filter[shouldAdd? "addTag" : "removeTag"](label);
-			graph.update();
-		}
-
-		function addNextTagCheckbox(tagId, tag){
-			var tagCheckbox;
-			var checkboxContainer;
-
-			checkboxContainer = mainTagCheckboxContainer
-				.append("div")
-				.classed("checkboxContainer", true);
-
-			tagCheckbox = checkboxContainer
-				.append("input")
-				.classed("tagFilterCheckbox", true)
-				.attr("id", tagId)
-				.attr("type", "checkbox")
-				.on("click", function () {
-					var isEnabled = tagCheckbox.property("checked");
-					addOrRemoveTagFromFilter(tag, isEnabled);
-				});
-
-			checkboxContainer
-				.append("label")
-				.attr("for", tagId)
-				.text(tag);
-
-			return tagCheckbox;
-		}
-
-		var mainTagCheckboxContainer;
-		var addTagContainer;
-		var newTagInput;
-		var addTagBtn;
-
-		addFilterItem(filter, identifier, pluralNameOfFilteredItems, selector);
-
-		addTagContainer = d3.select(selector)
-			.append("div")
-			.classed("addTagContainer", true);
-
-		newTagInput = addTagContainer
-			.append("input")
-			.classed("newTagInput", true)
-			.attr("type", "text");
-
-		addTagBtn = addTagContainer
-			.append("button")
-			.classed("addTagBtn", true);
-
-		mainTagCheckboxContainer = d3.select(selector)
-			.append("div")
-			.classed("mainTagCheckboxContainer", true);
-
-
-
-		addTagBtn.on("click", function() {
-			var tag = newTagInput.property("value");
-			var tagId = tag + "tagCheckbox";
-			var tagCheckbox = d3.select("#" + tagId);
-
-			if(!filter.enabled() || !tag) {
-				return true;
-			}
-
-			tag = String.prototype.toLowerCase.apply(tag);
-			newTagInput.property("value", "");
-
-			if(tagCheckbox.empty()) {
-				tagCheckbox = addNextTagCheckbox(tagId, tag);
-			}
-
-			addOrRemoveTagFromFilter(tag, true);
-			tagCheckbox.property("checked", true);
-		});
-
-		return {
-			reset: function () {
-				filter.reset();
-				mainTagCheckboxContainer.html("");
-			}
-		}
 	}
 
 	function addNodeDegreeFilter(nodeDegreeFilter, container) {
@@ -273,8 +184,6 @@ module.exports = function (graph) {
 				checkbox.on("click")();
 			}
 		});
-
-		addedTagFilter.reset();
 		
 		setSliderValue(degreeSlider, 0);
 		degreeSlider.on("change")();

@@ -12,6 +12,7 @@ module.exports = function () {
 		width = 800,
 		selectionModules = [],
 		filterModules = [],
+		segmentsModule,
 		minMagnification = 0.95,
 		maxMagnification = 4,
 		compactNotation = false,
@@ -133,6 +134,12 @@ module.exports = function () {
 	options.filterModules = function (p) {
 		if (!arguments.length) return filterModules;
 		filterModules = p;
+		return options;
+	};
+
+	options.segmentsModule = function (p) {
+		if (!arguments.length) return segmentsModule;
+		segmentsModule = p;
 		return options;
 	};
 
