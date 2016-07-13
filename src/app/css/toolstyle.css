@@ -493,7 +493,7 @@ a#pause-button:not(.paused)::before {
 	content: "\25A4";
 }
 
-#tagFilteringOption {
+#allSegmentsFilteringOption {
 	border-bottom: 2px solid black;
 }
 
