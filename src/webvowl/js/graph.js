@@ -38,7 +38,8 @@ module.exports = function (graphContainerSelector) {
 		links,
 		properties,
 		unfilteredData,
-		// Graph behaviour
+		filterTags,
+	// Graph behaviour
 		force,
 		dragBehaviour,
 		zoomFactor,
@@ -148,6 +149,14 @@ module.exports = function (graphContainerSelector) {
 	 */
 	graph.graphOptions = function () {
 		return options;
+	};
+
+	/**
+	 * Returns the graph options of this graph (readonly).
+	 * @returns {webvowl.options} a graph options object
+	 */
+	graph.filterTags = function () {
+		return filterTags;
 	};
 
 	graph.scaleFactor = function () {
@@ -631,6 +640,8 @@ module.exports = function (graphContainerSelector) {
 			properties: parser.properties()
 		};
 
+		options.segmentsModule().initialize(parser.filterTags());
+		
 		// Initialize filters with data to replicate consecutive filtering
 		var initializationData = _.clone(unfilteredData);
 		options.filterModules().forEach(function (module) {
