@@ -6,7 +6,7 @@ module.exports = function () {
     var filter = {},
         nodes,
         properties,
-        enabled = false,
+        enabled = true,
         filteredNodes,
         filteredProperties,
         tags = [];
@@ -74,7 +74,7 @@ module.exports = function () {
         });
     };
 
-    filter.reset = function () {
+    filter.clear = function () {
       tags = [];
     };
     // Functions a filter must have
