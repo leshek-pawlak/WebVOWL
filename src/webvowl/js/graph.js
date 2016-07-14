@@ -288,13 +288,13 @@ module.exports = function (graphContainerSelector) {
 		zoomFactor = d3.event.scale;
 		graphTranslation = d3.event.translate;
         updateHaloRadius();
-		fitTextToContainersInCurrentScale(d3.event.scale);
+		fitTextContainersToCurrentScale(d3.event.scale);
 	}
 
 	/**
 	 * Adjusts the text containers to current scale.
 	 */
-	function fitTextToContainersInCurrentScale(currentScale) {
+	function fitTextContainersToCurrentScale(currentScale) {
 		var minimalFittedScale = 0.85;
 		var fittedScale = currentScale < minimalFittedScale?   minimalFittedScale / currentScale : 1;
 
