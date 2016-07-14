@@ -38,7 +38,6 @@ module.exports = function (graphContainerSelector) {
 		links,
 		properties,
 		unfilteredData,
-		filterTags,
 	// Graph behaviour
 		force,
 		dragBehaviour,
