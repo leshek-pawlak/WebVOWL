@@ -332,7 +332,7 @@ module.exports = function (graphContainerSelector) {
 	/**
 	 * Adjusts the text containers to current scale.
 	 */
-	function fitTextToContainersInCurrentScale(currentScale) {
+	function fitTextContainersToCurrentScale(currentScale) {
 		var minimalFittedScale = 0.85;
 		var fittedScale = currentScale < minimalFittedScale?   minimalFittedScale / currentScale : 1;
 
