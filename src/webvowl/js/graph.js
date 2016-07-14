@@ -288,6 +288,21 @@ module.exports = function (graphContainerSelector) {
 		zoomFactor = d3.event.scale;
 		graphTranslation = d3.event.translate;
         updateHaloRadius();
+		fitTextToContainersInCurrentScale(d3.event.scale);
+	}
+
+	/**
+	 * Adjusts the text containers to current scale.
+	 */
+	function fitTextToContainersInCurrentScale(currentScale) {
+		var minimalFittedScale = 0.85;
+		var fittedScale = currentScale < minimalFittedScale?   minimalFittedScale / currentScale : 1;
+
+		[labelContainer, nodeContainer].forEach(function (container) {
+			if (container) {
+				container.selectAll("rect,circle").attr("transform", "scale(" + fittedScale + "," + fittedScale + ")");
+			}
+		});
 	}
 
 	/**
@@ -428,6 +443,7 @@ module.exports = function (graphContainerSelector) {
 		}
 		force.start();
 		redrawContent();
+		fitTextToContainersInCurrentScale(zoom.scale());
 		graph.updatePulseIds(nodeArrayForPulse);
 		refreshGraphStyle();
 		var haloElement;
