@@ -892,6 +892,7 @@ module.exports = function (graphContainerSelector) {
 		};
 
 		options.segmentsModule().initialize(parser.filterTags());
+		options.pickAndPinModule().setPinnedElements(parser.pinnedElements());
 		
 		// Initialize filters with data to replicate consecutive filtering
 		var initializationData = _.clone(unfilteredData);
