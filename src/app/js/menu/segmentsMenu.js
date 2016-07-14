@@ -1,5 +1,3 @@
-var _ = require("lodash");
-
 /**
  * Contains the logic for connecting the segments filters with the website.
  *
@@ -63,11 +61,9 @@ module.exports = function (graph) {
     }
 
     segmentsMenu.initialize = function (tags) {
-        if(_.isEmpty(tags)) {
-            d3.selectAll(allOptionsWithoutAllSegments).remove();
-            filter.clear();
-            return;
-        }
+
+        d3.selectAll(allOptionsWithoutAllSegments).remove();
+        filter.clear();
 
         tags.forEach(function (tag) {
             addTagFilterItem(tag);
