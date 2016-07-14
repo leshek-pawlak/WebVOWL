@@ -13,6 +13,7 @@ module.exports = function () {
 		selectionModules = [],
 		filterModules = [],
 		segmentsModule,
+		pickAndPinModule,
 		minMagnification = 0.95,
 		maxMagnification = 4,
 		compactNotation = false,
@@ -140,6 +141,12 @@ module.exports = function () {
 	options.segmentsModule = function (p) {
 		if (!arguments.length) return segmentsModule;
 		segmentsModule = p;
+		return options;
+	};
+	
+	options.pickAndPinModule = function (p) {
+		if (!arguments.length) return pickAndPinModule;
+		pickAndPinModule = p;
 		return options;
 	};
 
