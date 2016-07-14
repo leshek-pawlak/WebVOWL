@@ -287,8 +287,6 @@ module.exports = function (graphContainerSelector) {
 
 	/** Adjusts the containers current scale and position. */
 	function zoomed() {
-
-
         var zoomEventByMWheel=false;
         if (d3.event.sourceEvent) {
             if (d3.event.sourceEvent.deltaY)
@@ -304,6 +302,7 @@ module.exports = function (graphContainerSelector) {
             graphTranslation = d3.event.translate;
             graphContainer.attr("transform", "translate(" + graphTranslation + ")scale(" + zoomFactor + ")");
             updateHaloRadius();
+		fitTextToContainersInCurrentScale(d3.event.scale);
             return;
 		}
 		/** animate the transition **/
@@ -330,7 +329,23 @@ module.exports = function (graphContainerSelector) {
 
 	}
 
-	/** Initializes the graph. */
+	/**
+	 * Adjusts the text containers to current scale.
+	 */
+	function fitTextToContainersInCurrentScale(currentScale) {
+		var minimalFittedScale = 0.85;
+		var fittedScale = currentScale < minimalFittedScale?   minimalFittedScale / currentScale : 1;
+
+		[labelContainer, nodeContainer].forEach(function (container) {
+			if (container) {
+				container.selectAll("rect,circle").attr("transform", "scale(" + fittedScale + "," + fittedScale + ")");
+			}
+		});
+	}
+
+	/**
+	 * Initializes the graph.
+	 */
 	function initializeGraph() {
 		options.graphContainerSelector(graphContainerSelector);
 
@@ -467,6 +482,7 @@ module.exports = function (graphContainerSelector) {
 		}
 		force.start();
 		redrawContent();
+		fitTextToContainersInCurrentScale(zoom.scale());
 		graph.updatePulseIds(nodeArrayForPulse);
 		refreshGraphStyle();
 		var haloElement;
