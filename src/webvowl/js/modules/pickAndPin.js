@@ -60,5 +60,9 @@ module.exports = function () {
 		pinnedElements.length = 0;
 	};
 
+	pap.setPinnedElements = function (pinned) {
+		pinnedElements = pinned;
+	};
+
 	return pap;
 };
