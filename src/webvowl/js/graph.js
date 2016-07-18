@@ -294,7 +294,7 @@ module.exports = function (graphContainerSelector) {
 	 * Adjusts the text containers to current scale.
 	 */
 	function fitTextContainersToCurrentScale(currentScale) {
-		var minimalFittedScale = 0.85;
+		var minimalFittedScale = 1;
 		var fittedScale = currentScale < minimalFittedScale?   minimalFittedScale / currentScale : 1;
 
 		[labelContainer, nodeContainer].forEach(function (container) {
@@ -442,7 +442,7 @@ module.exports = function (graphContainerSelector) {
 		}
 		force.start();
 		redrawContent();
-		fitTextToContainersInCurrentScale(zoom.scale());
+		fitTextContainersToCurrentScale(zoom.scale());
 		graph.updatePulseIds(nodeArrayForPulse);
 		refreshGraphStyle();
 		var haloElement;
@@ -765,7 +765,7 @@ module.exports = function (graphContainerSelector) {
 			.call(dragBehaviour);
 
 		labelGroupElements.each(function (label) {
-			var success = label.draw(d3.select(this), options);
+			var success = label.draw(d3.select(this));
 			// Remove empty groups without a label.
 			if (!success) {
 				d3.select(this).remove();
@@ -893,7 +893,7 @@ module.exports = function (graphContainerSelector) {
 
 		options.segmentsModule().initialize(parser.filterTags());
 		options.pickAndPinModule().setPinnedElements(parser.pinnedElements());
-		
+
 		// Initialize filters with data to replicate consecutive filtering
 		var initializationData = _.clone(unfilteredData);
 		options.filterModules().forEach(function (module) {
@@ -1069,7 +1069,7 @@ module.exports = function (graphContainerSelector) {
 				}
 			});
 		}
-		
+
 		return data;
 	};
 
