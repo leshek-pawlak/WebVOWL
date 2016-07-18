@@ -7,5 +7,6 @@
   "maxMagnification": 4,
   "paused": true,
   "datatypeFilterEnabled": true,
-  "objectPropertyFilterEnabled": false
+  "objectPropertyFilterEnabled": false,
+  "forceFullLabels": false
 }

@@ -9,9 +9,9 @@ function CenteringTextElement(container, backgroundColor) {
 CenteringTextElement.prototype = Object.create(AbstractTextElement.prototype);
 CenteringTextElement.prototype.constructor = CenteringTextElement;
 
-CenteringTextElement.prototype.addText = function (text, prefix, suffix) {
+CenteringTextElement.prototype.addText = function (text, prefix, suffix, isForcedFullLabels, maxTextLineLength) {
 	if (text) {
-		this.addTextline(text, this.CSS_CLASSES.default, prefix, suffix);
+		this.addTextline(text, this.CSS_CLASSES.default, prefix, suffix, isForcedFullLabels, maxTextLineLength);
 	}
 };
 
@@ -34,15 +34,21 @@ CenteringTextElement.prototype.addInstanceCount = function (instanceCount) {
 };
 
 
-CenteringTextElement.prototype.addTextline = function (text, style, prefix, postfix) {
-	var truncatedText = textTools.truncate(text, this._textBlock().datum().textWidth(), style);
+CenteringTextElement.prototype.addTextline = function (text, style, prefix, postfix, isForcedFullLabels, maxTextLineLength) {
+	var textLine = isForcedFullLabels? text : textTools.truncate(text, this._textBlock().datum().textWidth(), style);
+	textLine = this._applyPreAndPostFix(textLine, prefix, postfix);
 
-	var tspan = this._textBlock().append("tspan")
-		.classed(this.CSS_CLASSES.default, true)
-		.classed(style, true)
-		.text(this._applyPreAndPostFix(truncatedText, prefix, postfix))
-		.attr("x", 0);
-	this._repositionTextLine(tspan);
+	var lines = isForcedFullLabels? textTools.splitToLines(textLine, maxTextLineLength) : [textLine];
+	var that = this;
+
+	lines.forEach(function (line) {
+		var tspan = that._textBlock().append("tspan")
+			.classed(that.CSS_CLASSES.default, true)
+			.classed(style, true)
+			.text(line)
+			.attr("x", 0);
+		that._repositionTextLine(tspan);
+	});
 
 	this._repositionTextBlock();
 };
