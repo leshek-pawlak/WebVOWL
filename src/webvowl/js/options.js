@@ -34,6 +34,7 @@ module.exports = function () {
 		paused = true,
 		datatypeFilterEnabled = true,
 		objectPropertyFilterEnabled = false,
+		forceFullLabels = false,
 		cardinalityVisible = true,
 		cardinalityPlacement = "PROPERTY";
 
@@ -231,6 +232,13 @@ module.exports = function () {
 	options.objectPropertyFilterEnabled = function (p) {
 		if (!arguments.length) return objectPropertyFilterEnabled;
 		objectPropertyFilterEnabled = p;
+		return options;
+	};
+
+	
+	options.forceFullLabels = function (p) {
+		if (!arguments.length) return forceFullLabels;
+		forceFullLabels = p;
 		return options;
 	};
 

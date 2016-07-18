@@ -4,6 +4,10 @@ var drawTools = require("../drawTools")();
 
 module.exports = (function () {
 
+	//Static variables
+	var maxTextLineLength = 25;
+	var padding = 10;
+
 	var o = function (graph) {
 		BaseNode.apply(this, arguments);
 
@@ -182,6 +186,11 @@ module.exports = (function () {
 		 */
 		this.postDrawActions = function () {
 			that.textBlock(createTextBlock());
+			var textBox = that.textBlock()._textBlock().node().getBBox();
+
+			if(graph.options().forceFullLabels()) {
+				that.radius(Math.max(textBox.width, textBox.height) / 2 + padding);
+			}
 
 			that.addMouseListeners();
 			if (that.pinned()) {
@@ -201,7 +210,7 @@ module.exports = (function () {
 			var equivalentsString = that.equivalentsString();
 			var suffixForFollowingEquivalents = equivalentsString ? "," : "";
 
-			textBlock.addText(that.labelForCurrentLanguage(), "", suffixForFollowingEquivalents);
+			textBlock.addText(that.labelForCurrentLanguage(), "", suffixForFollowingEquivalents, graph.options().forceFullLabels(), maxTextLineLength);
 			textBlock.addEquivalents(equivalentsString);
 			if (!graph.options().compactNotation()) {
 				textBlock.addSubText(that.indicationString());

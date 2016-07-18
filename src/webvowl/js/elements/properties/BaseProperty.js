@@ -9,7 +9,8 @@ module.exports = (function () {
 	// Static variables
 	var labelHeight = 28,
 		labelWidth = 80,
-		smallestRadius = labelHeight / 2;
+		labelMaxTextLineLength = 45,
+		labelPadding = 10;
 
 
 	// Constructor, private variables and privileged methods
@@ -39,7 +40,9 @@ module.exports = (function () {
 		// Other
 			pinGroupElement,
 			haloGroupElement,
-			redundantProperties = [];
+			redundantProperties = [],
+			width = labelWidth,
+			height = labelHeight;
 
 
 		this.getHalos=function(){
@@ -149,6 +152,23 @@ module.exports = (function () {
 			return this;
 		};
 
+		this.height = function (p) {
+			if (!arguments.length) return height;
+			height = p;
+			return this;
+		};
+
+		this.width = function (p) {
+			if (!arguments.length) return width;
+			width = p;
+			return this;
+		};
+
+		this.actualRadius = function () {
+			return height / 2;
+		};
+
+		this.textWidth = this.width;
 
 		// Functions
 		this.distanceToBorder = function (dx, dy) {
@@ -172,14 +192,14 @@ module.exports = (function () {
 
 
 		// Reused functions TODO refactor
-		this.draw = function (labelGroup, options) {
+		this.draw = function (labelGroup) {
 			function attachLabel(property) {
 				var labelContainer = labelGroup.append("g")
 					.datum(property)
 					.classed("label", true)
 					.attr("id", property.id());
 
-				property.drawLabel(labelContainer, options);
+				property.drawLabel(labelContainer);
 
 				return labelContainer;
 			}
@@ -219,16 +239,14 @@ module.exports = (function () {
 			var rect = labelContainer.append("rect")
 				.classed(that.styleClass(), true)
 				.classed("property", true)
-				.attr("x", -that.width() / 2)
-				.attr("y", -that.height() / 2)
-				.attr("width", that.width())
-				.attr("height", that.height())
 				.on("mouseover", function () {
 					onMouseOver();
 				})
 				.on("mouseout", function () {
 					onMouseOut();
 				});
+
+			repositionRect(rect);
 
 			rect.append("title")
 				.text(that.labelForCurrentLanguage());
@@ -242,38 +260,32 @@ module.exports = (function () {
 
 			return rect;
 		};
-		this.drawLabel = function (labelContainer, options) {
+		this.drawLabel = function (labelContainer) {
 
 			function prepareCardinalityText(isEnabled){
-				var preparedCardinalityText;
+				if(!isEnabled) return "";
 
-				if(!isEnabled) {
-					return null;
-				}
+				var preparedCardinalityText = that.generateCardinalityText();
 
-				preparedCardinalityText = that.generateCardinalityText();
-
-				if(preparedCardinalityText) {
-					preparedCardinalityText = " [" + preparedCardinalityText + "]"
-				}
-
-				return preparedCardinalityText;
+				return preparedCardinalityText? " [" + preparedCardinalityText + "]" : "";
 			}
 
 			var rect = this.addRect(labelContainer);
-			var cardinalityText = prepareCardinalityText(options && options.cardinalityVisible() && options.cardinalityPlacement() === "PROPERTY");
+			var cardinalityText = prepareCardinalityText(graph.options().cardinalityVisible() && graph.options().cardinalityPlacement() === "PROPERTY");
 
 			var equivalentsString = that.equivalentsString();
 			var textElement = new CenteringTextElement(labelContainer, this.backgroundColor());
 			textElement.addEquivalents(equivalentsString);
-			textElement.addText(this.labelForCurrentLanguage(), null, cardinalityText);
+			textElement.addText(this.labelForCurrentLanguage(), null, cardinalityText, graph.options().forceFullLabels(), labelMaxTextLineLength);
 			textElement.addSubText(this.indicationString());
 			this.addEquivalentsToLabel(textElement);
 
-			if(cardinalityText) {
-				rect.attr("width", that.width() + cardinalityText.length * 5);
-				rect.attr("x", -(that.width() + cardinalityText.length * 5)/ 2);
-			}
+
+			var textBox = textElement._textBlock().node().getBBox();
+			that.width(textBox.width + labelPadding);
+			that.height(textBox.height + labelPadding);
+
+			repositionRect(rect);
 
 		};
 
@@ -453,27 +465,20 @@ module.exports = (function () {
 			haloGroupElement = drawTools.drawRectHalo(that, that.width(), that.height(), offset);
 		};
 
+		function repositionRect(rect) {
+			if(!rect) return;
+			rect
+				.attr("x", -that.width() / 2)
+				.attr("y", -that.height() / 2)
+				.attr("width", that.width())
+				.attr("height", that.height());
+		}
 
 		forceLayoutNodeFunctions.addTo(this);
 	};
 
 	Base.prototype = Object.create(BaseElement.prototype);
 	Base.prototype.constructor = Base;
-
-	Base.prototype.height = function () {
-		return labelHeight;
-	};
-
-	Base.prototype.width = function () {
-		return labelWidth;
-	};
-
-	Base.prototype.actualRadius = function () {
-		return smallestRadius;
-	};
-
-	Base.prototype.textWidth = Base.prototype.width;
-
 
 	return Base;
 }());

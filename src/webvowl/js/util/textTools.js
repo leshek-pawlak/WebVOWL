@@ -52,6 +52,13 @@ tools.truncate = function (text, maxWidth, textStyle, additionalTextSpace) {
 	return text;
 };
 
+tools.splitToLines = function(text, maxTextLineLength) {
+	if(!text) return "";
+	
+	var regex = new RegExp(".{1," + (maxTextLineLength || "")+"}", "g");
+
+	return text.match(regex) || [];
+};
 
 module.exports = function () {
 	return tools;
