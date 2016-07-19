@@ -186,6 +186,11 @@ module.exports = function (graph) {
 		return pinnedElements;
 	};
 
+	function pinNode(node) {
+		node.pinned(true);
+		pinnedElements.push(node);
+	}
+
 	/**
 	 * Combines the passed objects with its attributes and prototypes. This also applies
 	 * attributes defined in the base of the prototype.
@@ -194,14 +199,18 @@ module.exports = function (graph) {
 		var combinations = [];
 		var prototypeMap = createLowerCasePrototypeMap(nodePrototypeMap);
 
-		function setDefinedPosition(element, node){
-			if(typeof element.x !== "undefined" && typeof element.y !== "undefined") {
-				node.pinned(true);
-				pinnedElements.push(node);
-				
-				node.x = element.x;
-				node.y = element.y;
-			}
+		function setDefinedPosition(node, x, y) {
+			pinNode(node);
+
+			node.x = x;
+			node.y = y;
+		}
+
+		function setOnCenter(node) {
+			pinNode(node);
+
+			node.x = graph.options().width() / 2;
+			node.y = graph.options().height() / 2;
 		}
 
 		if (baseObjects) {
@@ -242,8 +251,14 @@ module.exports = function (graph) {
 						.iri(element.iri)
 						.backgroundColor(element.backgroundColor)
 						.tags(element.tags);
-					
-					setDefinedPosition(element, node);
+
+					if(typeof element.x !== "undefined" && typeof element.y !== "undefined") {
+						setDefinedPosition(node, element.x, element.y);
+					}
+
+					if(element.center) {
+						setOnCenter(node);
+					}
 
 					if (element.pos) {
 						node.y = element.pos[1];
