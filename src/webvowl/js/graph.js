@@ -118,7 +118,7 @@ module.exports = function (graphContainerSelector) {
 
 		[labelContainer, nodeContainer].forEach(function (container) {
 			if (container) {
-				container.selectAll("rect,circle").attr("transform", "scale(" + fittedScale + "," + fittedScale + ")");
+				container.selectAll("rect, circle:not(.pin)").attr("transform", "scale(" + fittedScale + "," + fittedScale + ")");
 			}
 		});
 	}
