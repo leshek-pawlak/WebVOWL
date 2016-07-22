@@ -7,7 +7,7 @@
 module.exports = function (graph) {
 
     var segmentsMenu = {},
-        allSegmentsCheckbox = [],
+        allSegmentsCheckbox,
         filter,
         allSegmentsFilteringOptionId = "#allSegmentsFilteringOption",
         allOptionsWithoutAllSegments = "#segmentsCheckboxes li:not(" + allSegmentsFilteringOptionId + ")";
@@ -51,7 +51,6 @@ module.exports = function (graph) {
                     d3.select(this).on("click")();
                 });
 
-            filter.enabled(isEnabled);
             graph.update();
         });
 
@@ -90,7 +89,7 @@ module.exports = function (graph) {
 
         filterCheckbox.on("click", function () {
             var isEnabled = filterCheckbox.property("checked");
-            filter[isEnabled ? "addTag" : "removeTag"](tag);
+            filter[isEnabled ? "removeTag" : "addTag"](tag);
             graph.update();
         });
 
