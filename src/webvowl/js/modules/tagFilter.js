@@ -43,7 +43,7 @@ module.exports = function () {
 
         nodeTags = _.invokeMap(nodeTags, String.prototype.toLowerCase);
 
-        return _.isEmpty(_.intersection(tags, nodeTags));
+        return !_.isEmpty(_.difference(nodeTags, tags));
 
     }
 
