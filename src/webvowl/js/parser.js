@@ -19,7 +19,8 @@ module.exports = function (graph) {
 		settingsImported = false,
 		dictionary=[],
 		propertyMap,
-		pinnedElements;
+		pinnedElements,
+		centralizedNode;
 
 	parser.getDictionary=function(){
 		return dictionary;
@@ -124,6 +125,7 @@ module.exports = function (graph) {
 	 */
 	parser.parse = function (ontologyData) {
 		pinnedElements = [];
+		centralizedNode = null;
 
 		if (!ontologyData) {
 			nodes = [];
@@ -186,6 +188,13 @@ module.exports = function (graph) {
 		return pinnedElements;
 	};
 
+	/**
+	 * @returns {Array} the preprocessed center node
+	 */
+	parser.centralizedNode = function () {
+		return centralizedNode;
+	};
+
 	function pinNode(node) {
 		node.pinned(true);
 		pinnedElements.push(node);
@@ -204,13 +213,6 @@ module.exports = function (graph) {
 
 			node.x = x;
 			node.y = y;
-		}
-
-		function setOnCenter(node) {
-			pinNode(node);
-
-			node.x = graph.options().width() / 2;
-			node.y = graph.options().height() / 2;
 		}
 
 		if (baseObjects) {
@@ -257,7 +259,7 @@ module.exports = function (graph) {
 					}
 
 					if(element.center) {
-						setOnCenter(node);
+						centralizedNode = node;
 					}
 
 					if (element.pos) {
