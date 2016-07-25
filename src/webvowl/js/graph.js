@@ -38,6 +38,7 @@ module.exports = function (graphContainerSelector) {
 		links,
 		properties,
 		unfilteredData,
+		centerPositionOnStart,
 	// Graph behaviour
 		force,
 		dragBehaviour,
@@ -49,7 +50,8 @@ module.exports = function (graphContainerSelector) {
 		nodeArrayForPulse = [],
 		nodeMap = [],
         locationId = 0,
-		zoom;
+		zoom,
+		isInitialBoot = true;
 
 	/**
 	 * Recalculates the positions of nodes, links, ... and updates them.
@@ -412,10 +414,12 @@ module.exports = function (graphContainerSelector) {
 
 	/** Loads all settings, removes the old graph (if it exists) and draws a new one. */
 	graph.start = function () {
+		isInitialBoot = true;
 		force.stop();
 		loadGraphData();
 		redrawGraph();
 		graph.update();
+		isInitialBoot = false;
 	};
 
 	/**    Updates only the style of the graph. */
@@ -425,8 +429,10 @@ module.exports = function (graphContainerSelector) {
 	};
 
 	graph.reload = function () {
+		isInitialBoot = true;
 		loadGraphData();
 		this.update();
+		isInitialBoot = false;
 	};
 
 	graph.load = function () {
@@ -529,7 +535,7 @@ module.exports = function (graphContainerSelector) {
 
 	/** resetting the graph **/
 	graph.reset = function () {
-		zoom.translate([0, 0])
+		zoom.translate(centerPositionOnStart)
 			.scale(1);
 	};
 
@@ -775,6 +781,12 @@ module.exports = function (graphContainerSelector) {
 		// Empty the graph container
 		graphContainer.selectAll("*").remove();
 
+		if(isInitialBoot) {
+			graphContainer.attr("transform", "translate(" + centerPositionOnStart + ")");
+			zoom.translate(centerPositionOnStart);
+		}
+
+
 		// Last container -> elements of this container overlap others
 		linkContainer = graphContainer.append("g").classed("linkContainer", true);
 		if(isCardinalityEnabled()) {
@@ -880,6 +892,12 @@ module.exports = function (graphContainerSelector) {
 		});
 	}
 
+	function computeCenterPositionOnStart(centralizedNode) {
+		if(!centralizedNode) return [0,0];
+
+		return _.compact([graph.options().width()/2 - centralizedNode.x, graph.options().height()/2 - centralizedNode.y]);
+	}
+
 	function generateDictionary(data){
 		var i;
 		var originalDictionary = [];
@@ -933,6 +951,8 @@ module.exports = function (graphContainerSelector) {
 			nodes: parser.nodes(),
 			properties: parser.properties()
 		};
+
+		centerPositionOnStart = computeCenterPositionOnStart(parser.centralizedNode());
 
 		options.segmentsModule().initialize(parser.filterTags());
 		options.pickAndPinModule().setPinnedElements(parser.pinnedElements());
