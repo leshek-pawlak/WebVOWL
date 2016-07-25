@@ -643,9 +643,6 @@ module.exports = function (graph) {
 			var clazzTags = clazz.tags();
 
 			if(!_.isEmpty(clazzTags)) {
-
-				clazzTags = _.invokeMap(clazzTags, String.prototype.toLowerCase);
-
 				foundTags = _.concat(foundTags, clazzTags);
 			}
 		});
