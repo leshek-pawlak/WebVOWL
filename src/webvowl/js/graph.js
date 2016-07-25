@@ -333,13 +333,11 @@ module.exports = function (graphContainerSelector) {
 	 */
 	function fitTextContainersToCurrentScale(currentScale) {
 		var minimalFittedScale = 1;
-		var fittedScale = currentScale < minimalFittedScale?   minimalFittedScale / currentScale : 1;
 
-		[labelContainer, nodeContainer].forEach(function (container) {
-			if (container) {
-				container.selectAll("rect, circle:not(.pin)").attr("transform", "scale(" + fittedScale + "," + fittedScale + ")");
-			}
-		});
+		if(currentScale < minimalFittedScale) {
+			graph.update(); // force the redraw of components
+		}
+
 	}
 
 	/**
@@ -1045,9 +1043,6 @@ module.exports = function (graphContainerSelector) {
 	 */
 	function refreshGraphStyle() {
 		zoom = zoom.scaleExtent([options.minMagnification(), options.maxMagnification()]);
-		if (graphContainer) {
-			zoom.event(graphContainer);
-		}
 
 		force.charge(function (element) {
 			var charge = options.charge();

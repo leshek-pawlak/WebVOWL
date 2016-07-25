@@ -6,7 +6,6 @@ module.exports = (function () {
 
 	//Static variables
 	var maxTextLineLength = 25;
-	var padding = 10;
 
 	var o = function (graph) {
 		BaseNode.apply(this, arguments);
@@ -186,11 +185,6 @@ module.exports = (function () {
 		 */
 		this.postDrawActions = function () {
 			that.textBlock(createTextBlock());
-			var textBox = that.textBlock()._textBlock().node().getBBox();
-
-			if(graph.options().forceFullLabels()) {
-				that.radius(Math.max(textBox.width, textBox.height) / 2 + padding);
-			}
 
 			that.addMouseListeners();
 			if (that.pinned()) {
