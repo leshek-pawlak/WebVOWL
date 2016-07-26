@@ -9,7 +9,6 @@ module.exports = (function () {
 	// Static variables
 	var labelHeight = 28,
 		labelWidth = 80,
-		labelMaxTextLineLength = 45,
 		labelPadding = 10;
 
 
@@ -276,7 +275,7 @@ module.exports = (function () {
 			var equivalentsString = that.equivalentsString();
 			var textElement = new CenteringTextElement(labelContainer, this.backgroundColor());
 			textElement.addEquivalents(equivalentsString);
-			textElement.addText(this.labelForCurrentLanguage(), null, cardinalityText, graph.options().forceFullLabels(), labelMaxTextLineLength);
+			textElement.addText(this.labelForCurrentLanguage(), null, cardinalityText, graph.options().forceFullLabels(), graph.options().labelMaxTextLineLength());
 			textElement.addSubText(this.indicationString());
 			this.addEquivalentsToLabel(textElement);
 
