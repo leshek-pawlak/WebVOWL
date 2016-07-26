@@ -35,6 +35,7 @@ module.exports = function () {
 		datatypeFilterEnabled = true,
 		objectPropertyFilterEnabled = false,
 		forceFullLabels = false,
+		labelMaxTextLineLength = 45,
 		cardinalityVisible = true,
 		cardinalityPlacement = "PROPERTY";
 
@@ -234,11 +235,16 @@ module.exports = function () {
 		objectPropertyFilterEnabled = p;
 		return options;
 	};
-
 	
 	options.forceFullLabels = function (p) {
 		if (!arguments.length) return forceFullLabels;
 		forceFullLabels = p;
+		return options;
+	};
+
+	options.labelMaxTextLineLength = function (p) {
+		if (!arguments.length) return labelMaxTextLineLength;
+		labelMaxTextLineLength = p;
 		return options;
 	};
 
