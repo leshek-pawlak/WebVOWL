@@ -4,9 +4,6 @@ var drawTools = require("../drawTools")();
 
 module.exports = (function () {
 
-	//Static variables
-	var maxTextLineLength = 25;
-
 	var o = function (graph) {
 		BaseNode.apply(this, arguments);
 
@@ -204,7 +201,7 @@ module.exports = (function () {
 			var equivalentsString = that.equivalentsString();
 			var suffixForFollowingEquivalents = equivalentsString ? "," : "";
 
-			textBlock.addText(that.labelForCurrentLanguage(), "", suffixForFollowingEquivalents, graph.options().forceFullLabels(), maxTextLineLength);
+			textBlock.addText(that.labelForCurrentLanguage(), "", suffixForFollowingEquivalents, graph.options().forceFullLabels(), graph.options().labelMaxTextLineLength());
 			textBlock.addEquivalents(equivalentsString);
 			if (!graph.options().compactNotation()) {
 				textBlock.addSubText(that.indicationString());
