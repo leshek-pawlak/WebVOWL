@@ -1,3 +1,4 @@
+var _ = require("lodash");
 var ADDITIONAL_TEXT_SPACE = 4;
 
 var tools = {};
@@ -53,11 +54,31 @@ tools.truncate = function (text, maxWidth, textStyle, additionalTextSpace) {
 };
 
 tools.splitToLines = function(text, maxTextLineLength) {
-	if(!text) return "";
-	
-	var regex = new RegExp(".{1," + (maxTextLineLength || "")+"}", "g");
+	var words = _.words(text, /[^, ]+/g);
+	var currentTextLineLength = 0;
+	var lineIndex = 0;
+	var minWordLengthToWrap = 10;
 
-	return text.match(regex) || [];
+	return _.reduce(words, function(result, value) {
+		currentTextLineLength = currentTextLineLength + value.length;
+		var isLastWordOfCurrentLine = currentTextLineLength > maxTextLineLength;
+		var isWordToLong = value.length > minWordLengthToWrap;
+		var currentLineText = isLastWordOfCurrentLine && isWordToLong ? value.substr(0, minWordLengthToWrap) : value;
+		var nextLineText = isLastWordOfCurrentLine && isWordToLong ? value.substr(minWordLengthToWrap) : '';
+
+		result[lineIndex]  = ((result[lineIndex] || "") + " " + currentLineText).trim();
+
+		if(nextLineText) {
+			result[lineIndex + 1]  = nextLineText;
+		}
+
+		if(isLastWordOfCurrentLine) {
+			currentTextLineLength = 0;
+			lineIndex = lineIndex + 1;
+		}
+
+		return result;
+	}, []);
 };
 
 module.exports = function () {
