@@ -20,7 +20,7 @@ module.exports = function (graph) {
     segmentsMenu.setup = function (tagFilter) {
         filter = tagFilter;
 
-        addFilterItem(tagFilter, "allSegments", "All segments", allSegmentsFilteringOptionId);
+        addFilterItem(tagFilter, "allSegments", "Show all", allSegmentsFilteringOptionId);
     };
 
     function addFilterItem(filter, identifier, pluralNameOfFilteredItems, selector) {
