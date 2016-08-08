@@ -57,7 +57,7 @@ tools.splitToLines = function(text, maxTextLineLength) {
 	var words = _.words(text, /[^, ]+/g);
 	var currentTextLineLength = 0;
 	var lineIndex = 0;
-	var minWordLengthToWrap = 10;
+	var minWordLengthToWrap = 15;
 
 	return _.reduce(words, function(result, value) {
 		currentTextLineLength = currentTextLineLength + value.length;
