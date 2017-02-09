@@ -19,7 +19,7 @@ module.exports = {
 	},
 	module: {
 		loaders: [
-			{test: /\.css$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader")}
+			{test: /\.css$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader!postcss-loader")}
 		]
 	},
 	plugins: [
@@ -30,6 +30,25 @@ module.exports = {
 		new ExtractTextPlugin("css/[name].css"),
 		new webpack.ProvidePlugin({
 			d3: "d3"
+		})
+	],
+	postcss: [
+		require("postcss-nested")(),
+		require("postcss-quantity-queries")(),
+		require("cssnano")({
+			autoprefixer: {
+				add: true,
+				remove: true,
+				browsers: ['last 2 versions']
+			},
+			discardComments: {
+				removeAll: true
+			},
+			discardUnused: false,
+			mergeIdents: false,
+			reduceIdents: false,
+			safe: true,
+			sourcemap: true
 		})
 	],
 	externals: {
