@@ -107,20 +107,6 @@ module.exports = function (graphContainerSelector) {
 		// store zoom factor for export
 		zoomFactor = d3.event.scale;
 		graphTranslation = d3.event.translate;
-
-		fitTextContainersToCurrentScale(d3.event.scale);
-	}
-
-	/**
-	 * Adjusts the text containers to current scale.
-	 */
-	function fitTextContainersToCurrentScale(currentScale) {
-		var minimalFittedScale = 1;
-
-		if(currentScale < minimalFittedScale) {
-			graph.update(); // force the redraw of components
-		}
-
 	}
 
 	/**
@@ -264,7 +250,6 @@ module.exports = function (graphContainerSelector) {
 		}
 		force.start();
 		redrawContent();
-		fitTextContainersToCurrentScale(zoom.scale());
 		graph.updatePulseIds(nodeArrayForPulse);
 		refreshGraphStyle();
 		var haloElement;

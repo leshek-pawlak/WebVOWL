@@ -183,13 +183,6 @@ module.exports = function (graph) {
 			return;
 		}
 
-		var exportableWithGraphChanges;
-
-		if(graph.options().exportWithGraphChanges()) {
-			exportableWithGraphChanges = graph.addGraphChanges(JSON.parse(exportableJsonText));
-			exportableJsonText = JSON.stringify(exportableWithGraphChanges, null, 2);
-		}
-
 		var i; // an index variable for the for-loops
 
 		/** get data for exporter **/

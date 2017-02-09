@@ -18,22 +18,22 @@ module.exports = function () {
 		navigationMenu = require("./menu/navigationMenu")(graph),
 		sidebar = require("./sidebar")(graph),
 	// Graph modules
-		colorExternalsSwitch = webvowl.modules.colorExternalsSwitch(graph),
-		compactNotationSwitch = webvowl.modules.compactNotationSwitch(graph),
-		datatypeFilter = webvowl.modules.datatypeFilter(),
-		disjointFilter = webvowl.modules.disjointFilter(),
-		focuser = webvowl.modules.focuser(),
-		emptyLiteralFilter=webvowl.modules.emptyLiteralFilter(),
-		nodeDegreeFilter = webvowl.modules.nodeDegreeFilter(filterMenu),
-		nodeScalingSwitch = webvowl.modules.nodeScalingSwitch(graph),
-		objectPropertyFilter = webvowl.modules.objectPropertyFilter(),
-		pickAndPin = webvowl.modules.pickAndPin(),
-		selectionDetailDisplayer = webvowl.modules.selectionDetailsDisplayer(sidebar.updateSelectionInformation),
-		statistics = webvowl.modules.statistics(),
-		subclassFilter = webvowl.modules.subclassFilter(),
-		progress=document.getElementById("myProgress"),
-		predefinedLabelFilter = webvowl.modules.predefinedLabelFilter(),
-		setOperatorFilter = webvowl.modules.setOperatorFilter();
+		colorExternalsSwitch,
+		compactNotationSwitch,
+		datatypeFilter,
+		disjointFilter,
+		emptyLiteralFilter,
+		focuser,
+		nodeDegreeFilter,
+		nodeScalingSwitch,
+		objectPropertyFilter,
+		pickAndPin,
+		selectionDetailDisplaye,
+		statistics,
+		subclassFilte,
+		progress,
+		tagFilter,
+		setOperatorFilter;
 
 	app.overrideOptions = function(overridingOptions) {
 		options.rewriteFrom(overridingOptions);
@@ -98,14 +98,17 @@ module.exports = function () {
 		compactNotationSwitch = webvowl.modules.compactNotationSwitch(graph);
 		datatypeFilter = webvowl.modules.datatypeFilter(options);
 		disjointFilter = webvowl.modules.disjointFilter();
+		emptyLiteralFilter = webvowl.modules.emptyLiteralFilter();
 		focuser = webvowl.modules.focuser();
 		nodeDegreeFilter = webvowl.modules.nodeDegreeFilter(filterMenu);
 		nodeScalingSwitch = webvowl.modules.nodeScalingSwitch(graph);
 		objectPropertyFilter = webvowl.modules.objectPropertyFilter(options);
 		pickAndPin = webvowl.modules.pickAndPin();
+		progress = document.getElementById("myProgress");
 		selectionDetailDisplayer = webvowl.modules.selectionDetailsDisplayer(sidebar.updateSelectionInformation);
 		statistics = webvowl.modules.statistics();
 		subclassFilter = webvowl.modules.subclassFilter();
+		tagFilter = webvowl.modules.tagFilter();
 		tagFilter = webvowl.modules.tagFilter();
 		setOperatorFilter = webvowl.modules.setOperatorFilter();
 	}
@@ -162,7 +165,7 @@ module.exports = function () {
 		exportMenu.setJsonText(jsonText);
 		options.data(data);
 		graph.load();
-		
+
 		sidebar.updateOntologyInformation(data, statistics);
 		exportMenu.setFilename(filename);
 	}
