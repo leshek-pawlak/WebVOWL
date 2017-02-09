@@ -271,21 +271,18 @@ module.exports = (function () {
 
 			var rect = this.addRect(labelContainer);
 			var cardinalityText = prepareCardinalityText(graph.options().cardinalityVisible() && graph.options().cardinalityPlacement() === "PROPERTY");
-
 			var equivalentsString = that.equivalentsString();
 			var textElement = new CenteringTextElement(labelContainer, this.backgroundColor());
+
 			textElement.addEquivalents(equivalentsString);
 			textElement.addText(this.labelForCurrentLanguage(), null, cardinalityText, graph.options().forceFullLabels(), graph.options().labelMaxTextLineLength());
 			textElement.addSubText(this.indicationString());
-			this.addEquivalentsToLabel(textElement);
-
 
 			var textBox = textElement._textBlock().node().getBBox();
 			that.width(textBox.width + labelPadding);
 			that.height(textBox.height + labelPadding);
 
 			repositionRect(rect);
-
 		};
 
 		this.equivalentsString = function () {
