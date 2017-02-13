@@ -375,14 +375,6 @@ module.exports = function (graphContainerSelector) {
 		return options;
 	};
 
-	/**
-	 * Returns the graph options of this graph (readonly).
-	 * @returns {webvowl.options} a graph options object
-	 */
-	graph.filterTags = function () {
-		return filterTags;
-	};
-
 	graph.scaleFactor = function () {
 		return zoomFactor;
 	};
