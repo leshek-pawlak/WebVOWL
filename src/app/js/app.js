@@ -28,9 +28,9 @@ module.exports = function () {
 		nodeScalingSwitch,
 		objectPropertyFilter,
 		pickAndPin,
-		selectionDetailDisplaye,
+		selectionDetailDisplayer,
 		statistics,
-		subclassFilte,
+		subclassFilter,
 		progress,
 		tagFilter,
 		setOperatorFilter;
@@ -108,7 +108,6 @@ module.exports = function () {
 		selectionDetailDisplayer = webvowl.modules.selectionDetailsDisplayer(sidebar.updateSelectionInformation);
 		statistics = webvowl.modules.statistics();
 		subclassFilter = webvowl.modules.subclassFilter();
-		tagFilter = webvowl.modules.tagFilter();
 		tagFilter = webvowl.modules.tagFilter();
 		setOperatorFilter = webvowl.modules.setOperatorFilter();
 	}
