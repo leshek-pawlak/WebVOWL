@@ -13,6 +13,7 @@ module.exports = function () {
 		modeMenu = require("./menu/modeMenu")(graph),
 		ontologyMenu = require("./menu/ontologyMenu")(graph),
 		pauseMenu = require("./menu/pauseMenu")(graph),
+		viewsMenu = require("./menu/viewsMenu")(graph),
 		resetMenu = require("./menu/resetMenu")(graph),
 		searchMenu = require("./menu/searchMenu")(graph),
 		navigationMenu = require("./menu/navigationMenu")(graph),
@@ -59,6 +60,7 @@ module.exports = function () {
 		options.filterModules().push(compactNotationSwitch);
 		options.filterModules().push(colorExternalsSwitch);
 		options.filterModules().push(tagFilter);
+		options.viewsMenu(viewsMenu);
 		options.segmentsModule(segmentsMenu);
 		options.pickAndPinModule(pickAndPin);
 
@@ -71,9 +73,10 @@ module.exports = function () {
 		segmentsMenu.setup(tagFilter);
 		modeMenu.setup(pickAndPin, nodeScalingSwitch, compactNotationSwitch, colorExternalsSwitch);
 		pauseMenu.setup();
+		viewsMenu.setup();
 		sidebar.setup();
 		ontologyMenu.setup(loadOntologyFromText);
-		resetMenu.setup([gravityMenu, filterMenu, modeMenu, focuser, selectionDetailDisplayer, pauseMenu, segmentsMenu]);
+		resetMenu.setup([gravityMenu, filterMenu, modeMenu, focuser, selectionDetailDisplayer, pauseMenu, segmentsMenu, viewsMenu]);
 		searchMenu.setup();
 		navigationMenu.setup();
 
@@ -88,6 +91,7 @@ module.exports = function () {
 		options.searchMenu(searchMenu);
 		options.ontologyMenu(ontologyMenu);
 		options.navigationMenu(navigationMenu);
+		options.viewsMenu(viewsMenu);
 		options.sidebar(sidebar);
 		graph.start();
 		adjustSize();
