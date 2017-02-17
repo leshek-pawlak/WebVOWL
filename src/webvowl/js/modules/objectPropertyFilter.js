@@ -2,6 +2,9 @@ var elementTools = require("../util/elementTools")();
 
 
 module.exports = function (options) {
+	if (typeof options === 'undefined') {
+		options = require("../options")();
+	}
 
 	var filter = {},
 		nodes,

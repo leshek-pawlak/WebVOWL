@@ -11,16 +11,16 @@ describe("Filtering of object properties", function () {
 
 	beforeEach(function () {
 		jasmine.addMatchers({
-			                    toBeInstanceOf: function () {
-				                    return {
-					                    compare: function (actual, expected) {
-						                    return {
-							                    pass: actual instanceof expected
-						                    };
-					                    }
-				                    };
-			                    }
-		                    });
+      toBeInstanceOf: function () {
+        return {
+          compare: function (actual, expected) {
+            return {
+              pass: actual instanceof expected
+            };
+          }
+        };
+      }
+    });
 	});
 
 	beforeEach(function () {
