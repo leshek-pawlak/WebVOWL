@@ -33,7 +33,14 @@ a#locateSearchResult{
 	display:none;
 }
 
-
+#viewsRadios label {
+	cursor: pointer;
+	display: block;
+	padding: 8px 5px;
+	&:hover {
+		background-color: #bdc3c7;
+	}
+}
 
 /** adding searching Styles **/
 .dbEntry {
