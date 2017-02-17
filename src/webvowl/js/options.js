@@ -29,6 +29,7 @@ module.exports = function () {
 		searchMenu,
 		ontologyMenu,
 		sidebar,
+		viewsMenu,
 		navigationMenu,
 		scaleNodesByIndividuals = false,
 		paused = true,
@@ -224,6 +225,13 @@ module.exports = function () {
 		return options;
 	};	
 	
+
+	options.viewsMenu = function (p) {
+		if (!arguments.length) return viewsMenu;
+		viewsMenu = p;
+		return options;
+	};
+
 	options.datatypeFilterEnabled = function (p) {
 		if (!arguments.length) return datatypeFilterEnabled;
 		datatypeFilterEnabled = p;
