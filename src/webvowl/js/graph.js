@@ -411,6 +411,7 @@ module.exports = function (graphContainerSelector) {
 
 			if (forceId !== undefined) {
 				var le_node = force.nodes()[forceId];
+				focusOnNodeAfterSearch(le_node);
 				if (le_node.id) {
 					if (pulseNodeIds.indexOf(forceId) === -1) {
 						pulseNodeIds.push(forceId);
@@ -848,6 +849,17 @@ module.exports = function (graphContainerSelector) {
 		}
 
 		return false;
+	}
+
+	function focusOnNodeAfterSearch(node) {
+		// calculate center position for scale == 1.
+		var newPosition = _.compact([graph.options().width() / 2 - node.x + node.actualRadius(), graph.options().height() / 2 - node.y + node.actualRadius()]);
+		// set default zoom
+		graph.setZoom(1);
+		// set new translation
+		graph.setTranslation(newPosition);
+		// do some magic
+		graphContainer.transition().duration(300).attr("transform", "translate(" + newPosition + ")scale(1)");
 	}
 
 	return graph;
