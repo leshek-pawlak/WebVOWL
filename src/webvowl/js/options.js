@@ -29,7 +29,7 @@ module.exports = function () {
 		searchMenu,
 		ontologyMenu,
 		sidebar,
-		viewsMenu,
+		structuresMenu,
 		navigationMenu,
 		scaleNodesByIndividuals = false,
 		paused = true,
@@ -226,9 +226,9 @@ module.exports = function () {
 	};	
 	
 
-	options.viewsMenu = function (p) {
-		if (!arguments.length) return viewsMenu;
-		viewsMenu = p;
+	options.structuresMenu = function (p) {
+		if (!arguments.length) return structuresMenu;
+		structuresMenu = p;
 		return options;
 	};
 
