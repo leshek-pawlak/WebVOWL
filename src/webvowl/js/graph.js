@@ -995,6 +995,7 @@ module.exports = function (graphContainerSelector) {
 	 * Applies all options that don't change the graph data.
 	 */
 	function refreshGraphStyle() {
+		options.structuresMenu().render();
 		zoom = zoom.scaleExtent([options.minMagnification(), options.maxMagnification()]);
 
 		force.charge(function (element) {
