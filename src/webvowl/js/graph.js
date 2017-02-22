@@ -42,14 +42,14 @@ module.exports = function (graphContainerSelector) {
 	// Graph behaviour
 		force,
 		dragBehaviour,
-		zoomFactor,
+		zoomFactor = 1,
 		transformAnimation=false,
-		graphTranslation,
+		graphTranslation = [0, 0],
 		graphUpdateRequired = false,
 		pulseNodeIds=[],
 		nodeArrayForPulse = [],
 		nodeMap = [],
-        locationId = 0,
+    locationId = 0,
 		zoom,
 		isInitialBoot = true;
 
