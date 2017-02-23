@@ -75,14 +75,16 @@ module.exports = function (graph) {
         if (structure === 'rect') {
           // change circle to rect
           element.property('outerHTML', element.property('outerHTML').replace(/circle/g, 'rect'));
-          // save old 'y' value as 'data-y'
-          if (!textElement.attr('data-y')) {
-            textElement.attr('data-y', textElement.attr('y'));
+          if (textElement.node()) {
+            // save old 'y' value as 'data-y'
+            if (!textElement.attr('data-y')) {
+              textElement.attr('data-y', textElement.attr('y'));
+            }
+            // move text to the top of rect. like in UML structure.
+            textElement.attr('y', -1 * parseInt(element.attr('r')) + 5 + 'px');
           }
-          // move text to the top of rect. like in UML structure.
-          textElement.attr('y', -1 * parseInt(element.attr('r')) + 5 + 'px');
         } else {
-          if (textElement.attr('data-y')) {
+          if (textElement.node() && textElement.attr('data-y')) {
             // restore old 'y' value from 'data-y'
             textElement.attr('y', textElement.attr('data-y'));
           }
@@ -94,7 +96,7 @@ module.exports = function (graph) {
 
     function getClosestTextElement(element) {
       var node = element.node();
-      while (typeof node === 'object' && node.nodeName !== 'text') {
+      while (node && node.nodeName !== 'text') {
         node = node.nextElementSibling;
       }
 

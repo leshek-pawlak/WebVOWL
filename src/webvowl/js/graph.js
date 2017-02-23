@@ -109,11 +109,13 @@ module.exports = function (graphContainerSelector) {
                 rectHalo.classed("hidden", true);
                 roundHalo = node.getHalos().select("circle");
                 if (roundHalo.node() === null) {
-                    radius = Math.max(node.width(), node.height());
-                    roundHalo = node.getHalos().append("circle")
-                        .classed("searchResultB", true)
-                        .classed("searchResultA", false)
-                        .attr("r", radius + offset);
+									var width = node.width ? node.width() : node.nodeElement().select('rect').attr('width');
+									var height = node.height ? node.height() : node.nodeElement().select('rect').attr('height');
+                  radius = Math.max(width, height);
+                  roundHalo = node.getHalos().append("circle")
+                      .classed("searchResultB", true)
+                      .classed("searchResultA", false)
+                      .attr("r", radius + offset);
 
                 }
                 halo = roundHalo;
