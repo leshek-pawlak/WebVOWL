@@ -745,6 +745,20 @@ module.exports = function (graphContainerSelector) {
 
 		nodeElements.each(function (node) {
 			node.draw(d3.select(this));
+			// if we need to draw UML structure
+			if (options.structuresMenu().structure === 'rect') {
+				// we need to get size from "r" attribute
+				var circleSize = parseInt(node.nodeElement().select('circle').attr('r')) * 2;
+				// then we create line under the class title. we need to calculate place where should line be placed.
+				node.nodeElement().append('line')
+					.attr("x1", circleSize/3.57)
+					.attr("y1", circleSize)
+					.attr("x2", circleSize)
+					.attr("y2", circleSize/3.57)
+					.attr("transform", "translate(0," + -(circleSize + (circleSize / 7.14)) + ")rotate(45)")
+					.attr("stroke", "black")
+					.attr("stroke-width", 2);
+			}
 		});
 
 		// Draw label groups (property + inverse)
@@ -798,14 +812,40 @@ module.exports = function (graphContainerSelector) {
 			.append("g")
 			.classed("link", true);
 
-		linkGroups.each(function (link) {
-			link.draw(d3.select(this), markerContainer);
-		});
+		if (options.structuresMenu().structure === 'rect') {
+			linkGroups.each(function (link) {
+				if (link.range().id().indexOf('datatype') > -1) {
+					drawUmlStructure(link);
+				} else {
+					link.draw(d3.select(this), markerContainer);
+				}
+			});
+		} else {
+			linkGroups.each(function (link) {
+				link.draw(d3.select(this), markerContainer);
+			});
+		}
 
 		// Select the path for direct access to receive a better performance
 		linkPathElements = linkGroups.selectAll("path");
 
 		addClickEvents();
+		options.structuresMenu().render();
+	}
+
+	/**
+	 * It renders properties inside the class.
+	 */
+	function drawUmlStructure(link) {
+		var domainElement = link.domain().nodeElement();
+		var label = link.label().property().label()[language];
+		var text = link.range().nodeElement().select('title').text();
+		var translateX = -1 * parseInt(domainElement.select('circle').attr('r'));
+		// debugger;
+		domainElement.append("text")
+			.text(label + ': ' + text)
+			.classed("text", true)
+			.attr("transform", "translate(" + translateX + "," + (((domainElement.selectAll('text')[0].length - 2) * 14) - 10) + ")");
 	}
 
 	/**
@@ -997,7 +1037,6 @@ module.exports = function (graphContainerSelector) {
 	 * Applies all options that don't change the graph data.
 	 */
 	function refreshGraphStyle() {
-		options.structuresMenu().render();
 		zoom = zoom.scaleExtent([options.minMagnification(), options.maxMagnification()]);
 
 		force.charge(function (element) {
