@@ -8,9 +8,9 @@ module.exports = function (graph) {
 
     var structuresMenu = {},
         DEFAULT_VIEW = 'circle',
-        allStructures,
-        structure = DEFAULT_VIEW;
+        allStructures;
 
+    structuresMenu.structure = DEFAULT_VIEW;
     /**
      * Connects the website with graph structures.
      * @param choosedView save as structure
@@ -23,7 +23,7 @@ module.exports = function (graph) {
         radio.on("click", function() { changeView(radio.attr('value')); });
       });
 
-      d3.select('#structuresRadios input[value="'+ structure +'"]').property('checked', true).on("click")();
+      d3.select('#structuresRadios input[value="'+ structuresMenu.structure +'"]').property('checked', true).on("click")();
 
       if (d3.selectAll('circle')[0].length > 0) {
         prepareCircles();
@@ -53,8 +53,8 @@ module.exports = function (graph) {
     };
 
     function changeView(choosedView) {
-      if (choosedView === structure) return;
-      structure = choosedView;
+      if (choosedView === structuresMenu.structure) return;
+      structuresMenu.structure = choosedView;
 
       allStructures.each(function () {
         var radio = d3.select(this);
@@ -62,6 +62,7 @@ module.exports = function (graph) {
       });
 
       render();
+      graph.update();
     }
 
     function clear() {
@@ -72,7 +73,7 @@ module.exports = function (graph) {
       d3.selectAll('.elements-to-change').each(function () {
         var element = d3.select(this);
         var textElement = d3.select(getClosestTextElement(element));
-        if (structure === 'rect') {
+        if (structuresMenu.structure === 'rect') {
           // change circle to rect
           element.property('outerHTML', element.property('outerHTML').replace(/circle/g, 'rect'));
           if (textElement.node()) {
@@ -104,7 +105,7 @@ module.exports = function (graph) {
     }
 
     function prepareCircles() {
-      d3.selectAll('circle').each(function(){
+      d3.selectAll('circle:not(.pin)').each(function(){
         var circle = d3.select(this);
         var r = circle.property('r').baseVal.value;
         var size = r * 2;
