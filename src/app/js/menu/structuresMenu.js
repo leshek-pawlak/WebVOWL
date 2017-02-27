@@ -110,7 +110,9 @@ module.exports = function (graph) {
         var r = circle.property('r').baseVal.value;
         var size = r * 2;
         circle.classed("elements-to-change", true);
-        circle.attr('height', size);
+        if (!circle.attr('height')) {
+            circle.attr('height', 26);
+        }
         circle.attr('width', size);
         circle.attr('x', r * -1);
         circle.attr('y', r * -1);

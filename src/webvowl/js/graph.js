@@ -748,16 +748,19 @@ module.exports = function (graphContainerSelector) {
 			// if we need to draw UML structure
 			if (options.structuresMenu().structure === 'rect') {
 				// we need to get size from "r" attribute
-				var circleSize = parseInt(node.nodeElement().select('circle').attr('r')) * 2;
-				// then we create line under the class title. we need to calculate place where should line be placed.
-				node.nodeElement().append('line')
-					.attr("x1", circleSize/3.57)
-					.attr("y1", circleSize)
-					.attr("x2", circleSize)
-					.attr("y2", circleSize/3.57)
-					.attr("transform", "translate(0," + -(circleSize + (circleSize / 7.14)) + ")rotate(45)")
-					.attr("stroke", "black")
-					.attr("stroke-width", 2);
+				var circle = node.nodeElement().select('circle');
+				if (circle.node()) {
+					var circleSize = parseInt(circle.attr('r')) * 2;
+					// then we create line under the class title. we need to calculate place where should line be placed.
+					node.nodeElement().append('line')
+						.attr("x1", circleSize/3.57)
+						.attr("y1", circleSize)
+						.attr("x2", circleSize)
+						.attr("y2", circleSize/3.57)
+						.attr("transform", "translate(0," + -(circleSize + (circleSize / 7.14)) + ")rotate(45)")
+						.attr("stroke", "black")
+						.attr("stroke-width", 2);
+				}
 			}
 		});
 
@@ -769,10 +772,13 @@ module.exports = function (graphContainerSelector) {
 			.call(dragBehaviour);
 
 		labelGroupElements.each(function (label) {
-			var success = label.draw(d3.select(this));
-			// Remove empty groups without a label.
-			if (!success) {
-				d3.select(this).remove();
+			// hide labels for 'datatypes' for UML structure
+			if (options.structuresMenu().structure === 'circle' || (label.property().attributes()[0] && label.property().attributes()[0].indexOf('datatype') === -1)) {
+				var success = label.draw(d3.select(this));
+				// Remove empty groups without a label.
+				if (!success) {
+					d3.select(this).remove();
+				}
 			}
 		});
 
@@ -840,7 +846,20 @@ module.exports = function (graphContainerSelector) {
 		var domainElement = link.domain().nodeElement();
 		var label = link.label().property().label()[language];
 		var text = link.range().nodeElement().select('title').text();
-		var translateX = -1 * parseInt(domainElement.select('circle').attr('r'));
+		var circles = domainElement.selectAll('circle');
+		var translateX = -(circles[0][circles[0].length - 1].r.baseVal.value - 4);
+		for (var i = 0; i < circles[0].length; ++i) {
+			var circle = d3.select(circles[0][i]);
+			if (!circle.attr('height')) {
+				if (circle.classed('white')) {
+					circle.attr('height', 55);
+				} else {
+					circle.attr('height', 47);
+				}
+			} else {
+				circle.attr('height', parseInt(circle.attr('height')) + 18);
+			}
+		}
 		// debugger;
 		domainElement.append("text")
 			.text(label + ': ' + text)
