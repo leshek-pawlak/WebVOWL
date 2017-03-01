@@ -894,7 +894,6 @@ module.exports = function (graphContainerSelector) {
 		var label = link.label().property().label()[language];
 		var text = link.range().nodeElement().select('title').text();
 		var circles = domainElement.selectAll('circle:not(.pin)');
-		var translateX = -(circles[0][circles[0].length - 1].r.baseVal.value - 4);
 		var txt = label + ': ' + text;
 		for (var i = 0; i < circles[0].length; ++i) {
 			var circle = d3.select(circles[0][i]);
@@ -905,15 +904,48 @@ module.exports = function (graphContainerSelector) {
 					circle.attr('height', 47);
 				}
 			} else {
-				circle.attr('height', parseInt(circle.attr('height')) + 17);
+				circle.attr('height', parseInt(circle.attr('height')) + 22);
 			}
 		}
-		// debugger;
-		resizeContainerWhenTextIsLonger(domainElement, getTextWidth(txt));
+		// check if it's needed to resize container
+		resizeContainerWhenTextIsLonger(domainElement, txt);
+		// compute line position in the container
+		// TODO better positioning
+		computeLine(domainElement);
+		// create new text element from property
 		domainElement.append("text")
 			.text(txt)
 			.classed("text", true)
-			.attr("transform", "translate(" + translateX + "," + (((domainElement.selectAll('text')[0].length - 2) * 14) - 10) + ")");
+			.classed("class-property", true);
+		// set transforms to text
+		recalculateTextTransforms(domainElement);
+	}
+
+	/**
+	 * Compute text elements transforms
+	 */
+	function recalculateTextTransforms(node) {
+		// get circle but not .pin
+		var circle = node.select('circle:not(.pin)');
+		// compute translate from circle.width if exists, else from container.width
+		var translateX = -(circle.attr('width') / 2) + 4 || -(node.node().getBoundingClientRect().width / 2) + 4;
+		// get all text elements which are class properties
+		var texts = node.selectAll('text.class-property');
+		texts.each(function(text, index) {
+			var textElement = d3.select(this);
+			// compute translate from position on the list of properties.
+			var translateY = (index + 1) * 15;
+			if (texts[0].length > 1) {
+				// for lists longer then one element - remove text-anchor, and set translate()
+				translateY = index * 15;
+				textElement.attr("text-anchor", false);
+				textElement.attr("transform", "translate(" + translateX + "," + translateY + ")");
+			} else {
+				// for one element lists center text , and translate only "y"
+				textElement.attr("text-anchor", "middle");
+				textElement.attr("transform", "translate(0," + translateY + ")");
+			}
+		});
 	}
 
 	/**
@@ -924,8 +956,8 @@ module.exports = function (graphContainerSelector) {
 		var circle = container.select('circle:not(.pin)');
 		var containerWidth = container.node().getBoundingClientRect().width;
 		var circleWidth = containerWidth + 4;
-		var circleHeight = parseInt(circle.attr('width'));
-		// we find line under the class title. we need to calculate where should it be placed.
+		var circleHeight = parseInt(circle.attr('height'));
+		// we find line under the class title. we need to compute where should it be placed.
 		var line = container.select('line.uml-line');
 		line
 			.attr("x1", circleWidth / 3.57)
@@ -938,19 +970,18 @@ module.exports = function (graphContainerSelector) {
 	/**
 	 * Compare text width with the container width. Resize when it's needed.
 	 */
-	function resizeContainerWhenTextIsLonger(container, textWidth) {
+	function resizeContainerWhenTextIsLonger(container, text) {
+		var textWidth = getTextWidth(text);
 		var containerWidth = container.node().getBoundingClientRect().width;
 		if (textWidth > containerWidth) {
-			var circles = container.selectAll('circle:not(.pin)');
-			for (var i = 0; i < circles[0].length; ++i) {
-				var circle = d3.select(circles[0][i]);
+			container.selectAll('circle:not(.pin)').each(function() {
+				var circle = d3.select(this);
 				if (circle.classed('white')) {
-					circle.attr('width', containerWidth + 18);
+					circle.attr('width', textWidth + 12);
 				} else {
-					circle.attr('width', containerWidth + 10);
+					circle.attr('width', textWidth + 4);
 				}
-			}
-			computeLine(container);
+			});
 		}
 	}
 
@@ -960,7 +991,7 @@ module.exports = function (graphContainerSelector) {
 	function getTextWidth(txt) {
 		var c = document.getElementById("forComputationalProcesses");
 		var ctx = c.getContext("2d");
-		ctx.font = "14px Open Sans";
+		ctx.font = "12px Open Sans";
 
 		return ctx.measureText(txt).width;
 	}

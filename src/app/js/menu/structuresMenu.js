@@ -108,14 +108,13 @@ module.exports = function (graph) {
       d3.selectAll('circle:not(.pin)').each(function(){
         var circle = d3.select(this);
         var r = circle.property('r').baseVal.value;
-        var size = r * 2;
         var textElement = getClosestTextElement(circle);
         circle.classed("elements-to-change", true);
         if (!circle.attr('height')) {
             circle.attr('height', textElement ? textElement.getBoundingClientRect().height + 8 : 26);
         }
         if (!circle.attr('width')) {
-          circle.attr('width', size);
+          circle.attr('width', r * 2);
         }
         circle.attr('x', -(parseInt(circle.attr('width')) / 2));
         circle.attr('y',  -(parseInt(circle.attr('height')) / 2));
