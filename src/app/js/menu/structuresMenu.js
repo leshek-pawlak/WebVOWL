@@ -82,7 +82,7 @@ module.exports = function (graph) {
               textElement.attr('data-y', textElement.attr('y'));
             }
             // move text to the top of rect. like in UML structure.
-            textElement.attr('y', -1 * parseInt(element.attr('r')) + 5 + 'px');
+            textElement.attr('y', -(parseInt(element.attr('height')) / 2) + 5 + 'px');
           }
         } else {
           if (textElement.node() && textElement.attr('data-y')) {
@@ -109,13 +109,16 @@ module.exports = function (graph) {
         var circle = d3.select(this);
         var r = circle.property('r').baseVal.value;
         var size = r * 2;
+        var textElement = getClosestTextElement(circle);
         circle.classed("elements-to-change", true);
         if (!circle.attr('height')) {
-            circle.attr('height', 26);
+            circle.attr('height', textElement ? textElement.getBoundingClientRect().height + 8 : 26);
         }
-        circle.attr('width', size);
-        circle.attr('x', r * -1);
-        circle.attr('y', r * -1);
+        if (!circle.attr('width')) {
+          circle.attr('width', size);
+        }
+        circle.attr('x', -(parseInt(circle.attr('width')) / 2));
+        circle.attr('y',  -(parseInt(circle.attr('height')) / 2));
       });
     }
 
