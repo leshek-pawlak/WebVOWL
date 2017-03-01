@@ -791,20 +791,18 @@ module.exports = function (graphContainerSelector) {
 			.call(dragBehaviour);
 
 		nodeElements.each(function (node) {
-			node.draw(d3.select(this));
+			var element = d3.select(this);
+			// hide class properties rects on UML structure graph.
+			if (options.structuresMenu().structure === 'rect' && element.attr('id').indexOf('datatype') > -1) {
+				element.classed('hidden', true);
+			}
+			node.draw(element);
 			// if we need to draw UML structure
 			if (options.structuresMenu().structure === 'rect') {
-				// we need to get size from "r" attribute
-				var circle = node.nodeElement().select('circle');
+				var circle = node.nodeElement().select('circle:not(.pin)');
 				if (circle.node()) {
-					var circleSize = parseInt(circle.attr('r')) * 2;
-					// then we create line under the class title. we need to calculate place where should line be placed.
 					node.nodeElement().append('line')
-						.attr("x1", circleSize/3.57)
-						.attr("y1", circleSize)
-						.attr("x2", circleSize)
-						.attr("y2", circleSize/3.57)
-						.attr("transform", "translate(0," + -(circleSize + (circleSize / 7.14)) + ")rotate(45)")
+						.classed("uml-line", true)
 						.attr("stroke", "black")
 						.attr("stroke-width", 2);
 				}
@@ -820,7 +818,8 @@ module.exports = function (graphContainerSelector) {
 
 		labelGroupElements.each(function (label) {
 			// hide labels for 'datatypes' for UML structure
-			if (options.structuresMenu().structure === 'circle' || (label.property().attributes()[0] && label.property().attributes()[0].indexOf('datatype') === -1)) {
+			if (options.structuresMenu().structure === 'circle' || (label.property().attributes()[0] && label.property().attributes().indexOf('datatype') === -1)) {
+				// console.log(label.property().attributes());
 				var success = label.draw(d3.select(this));
 				// Remove empty groups without a label.
 				if (!success) {
@@ -867,7 +866,8 @@ module.exports = function (graphContainerSelector) {
 
 		if (options.structuresMenu().structure === 'rect') {
 			linkGroups.each(function (link) {
-				if (link.range().id().indexOf('datatype') > -1) {
+				// debugger;
+				if (link.range().attributes().indexOf('datatype') > -1) {
 					drawUmlStructure(link);
 				} else {
 					link.draw(d3.select(this), markerContainer);
@@ -893,8 +893,9 @@ module.exports = function (graphContainerSelector) {
 		var domainElement = link.domain().nodeElement();
 		var label = link.label().property().label()[language];
 		var text = link.range().nodeElement().select('title').text();
-		var circles = domainElement.selectAll('circle');
+		var circles = domainElement.selectAll('circle:not(.pin)');
 		var translateX = -(circles[0][circles[0].length - 1].r.baseVal.value - 4);
+		var txt = label + ': ' + text;
 		for (var i = 0; i < circles[0].length; ++i) {
 			var circle = d3.select(circles[0][i]);
 			if (!circle.attr('height')) {
@@ -904,14 +905,64 @@ module.exports = function (graphContainerSelector) {
 					circle.attr('height', 47);
 				}
 			} else {
-				circle.attr('height', parseInt(circle.attr('height')) + 18);
+				circle.attr('height', parseInt(circle.attr('height')) + 17);
 			}
 		}
 		// debugger;
+		resizeContainerWhenTextIsLonger(domainElement, getTextWidth(txt));
 		domainElement.append("text")
-			.text(label + ': ' + text)
+			.text(txt)
 			.classed("text", true)
 			.attr("transform", "translate(" + translateX + "," + (((domainElement.selectAll('text')[0].length - 2) * 14) - 10) + ")");
+	}
+
+	/**
+	 * Compute line size and translation
+	 */
+	function computeLine(container) {
+		// First we find the rect under container to get properly size object.
+		var circle = container.select('circle:not(.pin)');
+		var containerWidth = container.node().getBoundingClientRect().width;
+		var circleWidth = containerWidth + 4;
+		var circleHeight = parseInt(circle.attr('width'));
+		// we find line under the class title. we need to calculate where should it be placed.
+		var line = container.select('line.uml-line');
+		line
+			.attr("x1", circleWidth / 3.57)
+			.attr("y1", circleWidth)
+			.attr("x2", circleWidth)
+			.attr("y2", circleWidth / 3.57)
+			.attr("transform", "translate(0," + -(circleHeight) + ")rotate(45)");
+	}
+
+	/**
+	 * Compare text width with the container width. Resize when it's needed.
+	 */
+	function resizeContainerWhenTextIsLonger(container, textWidth) {
+		var containerWidth = container.node().getBoundingClientRect().width;
+		if (textWidth > containerWidth) {
+			var circles = container.selectAll('circle:not(.pin)');
+			for (var i = 0; i < circles[0].length; ++i) {
+				var circle = d3.select(circles[0][i]);
+				if (circle.classed('white')) {
+					circle.attr('width', containerWidth + 18);
+				} else {
+					circle.attr('width', containerWidth + 10);
+				}
+			}
+			computeLine(container);
+		}
+	}
+
+	/**
+	 * Get width of text element.
+	 */
+	function getTextWidth(txt) {
+		var c = document.getElementById("forComputationalProcesses");
+		var ctx = c.getContext("2d");
+		ctx.font = "14px Open Sans";
+
+		return ctx.measureText(txt).width;
 	}
 
 	/**
