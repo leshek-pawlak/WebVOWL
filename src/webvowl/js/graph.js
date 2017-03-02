@@ -847,6 +847,7 @@ module.exports = function (graphContainerSelector) {
 		var label = link.label().property().label()[language];
 		var text = link.range().nodeElement().select('title').text();
 		var circles = domainElement.selectAll('circle:not(.pin)');
+		var mainCircle = d3.select(circles[0][0]);
 		var txt = label + ': ' + text;
 		for (var i = 0; i < circles[0].length; ++i) {
 			var circle = d3.select(circles[0][i]);
@@ -855,6 +856,7 @@ module.exports = function (graphContainerSelector) {
 					circle.attr('height', 55);
 				} else {
 					circle.attr('height', 47);
+					mainCircle = circle;
 				}
 			} else {
 				circle.attr('height', parseInt(circle.attr('height')) + 22);
@@ -862,62 +864,55 @@ module.exports = function (graphContainerSelector) {
 		}
 		// check if it's needed to resize container
 		resizeContainerWhenTextIsLonger(domainElement, txt);
-		// compute line position in the container
-		// TODO better positioning
-		computeLine(domainElement);
 		// create new text element from property
 		domainElement.append("text")
 			.text(txt)
 			.classed("text", true)
 			.classed("class-property", true);
 		// set transforms to text
-		recalculateTextTransforms(domainElement);
+		recalculateTextTransforms(domainElement, mainCircle);
+		// compute line position in the container
+		computeLine(domainElement, mainCircle);
 	}
 
 	/**
 	 * Compute text elements transforms
 	 */
-	function recalculateTextTransforms(node) {
-		// get circle but not .pin
-		var circle = node.select('circle:not(.pin)');
+	function recalculateTextTransforms(node, circle) {
 		// compute translate from circle.width if exists, else from container.width
-		var translateX = -(circle.attr('width') / 2) + 4 || -(node.node().getBoundingClientRect().width / 2) + 4;
+		var translateX = circle.attr('width') ? -(circle.attr('width') / 2) + 4 : -(node.node().getBoundingClientRect().width / 3);
 		// get all text elements which are class properties
 		var texts = node.selectAll('text.class-property');
 		texts.each(function(text, index) {
 			var textElement = d3.select(this);
 			// compute translate from position on the list of properties.
 			var translateY = (index + 1) * 15;
-			if (texts[0].length > 1) {
+			if (texts[0].length > 2) {
 				// for lists longer then one element - remove text-anchor, and set translate()
 				translateY = index * 15;
-				textElement.attr("text-anchor", false);
-				textElement.attr("transform", "translate(" + translateX + "," + translateY + ")");
-			} else {
-				// for one element lists center text , and translate only "y"
-				textElement.attr("text-anchor", "middle");
-				textElement.attr("transform", "translate(0," + translateY + ")");
 			}
+			textElement.attr("transform", "translate(" + translateX + "," + translateY + ")");
 		});
 	}
 
 	/**
 	 * Compute line size and translation
 	 */
-	function computeLine(container) {
+	function computeLine(container, circle) {
+		var line = container.select('line.uml-line');
 		// First we find the rect under container to get properly size object.
-		var circle = container.select('circle:not(.pin)');
-		var containerWidth = container.node().getBoundingClientRect().width;
-		var circleWidth = containerWidth + 4;
+		var circleWidth = container.node().getBoundingClientRect().width;
 		var circleHeight = parseInt(circle.attr('height'));
 		// we find line under the class title. we need to compute where should it be placed.
-		var line = container.select('line.uml-line');
+		var ratio = circleWidth / circleHeight;
+		// calculate line "y" position
+		var translateY = -(circleWidth - (3 * ratio));
 		line
 			.attr("x1", circleWidth / 3.57)
 			.attr("y1", circleWidth)
 			.attr("x2", circleWidth)
 			.attr("y2", circleWidth / 3.57)
-			.attr("transform", "translate(0," + -(circleHeight) + ")rotate(45)");
+			.attr("transform", "translate(0," + translateY + ")rotate(45)");
 	}
 
 	/**
