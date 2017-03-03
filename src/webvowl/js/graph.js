@@ -799,7 +799,7 @@ module.exports = function (graphContainerSelector) {
 			node.draw(element);
 			// if we need to draw UML structure
 			if (options.structuresMenu().structure === 'rect') {
-				var circle = node.nodeElement().select('circle:not(.pin)');
+				var circle = node.nodeElement().select('circle:not(.pin):not(.symbol):not(.nofill)');
 				if (circle.node()) {
 					node.nodeElement().append('line')
 						.classed("uml-line", true)
@@ -866,8 +866,12 @@ module.exports = function (graphContainerSelector) {
 
 		if (options.structuresMenu().structure === 'rect') {
 			linkGroups.each(function (link) {
-				// debugger;
-				if (link.range().attributes().indexOf('datatype') > -1) {
+				// if range is objectProperty of class it has grey background.
+				// put it on properties list and keep it as graph element.
+				if (link.range().nodeElement().select('circle.class').style('fill') === 'rgb(208, 208, 208)') {
+					drawUmlStructure(link);
+					link.draw(d3.select(this), markerContainer);
+				} else if (link.range().attributes().indexOf('datatype') > -1) {
 					drawUmlStructure(link);
 				} else {
 					link.draw(d3.select(this), markerContainer);
@@ -891,22 +895,24 @@ module.exports = function (graphContainerSelector) {
 	 */
 	function drawUmlStructure(link) {
 		var domainElement = link.domain().nodeElement();
-		var label = link.label().property().label()[language];
-		var text = link.range().nodeElement().select('title').text();
-		var circles = domainElement.selectAll('circle:not(.pin)');
+		var label = link.label().property().label() ? link.label().property().label()[language] : 'no label';
+		var text = link.range().labelForCurrentLanguage();
+		var circles = domainElement.selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
 		var mainCircle = d3.select(circles[0][0]);
 		var txt = label + ': ' + text;
 		for (var i = 0; i < circles[0].length; ++i) {
 			var circle = d3.select(circles[0][i]);
+			if (!circle.classed('white')) {
+				mainCircle = circle;
+			}
 			if (!circle.attr('height')) {
 				if (circle.classed('white')) {
 					circle.attr('height', 55);
 				} else {
 					circle.attr('height', 47);
-					mainCircle = circle;
 				}
 			} else {
-				circle.attr('height', parseInt(circle.attr('height')) + 22);
+				circle.attr('height', parseInt(circle.attr('height')) + 15);
 			}
 		}
 		// check if it's needed to resize container
@@ -932,12 +938,8 @@ module.exports = function (graphContainerSelector) {
 		var texts = node.selectAll('text.class-property');
 		texts.each(function(text, index) {
 			var textElement = d3.select(this);
-			// compute translate from position on the list of properties.
-			var translateY = (index + 1) * 15;
-			if (texts[0].length > 2) {
-				// for lists longer then one element - remove text-anchor, and set translate()
-				translateY = index * 15;
-			}
+			// set translate Y to display text properly inside class box
+			var translateY = (index + 1.6 - (texts[0].length / 2)) * 15;
 			textElement.attr("transform", "translate(" + translateX + "," + translateY + ")");
 		});
 	}
@@ -947,13 +949,25 @@ module.exports = function (graphContainerSelector) {
 	 */
 	function computeLine(container, circle) {
 		var line = container.select('line.uml-line');
+		var isEmbededInsideContainer = !!container.select('.embedded').node();
+		var textLength = container.selectAll('.class-property')[0].length;
 		// First we find the rect under container to get properly size object.
-		var circleWidth = container.node().getBoundingClientRect().width;
+		var circleWidth = circle.attr('width') ? parseInt(circle.attr('width')) : container.node().getBoundingClientRect().width;
 		var circleHeight = parseInt(circle.attr('height'));
 		// we find line under the class title. we need to compute where should it be placed.
 		var ratio = circleWidth / circleHeight;
+		// reduce ratio when element is too long and hasn't embeded element inside container
+		ratio = ratio > 4 && !isEmbededInsideContainer ? 4 : ratio;
+		// reset ratio when the list of properties is very long
+		ratio = textLength > 12 ? 0 : ratio;
+		// create factor which is needed to compute line position
+		var factor = (8 * ratio) - (5.5 * textLength);
+		// add extra value for containers with embeded inside
+		if (isEmbededInsideContainer) {
+			factor -= 8;
+		}
 		// calculate line "y" position
-		var translateY = -(circleWidth - (3 * ratio));
+		var translateY = parseInt(-(circleWidth - factor));
 		line
 			.attr("x1", circleWidth / 3.57)
 			.attr("y1", circleWidth)
@@ -969,7 +983,7 @@ module.exports = function (graphContainerSelector) {
 		var textWidth = getTextWidth(text);
 		var containerWidth = container.node().getBoundingClientRect().width;
 		if (textWidth > containerWidth) {
-			container.selectAll('circle:not(.pin)').each(function() {
+			container.selectAll('circle:not(.pin):not(.symbol):not(.nofill)').each(function() {
 				var circle = d3.select(this);
 				if (circle.classed('white')) {
 					circle.attr('width', textWidth + 12);
@@ -988,7 +1002,7 @@ module.exports = function (graphContainerSelector) {
 		var ctx = c.getContext("2d");
 		ctx.font = "12px Open Sans";
 
-		return ctx.measureText(txt).width;
+		return ctx.measureText(txt).width + 6;
 	}
 
 	/**

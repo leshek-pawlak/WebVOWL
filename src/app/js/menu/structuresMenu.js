@@ -105,13 +105,13 @@ module.exports = function (graph) {
     }
 
     function prepareCircles() {
-      d3.selectAll('circle:not(.pin)').each(function(){
+      d3.selectAll('circle:not(.pin):not(.symbol):not(.nofill)').each(function(){
         var circle = d3.select(this);
         var r = circle.property('r').baseVal.value;
         var textElement = getClosestTextElement(circle);
         circle.classed("elements-to-change", true);
         if (!circle.attr('height')) {
-            circle.attr('height', textElement ? textElement.getBoundingClientRect().height + 8 : 26);
+          circle.attr('height', textElement ? textElement.getBoundingClientRect().height + 8 : 26);
         }
         if (!circle.attr('width')) {
           circle.attr('width', r * 2);
