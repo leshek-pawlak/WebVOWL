@@ -771,13 +771,10 @@ module.exports = function (graphContainerSelector) {
 
 		labelGroupElements.each(function (label) {
 			// hide labels for 'datatypes' for UML structure
-			if (options.structuresMenu().structure === 'circle' || (label.property().attributes()[0] && label.property().attributes().indexOf('datatype') === -1)) {
-				// console.log(label.property().attributes());
-				var success = label.draw(d3.select(this));
-				// Remove empty groups without a label.
-				if (!success) {
-					d3.select(this).remove();
-				}
+			var success = label.draw(d3.select(this));
+			// Remove empty groups without a label.
+			if (!success) {
+				d3.select(this).remove();
 			}
 		});
 
