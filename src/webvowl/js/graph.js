@@ -46,7 +46,7 @@ module.exports = function (graphContainerSelector) {
 		transformAnimation=false,
 		graphTranslation = [0, 0],
 		graphUpdateRequired = false,
-		pulseNodeIds=[],
+		pulseNodeIds = [],
 		nodeArrayForPulse = [],
 		nodeMap = [],
     locationId = 0,
@@ -868,7 +868,7 @@ module.exports = function (graphContainerSelector) {
 			linkGroups.each(function (link) {
 				// if range is objectProperty of class it has grey background.
 				// put it on properties list and keep it as graph element.
-				if (link.range().nodeElement().select('circle.class').style('fill') === 'rgb(208, 208, 208)') {
+				if (link.range().nodeElement().select('circle.class').node() && link.range().nodeElement().select('circle.class').style('fill') === 'rgb(208, 208, 208)') {
 					drawUmlStructure(link);
 					link.draw(d3.select(this), markerContainer);
 				} else if (link.range().attributes().indexOf('datatype') > -1) {
@@ -898,10 +898,10 @@ module.exports = function (graphContainerSelector) {
 	 * It renders properties inside the class.
 	 */
 	function drawUmlStructure(link) {
-		var domainElement = link.domain().nodeElement();
+		var domainElement = link.domain();
 		var label = link.label().property().label() ? link.label().property().label()[language] : '(no label)';
 		var text = link.range().labelForCurrentLanguage();
-		var circles = domainElement.selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
+		var circles = domainElement.nodeElement().selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
 		var mainCircle = d3.select(circles[0][0]);
 		var txt = label + ': ' + text;
 		for (var i = 0; i < circles[0].length; ++i) {
@@ -912,17 +912,21 @@ module.exports = function (graphContainerSelector) {
 			if (!circle.attr('height')) {
 				if (circle.classed('white')) {
 					circle.attr('height', 55);
+					domainElement.height(55);
 				} else {
 					circle.attr('height', 47);
+					domainElement.height(47);
 				}
 			} else {
-				circle.attr('height', parseInt(circle.attr('height')) + 15);
+				var height = parseInt(circle.attr('height')) + 15;
+				circle.attr('height', height);
+				domainElement.height(height);
 			}
 		}
 		// check if it's needed to resize container
 		resizeContainerWhenTextIsLonger(domainElement, txt);
 		// create new text element from property
-		var g = domainElement.append("g")
+		var g = domainElement.nodeElement().append("g")
 			.attr('id', link.range().id())
 			.attr('node-index', link.range().index)
 			.classed('class-property-group', true)
@@ -948,9 +952,9 @@ module.exports = function (graphContainerSelector) {
 			.classed("class-property", true)
 			.classed("text", true);
 		// set transforms to text
-		recalculateTextTransforms(domainElement, mainCircle);
+		recalculateTextTransforms(domainElement.nodeElement(), mainCircle);
 		// compute line position in the container
-		computeLine(domainElement, mainCircle);
+		computeLine(domainElement.nodeElement(), mainCircle);
 	}
 
 	/**
@@ -980,23 +984,25 @@ module.exports = function (graphContainerSelector) {
 	 */
 	function computePin(link) {
 		if (link.domain().nodeElement().node()) {
-			computePinTransform(link.domain().nodeElement());
+			computePinTransform(link.domain());
 		}
 		if (link.range().nodeElement().node()) {
-			computePinTransform(link.range().nodeElement());
+			computePinTransform(link.range());
 		}
 	}
 
 	function computePinTransform(container) {
-		var circle = container.select('circle:not(.pin):not(.symbol):not(.nofill)');
-		var pinContainer = container.select('g.hidden-in-export');
+		var circle = container.nodeElement().select('circle:not(.pin):not(.symbol):not(.nofill)');
+		var pinContainer = container.nodeElement().select('g.hidden-in-export');
 		if (!circle.node() || !pinContainer.node()){
 			return;
 		}
-		var circleWidth = circle.attr('width') ? parseInt(circle.attr('width')) / 2 : circle.node().getBoundingClientRect().width / 2;
-		var circleHeight = circle.attr('height') ? parseInt(circle.attr('height')) / 2 : 12;
+		var translateX = circle.attr('width') ? parseInt(circle.attr('width')) / 2 : circle.node().getBoundingClientRect().width / 2;
+		var translateY = circle.attr('height') ? parseInt(circle.attr('height')) / 2 : circle.node().getBoundingClientRect().height / 5;
+		container.width(translateX * 2);
+		container.height(translateY * 2);
 		if (pinContainer.node()) {
-			pinContainer.attr('transform', 'translate(' + circleWidth  + ',' + -(circleHeight + 5) + ')');
+			pinContainer.attr('transform', 'translate(' + translateX  + ',' + -(translateY + 5) + ')');
 		}
 	}
 
@@ -1037,14 +1043,16 @@ module.exports = function (graphContainerSelector) {
 	 */
 	function resizeContainerWhenTextIsLonger(container, text) {
 		var textWidth = getTextWidth(text);
-		var containerWidth = container.node().getBoundingClientRect().width;
+		var containerWidth = container.nodeElement().node().getBoundingClientRect().width;
 		if (textWidth > containerWidth) {
-			container.selectAll('circle:not(.pin):not(.symbol):not(.nofill)').each(function() {
+			container.nodeElement().selectAll('circle:not(.pin):not(.symbol):not(.nofill)').each(function() {
 				var circle = d3.select(this);
 				if (circle.classed('white')) {
 					circle.attr('width', textWidth + 12);
+					container.width(textWidth + 12);
 				} else {
 					circle.attr('width', textWidth + 4);
+					container.width(textWidth + 4);
 				}
 			});
 		}
