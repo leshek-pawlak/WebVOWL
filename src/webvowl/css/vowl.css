@@ -58,6 +58,9 @@ marker path {
     fill: #f00 !important;
     cursor: pointer;
 }
+.hovered ~ text.text {
+  fill: white !important;
+}
 .feature{
     fill: #f00;
     cursor: pointer;
@@ -65,6 +68,9 @@ marker path {
 
 circle.pin {
     fill: white;
+}
+.node {
+  cursor: pointer;
 }
 
 
@@ -129,7 +135,7 @@ circle.pin {
     stroke: #f00;
 }
 
-.focused, path.hovered {
+circle.focused, path.hovered, .focused ~ .uml-line {
 	stroke: #f00 !important;
 }
 .indirect-highlighting, .feature:hover {
@@ -156,8 +162,12 @@ circle.pin {
 .dotted {
 	stroke-dasharray: 3;
 }
-rect.focused, circle.focused {
+circle.focused {
 	stroke-width: 4px;
+}
+.focused ~ text {
+  font-weight: bold;
+  fill: #f00 !important;
 }
 .nostroke {
 	stroke: none;

@@ -69,7 +69,7 @@ module.exports = (function () {
 
 		this.toggleFocus = function () {
 			that.focused(!that.focused());
-			that.nodeElement().select(".elements-to-change").classed("focused", that.focused());
+			that.nodeElement().select(graph.options().structuresMenu().structure).classed("focused", that.focused());
 			graph.resetSearchHighlight();
 			graph.options().searchMenu().clearText();
 
