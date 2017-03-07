@@ -1,6 +1,7 @@
 var BaseNode = require("./BaseNode");
 var CenteringTextElement = require("../../util/CenteringTextElement");
 var drawTools = require("../drawTools")();
+var rectangularElementTools = require("../rectangularElementTools")();
 
 module.exports = (function () {
 
@@ -10,6 +11,8 @@ module.exports = (function () {
 		var that = this,
 			collapsible = false,
 			radius = 50,
+			height = 26,
+			width = 100,
 			collapsingGroupElement,
 			pinGroupElement,
 			haloGroupElement = null,
@@ -43,6 +46,19 @@ module.exports = (function () {
 			return this;
 		};
 
+		// Properties needed for UML structure
+		this.height = function (p) {
+			if (!arguments.length) return height;
+			height = p;
+			return this;
+		};
+
+		this.width = function (p) {
+			if (!arguments.length) return width;
+			width = p;
+			return this;
+		};
+
 
 		// Functions
 		this.setHoverHighlighting = function (enable) {
@@ -50,6 +66,10 @@ module.exports = (function () {
 		};
 
 		this.textWidth = function (yOffset) {
+			if (graph.options().structuresMenu().structure === 'rect') {
+				return that.width();
+			}
+			
 			var availableWidth = this.actualRadius() * 2;
 
 			// if the text is not placed in the center of the circle, it can't have the full width
@@ -87,10 +107,14 @@ module.exports = (function () {
 			}
 		};
 
-		this.distanceToBorder = function () {
+		this.distanceToBorder = function (dx, dy) {
+			if (graph.options().structuresMenu().structure === 'rect') {
+				return rectangularElementTools.distanceToBorder(that, dx, dy);
+			}
+
 			return that.actualRadius();
 		};
-		
+
 		this.removeHalo = function () {
 			if (that.halo()) {
 				that.halo(false);
@@ -109,10 +133,16 @@ module.exports = (function () {
 		 * Draws the pin on a round node on a position depending on its radius.
 		 */
 		this.drawPin = function () {
+			var dx, dy;
 			that.pinned(true);
 
-			var dx = (2 / 5) * that.actualRadius(),
+			if (graph.options().structuresMenu().structure === 'rect') {
+				dx = 0.5 * width;
+				dy = -0.5 * height;
+			} else {
+				dx = (2 / 5) * that.actualRadius(),
 				dy = (-7 / 10) * that.actualRadius();
+			}
 
 			pinGroupElement = drawTools.drawPin(that.nodeElement(), dx, dy, this.removePin);
 		};
