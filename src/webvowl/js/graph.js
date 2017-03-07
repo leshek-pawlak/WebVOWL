@@ -829,6 +829,8 @@ module.exports = function (graphContainerSelector) {
 				} else {
 					link.draw(d3.select(this), markerContainer);
 				}
+				// if pin exists compute transation
+				computePin(link);
 			});
 		} else {
 			linkGroups.each(function (link) {
@@ -838,6 +840,8 @@ module.exports = function (graphContainerSelector) {
 
 		// Select the path for direct access to receive a better performance
 		linkPathElements = linkGroups.selectAll("path");
+		// classNodes must be part of window to use it in eventListener function.
+		window.classNodes = classNodes;
 
 		addClickEvents();
 		options.structuresMenu().render();
@@ -848,7 +852,7 @@ module.exports = function (graphContainerSelector) {
 	 */
 	function drawUmlStructure(link) {
 		var domainElement = link.domain().nodeElement();
-		var label = link.label().property().label() ? link.label().property().label()[language] : 'no label';
+		var label = link.label().property().label() ? link.label().property().label()[language] : '(no label)';
 		var text = link.range().labelForCurrentLanguage();
 		var circles = domainElement.selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
 		var mainCircle = d3.select(circles[0][0]);
@@ -871,10 +875,31 @@ module.exports = function (graphContainerSelector) {
 		// check if it's needed to resize container
 		resizeContainerWhenTextIsLonger(domainElement, txt);
 		// create new text element from property
-		domainElement.append("text")
+		var g = domainElement.append("g")
+			.attr('id', link.range().id())
+			.attr('node-index', link.range().index)
+			.classed('class-property-group', true)
+			.classed('node', true)
+			.on("click", function() {
+				event.stopPropagation();
+				// mark as selected nodes inside nodes
+				var focused = d3.select('.focused')
+				if (focused.node()) {
+					focused.classed('focused', false);
+				}
+				// find current target in classNodes
+				var clickedNode = classNodes[this.getAttribute('node-index')];
+				// chnage node element to clicked one
+				clickedNode.nodeElement(d3.select(this));
+				executeModules(clickedNode);
+			});
+		g.append("rect")
+			.attr('width', getTextWidth(txt))
+			.attr('height', 15);
+		g.append("text")
 			.text(txt)
-			.classed("text", true)
-			.classed("class-property", true);
+			.classed("class-property", true)
+			.classed("text", true);
 		// set transforms to text
 		recalculateTextTransforms(domainElement, mainCircle);
 		// compute line position in the container
@@ -884,17 +909,48 @@ module.exports = function (graphContainerSelector) {
 	/**
 	 * Compute text elements transforms
 	 */
-	function recalculateTextTransforms(node, circle) {
+	function recalculateTextTransforms(container, circle) {
 		// compute translate from circle.width if exists, else from container.width
-		var translateX = circle.attr('width') ? -(circle.attr('width') / 2) + 4 : -(node.node().getBoundingClientRect().width / 3);
+		var translateX = circle.attr('width') ? -(circle.attr('width') / 2) + 4 : -(container.node().getBoundingClientRect().width / 3);
 		// get all text elements which are class properties
-		var texts = node.selectAll('text.class-property');
-		texts.each(function(text, index) {
-			var textElement = d3.select(this);
+		var propertyGroups = container.selectAll('.class-property-group');
+		propertyGroups.each(function(text, index) {
+			var propertyElement = d3.select(this);
+			var text = propertyElement.select('text');
+			var rect = propertyElement.select('rect');
 			// set translate Y to display text properly inside class box
-			var translateY = (index + 1.6 - (texts[0].length / 2)) * 15;
-			textElement.attr("transform", "translate(" + translateX + "," + translateY + ")");
+			var translateY = (parseInt(circle.attr('height')) / 2) - ((index + 0.8 - (text[0].length / 2)) * 15);
+			propertyElement.attr("transform", "translate(" + translateX + "," + translateY + ")");
+			// make text clickable by using rect
+			rect
+				.attr("fill", "transparent")
+				.attr("transform", "translate(0,-11)");
 		});
+	}
+
+	/**
+	 * If pin exists compute the translation
+	 */
+	function computePin(link) {
+		if (link.domain().nodeElement().node()) {
+			computePinTransform(link.domain().nodeElement());
+		}
+		if (link.range().nodeElement().node()) {
+			computePinTransform(link.range().nodeElement());
+		}
+	}
+
+	function computePinTransform(container) {
+		var circle = container.select('circle:not(.pin):not(.symbol):not(.nofill)');
+		var pinContainer = container.select('g.hidden-in-export');
+		if (!circle.node() || !pinContainer.node()){
+			return;
+		}
+		var circleWidth = circle.attr('width') ? parseInt(circle.attr('width')) / 2 : circle.node().getBoundingClientRect().width / 2;
+		var circleHeight = circle.attr('height') ? parseInt(circle.attr('height')) / 2 : 12;
+		if (pinContainer.node()) {
+			pinContainer.attr('transform', 'translate(' + circleWidth  + ',' + -(circleHeight + 5) + ')');
+		}
 	}
 
 	/**
@@ -914,7 +970,7 @@ module.exports = function (graphContainerSelector) {
 		// reset ratio when the list of properties is very long
 		ratio = textLength > 12 ? 0 : ratio;
 		// create factor which is needed to compute line position
-		var factor = (8 * ratio) - (5.5 * textLength);
+		var factor = (8.5 * ratio) - (5 * textLength);
 		// add extra value for containers with embeded inside
 		if (isEmbededInsideContainer) {
 			factor -= 8;
@@ -923,8 +979,8 @@ module.exports = function (graphContainerSelector) {
 		var translateY = parseInt(-(circleWidth - factor));
 		line
 			.attr("x1", circleWidth / 3.57)
-			.attr("y1", circleWidth)
-			.attr("x2", circleWidth)
+			.attr("y1", circleWidth - 3)
+			.attr("x2", circleWidth - 3)
 			.attr("y2", circleWidth / 3.57)
 			.attr("transform", "translate(0," + translateY + ")rotate(45)");
 	}
@@ -953,26 +1009,30 @@ module.exports = function (graphContainerSelector) {
 	function getTextWidth(txt) {
 		var c = document.getElementById("forComputationalProcesses");
 		var ctx = c.getContext("2d");
-		ctx.font = "12px Open Sans";
+		ctx.font = "13px Open Sans";
 
-		return ctx.measureText(txt).width + 6;
+		return ctx.measureText(txt).width;
+	}
+
+	function executeModules(selectedElement) {
+		options.selectionModules().forEach(function (module) {
+			module.handle(selectedElement);
+		});
 	}
 
 	/**
 	 * Applies click listeners to nodes and properties.
 	 */
 	function addClickEvents() {
-		function executeModules(selectedElement) {
-			options.selectionModules().forEach(function (module) {
-				module.handle(selectedElement);
-			});
-		}
-
 		nodeElements.on("click", function (clickedNode) {
+			event.stopPropagation();
+			// to be sure that will be highlight clicked element.
+			clickedNode.nodeElement(d3.select(this));
 			executeModules(clickedNode);
 		});
 
 		labelGroupElements.selectAll(".label").on("click", function (clickedProperty) {
+			event.stopPropagation();
 			executeModules(clickedProperty);
 		});
 	}
