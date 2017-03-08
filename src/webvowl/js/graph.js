@@ -793,7 +793,7 @@ module.exports = function (graphContainerSelector) {
 		nodeElements.each(function (node) {
 			var element = d3.select(this);
 			// hide class properties rects on UML structure graph.
-			if (options.structuresMenu().structure === 'rect' && element.attr('id').indexOf('datatype') > -1) {
+			if (options.structuresMenu().structure === 'rect' && node.type().indexOf('rdfs') > -1) {
 				element.classed('hidden', true);
 			}
 			node.draw(element);
@@ -817,11 +817,13 @@ module.exports = function (graphContainerSelector) {
 			.call(dragBehaviour);
 
 		labelGroupElements.each(function (label) {
-			// hide labels for 'datatypes' for UML structure
-			var success = label.draw(d3.select(this));
-			// Remove empty groups without a label.
-			if (!success) {
-				d3.select(this).remove();
+			if (options.structuresMenu().structure === 'circle' || label.property().type().indexOf('Datatype') === -1) {
+				// hide labels for 'datatypes' for UML structure
+				var success = label.draw(d3.select(this));
+				// Remove empty groups without a label.
+				if (!success) {
+					d3.select(this).remove();
+				}
 			}
 		});
 
@@ -896,11 +898,11 @@ module.exports = function (graphContainerSelector) {
 	 */
 	function drawUmlStructure(link) {
 		var domainElement = link.domain();
-		var label = link.label().property().label() ? link.label().property().label()[language] : '(no label)';
+		var label = link.label().property().label() ? link.label().property().label()[language] + ' [' + link.label().property().generateCardinalityText() + ']' : '(no label)';
 		var text = link.range().labelForCurrentLanguage();
 		var circles = domainElement.nodeElement().selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
 		var mainCircle = d3.select(circles[0][0]);
-		var txt = label + ': ' + text;
+		var txt = label + ' : ' + text;
 		for (var i = 0; i < circles[0].length; ++i) {
 			var circle = d3.select(circles[0][i]);
 			if (!circle.classed('white')) {
@@ -1016,7 +1018,7 @@ module.exports = function (graphContainerSelector) {
 		// we find line under the class title. we need to compute where should it be placed.
 		var ratio = circleWidth / circleHeight;
 		// reduce ratio when element is too long and hasn't embeded element inside container
-		ratio = ratio > 4 && !isEmbededInsideContainer ? 4 : ratio;
+		ratio = ratio > 4.5 && !isEmbededInsideContainer ? 4.5 : ratio;
 		// reset ratio when the list of properties is very long
 		ratio = textLength > 12 ? 0 : ratio;
 		// create factor which is needed to compute line position
