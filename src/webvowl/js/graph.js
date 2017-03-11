@@ -828,6 +828,7 @@ module.exports = function (graphContainerSelector) {
 				} else {
 					link.draw(d3.select(this), markerContainer);
 				}
+				computePropertySize(link);
 				// if pin exists compute transation
 				computePin(link);
 			});
@@ -846,14 +847,36 @@ module.exports = function (graphContainerSelector) {
 		options.structuresMenu().render();
 	}
 
+	function computePropertySize(link) {
+		var circle = link.range().nodeElement().select('circle:not(.pin):not(.symbol):not(.nofill)');
+		var text = link.range().nodeElement().select('text');
+		var isEmbededInsideContainer = !!link.range().nodeElement().select('.embedded').node();
+		if (!circle.node() || !text.node() || isEmbededInsideContainer){
+			return;
+		}
+		if (!circle.attr('height')) {
+			circle.attr('height', text.node().getBoundingClientRect().height + 15);
+		}
+		if (!circle.attr('width')) {
+			circle.attr('width', text.node().getBoundingClientRect().width + 15);
+		}
+	}
+
 	/**
 	 * It renders properties inside the class.
 	 */
 	function drawUmlStructure(link) {
 		var domainElement = link.domain();
-		var label = link.label().property().label() ? link.label().property().label()[language] + ' [' + link.label().property().generateCardinalityText() + ']' : '(no label)';
+		var label = '(no label)';
+		if (link.label().property().label()) {
+			label = link.label().property().label()[language];
+			if (link.label().property().generateCardinalityText()) {
+				label += ' [' + link.label().property().generateCardinalityText() + ']';
+			}
+		}
 		var text = link.range().labelForCurrentLanguage();
 		var circles = domainElement.nodeElement().selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
+		var isEmbededInsideContainer = !!domainElement.nodeElement().select('.embedded').node();
 		var mainCircle = d3.select(circles[0][0]);
 		var txt = label + ' : ' + text;
 		for (var i = 0; i < circles[0].length; ++i) {
@@ -862,12 +885,13 @@ module.exports = function (graphContainerSelector) {
 				mainCircle = circle;
 			}
 			if (!circle.attr('height')) {
+				var newHeight = isEmbededInsideContainer ? 60 : 47;
 				if (circle.classed('white')) {
-					circle.attr('height', 55);
-					domainElement.height(55);
+					circle.attr('height', newHeight + 8);
+					domainElement.height(newHeight + 8);
 				} else {
-					circle.attr('height', 47);
-					domainElement.height(47);
+					circle.attr('height', newHeight);
+					domainElement.height(newHeight);
 				}
 			} else {
 				var height = parseInt(circle.attr('height')) + 15;
@@ -954,7 +978,7 @@ module.exports = function (graphContainerSelector) {
 		container.width(translateX * 2);
 		container.height(translateY * 2);
 		if (pinContainer.node()) {
-			pinContainer.attr('transform', 'translate(' + translateX  + ',' + -(translateY + 5) + ')');
+			pinContainer.attr('transform', 'translate(' + (translateX - 10)  + ',' + -(translateY - 5) + ')');
 		}
 	}
 
@@ -968,6 +992,7 @@ module.exports = function (graphContainerSelector) {
 		// First we find the rect under container to get properly size object.
 		var circleWidth = circle.attr('width') ? parseInt(circle.attr('width')) : container.node().getBoundingClientRect().width;
 		var circleHeight = parseInt(circle.attr('height'));
+
 		// we find line under the class title. we need to compute where should it be placed.
 		var ratio = circleWidth / circleHeight;
 		// reduce ratio when element is too long and hasn't embeded element inside container
@@ -978,7 +1003,9 @@ module.exports = function (graphContainerSelector) {
 		var factor = (8.5 * ratio) - (5 * textLength);
 		// add extra value for containers with embeded inside
 		if (isEmbededInsideContainer) {
-			factor -= 8;
+			container.select('text:not(.class-property)').attr('transform', 'translate(0,-5)');
+			container.select('.embedded').attr('transform', 'translate(-5,-5.35)');
+			factor += 10;
 		}
 		// calculate line "y" position
 		var translateY = parseInt(-(circleWidth - factor));

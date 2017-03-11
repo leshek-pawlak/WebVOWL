@@ -82,7 +82,7 @@ module.exports = function (graph) {
               textElement.attr('data-y', textElement.attr('y'));
             }
             // move text to the top of rect. like in UML structure.
-            textElement.attr('y', -(parseInt(element.attr('height')) / 2) + 5 + 'px');
+            textElement.attr('y', -(parseInt(element.attr('height')) / 2) + 3 + 'px');
           }
         } else {
           if (textElement.node() && textElement.attr('data-y')) {
