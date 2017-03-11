@@ -137,8 +137,8 @@ module.exports = (function () {
 			that.pinned(true);
 
 			if (graph.options().structuresMenu().structure === 'rect') {
-				dx = 0.5 * width;
-				dy = -0.5 * height;
+				dx = (0.5 * width) - 10;
+				dy = (-0.5 * height) + 5;
 			} else {
 				dx = (2 / 5) * that.actualRadius(),
 				dy = (-7 / 10) * that.actualRadius();
