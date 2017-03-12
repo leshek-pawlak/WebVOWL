@@ -855,10 +855,10 @@ module.exports = function (graphContainerSelector) {
 			return;
 		}
 		if (!circle.attr('height')) {
-			circle.attr('height', text.node().getBoundingClientRect().height + 15);
+			circle.attr('height', (text.node().getBoundingClientRect().height + 15) / zoomFactor);
 		}
 		if (!circle.attr('width')) {
-			circle.attr('width', text.node().getBoundingClientRect().width + 15);
+			circle.attr('width', (text.node().getBoundingClientRect().width + 15) / zoomFactor);
 		}
 	}
 
@@ -1022,19 +1022,21 @@ module.exports = function (graphContainerSelector) {
 	 */
 	function resizeContainerWhenTextIsLonger(container, text) {
 		var textWidth = getTextWidth(text);
-		var containerWidth = container.nodeElement().node().getBoundingClientRect().width;
-		if (textWidth > containerWidth) {
-			container.nodeElement().selectAll('circle:not(.pin):not(.symbol):not(.nofill)').each(function() {
-				var circle = d3.select(this);
-				if (circle.classed('white')) {
-					circle.attr('width', textWidth + 12);
-					container.width(textWidth + 12);
-				} else {
-					circle.attr('width', textWidth + 4);
-					container.width(textWidth + 4);
-				}
-			});
-		}
+		container.nodeElement().selectAll('circle:not(.pin):not(.symbol):not(.nofill)').each(function() {
+			var circle = d3.select(this);
+			if (!circle.attr('width')) {
+				// set minimal box width
+				circle.attr('width', 100 * zoomFactor);
+			}
+			var circleWidth = parseInt(circle.attr('width'));
+			if (circle.classed('white') && circleWidth < textWidth + 12) {
+				circle.attr('width', textWidth + 12);
+				container.width(textWidth + 12);
+			} else if (circleWidth < textWidth + 4) {
+				circle.attr('width', textWidth + 4);
+				container.width(textWidth + 4);
+			}
+		});
 	}
 
 	/**
