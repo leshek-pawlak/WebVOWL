@@ -863,6 +863,7 @@ module.exports = function (graphContainerSelector) {
 			.append("g")
 			.classed("link", true);
 
+		// sort links alphabetically in the boxes
 		if (options.structuresMenu().structure === 'rect') {
 			linkGroups.sort(function(x,y) {
 				var xLabel = typeof x.label().property().label() === 'object' ? x.label().property().label() : { 'undefined': "Z" };
@@ -896,8 +897,8 @@ module.exports = function (graphContainerSelector) {
 
 		// Select the path for direct access to receive a better performance
 		linkPathElements = linkGroups.selectAll("path");
-		// classNodes must be part of window to use it in eventListener function.
-		window.classNodes = classNodes;
+		// labelNodes must be part of window to use it in eventListener function.
+		window.labelNodes = labelNodes;
 
 		addClickEvents();
 		options.structuresMenu().render();
@@ -960,9 +961,9 @@ module.exports = function (graphContainerSelector) {
 		// create new text element from property
 		var g = domainElement.nodeElement().append("g")
 			.attr('id', link.range().id())
-			.attr('node-index', link.range().index)
+			.attr('label-index', link.label().index - 29)
 			.classed('class-property-group', true)
-			.classed('node', true)
+			.classed('label', true)
 			.on("click", function() {
 				event.stopPropagation();
 				// mark as selected nodes inside nodes
@@ -971,10 +972,14 @@ module.exports = function (graphContainerSelector) {
 					focused.classed('focused', false);
 				}
 				// find current target in classNodes
-				var clickedNode = classNodes[this.getAttribute('node-index')];
+				var clickedLabel = labelNodes[this.getAttribute('label-index')].property();
+				// save original element to highlight purpose
+				if (!clickedLabel.originalLabelElement) {
+					clickedLabel.originalLabelElement = clickedLabel.labelElement();
+				}
 				// chnage node element to clicked one
-				clickedNode.nodeElement(d3.select(this));
-				executeModules(clickedNode);
+				clickedLabel.labelElement(d3.select(this));
+				executeModules(clickedLabel);
 			});
 		g.append("rect")
 			.attr('width', getTextWidth(txt))
@@ -1118,13 +1123,13 @@ module.exports = function (graphContainerSelector) {
 	function addClickEvents() {
 		nodeElements.on("click", function (clickedNode) {
 			event.stopPropagation();
-			// to be sure that will be highlight clicked element.
-			clickedNode.nodeElement(d3.select(this));
 			executeModules(clickedNode);
 		});
 
 		labelGroupElements.selectAll(".label").on("click", function (clickedProperty) {
 			event.stopPropagation();
+			// to be sure that will be highlight clicked element.
+			clickedProperty.labelElement(d3.select(this));
 			executeModules(clickedProperty);
 		});
 	}
