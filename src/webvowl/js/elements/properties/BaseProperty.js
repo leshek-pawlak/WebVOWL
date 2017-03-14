@@ -329,7 +329,13 @@ module.exports = (function () {
 
 		that.setHighlighting = function (enable) {
 			if (that.labelElement && that.labelElement()) {
-				that.labelElement().select("rect").classed("hovered", enable);
+				var label = that.labelElement();
+				// if originalLabelElement exists it means that labelElement has changed.
+				// to highlight right element we need to recover it from originalLabelElement property.
+				if (that.originalLabelElement) {
+					label = that.originalLabelElement
+				}
+				label.select("rect").classed("hovered", enable);
 			}
 			that.linkGroup().selectAll("path, text").classed("hovered", enable);
 			if (that.markerElement()) {
