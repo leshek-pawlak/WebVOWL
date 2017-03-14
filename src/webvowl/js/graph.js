@@ -817,6 +817,15 @@ module.exports = function (graphContainerSelector) {
 			.classed("link", true);
 
 		if (options.structuresMenu().structure === 'rect') {
+			linkGroups.sort(function(x,y) {
+				var xLabel = typeof x.label().property().label() === 'object' ? x.label().property().label() : { 'undefined': "Z" };
+				var yLabel = typeof y.label().property().label() === 'object' ? y.label().property().label() : { 'undefined': "Z" };
+
+				return d3.ascending(yLabel.undefined, xLabel.undefined);
+			})
+		}
+
+		if (options.structuresMenu().structure === 'rect') {
 			linkGroups.each(function (link) {
 				// if range is objectProperty of class it has grey background.
 				// put it on properties list and keep it as graph element.
@@ -870,11 +879,11 @@ module.exports = function (graphContainerSelector) {
 		var label = '(no label)';
 		if (link.label().property().label()) {
 			label = link.label().property().label()[language];
-			if (link.label().property().generateCardinalityText()) {
-				label += ' [' + link.label().property().generateCardinalityText() + ']';
-			}
 		}
 		var text = link.range().labelForCurrentLanguage();
+		if (link.label().property().generateCardinalityText()) {
+			text += ' [' + link.label().property().generateCardinalityText() + ']';
+		}
 		var circles = domainElement.nodeElement().selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
 		var isEmbededInsideContainer = !!domainElement.nodeElement().select('.embedded').node();
 		var mainCircle = d3.select(circles[0][0]);
@@ -1003,8 +1012,8 @@ module.exports = function (graphContainerSelector) {
 		var factor = (8.5 * ratio) - (5 * textLength);
 		// add extra value for containers with embeded inside
 		if (isEmbededInsideContainer) {
-			container.select('text:not(.class-property)').attr('transform', 'translate(0,-5)');
-			container.select('.embedded').attr('transform', 'translate(-5,-5.35)');
+			container.select('text:not(.class-property)').attr('transform', 'translate(0,' + -(2 * ratio) + ')');
+			container.select('.embedded').attr('transform', 'translate(-5,' + -(2 * ratio) + ')');
 			factor += 10;
 		}
 		// calculate line "y" position
