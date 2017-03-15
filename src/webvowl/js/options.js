@@ -38,7 +38,7 @@ module.exports = function () {
 		forceFullLabels = false,
 		labelMaxTextLineLength = 45,
 		cardinalityVisible = true,
-		cardinalityPlacement = "PROPERTY";
+		cardinalityPlacement = "CLASS";
 
 
 	options.sidebar= function(s){
