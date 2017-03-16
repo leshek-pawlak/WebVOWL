@@ -182,3 +182,9 @@ marker path {
        Use any value that is larger than the length of the marker path. */
     stroke-dasharray: 100;
 }
+
+#selection-details > div:not(.hidden) + div:not(.hidden) {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid rgba(255, 255, 255, 0.5);
+}
