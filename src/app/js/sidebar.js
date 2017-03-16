@@ -252,7 +252,11 @@ module.exports = function (graph) {
 			return;
 		}
 
-		if (elementTools.isProperty(selectedElement)) {
+		if (selectedElement && selectedElement.displayBoth) {
+			displayNodeInformation(selectedElement.range());
+			displayPropertyInformation(selectedElement);
+			showClassAndPropertyInformations();
+		} else if (elementTools.isProperty(selectedElement)) {
 			displayPropertyInformation(selectedElement);
 		} else if (elementTools.isNode(selectedElement)) {
 			displayNodeInformation(selectedElement);
@@ -324,6 +328,10 @@ module.exports = function (graph) {
 
 	function showPropertyInformations() {
 		setSelectionInformationVisibility(false, true, false);
+	}
+
+	function showClassAndPropertyInformations() {
+		setSelectionInformationVisibility(true, true, false);
 	}
 
 	function setIriLabel(element, name, iri) {

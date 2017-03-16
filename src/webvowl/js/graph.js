@@ -851,9 +851,8 @@ module.exports = function (graphContainerSelector) {
 
 		// Select the path for direct access to receive a better performance
 		linkPathElements = linkGroups.selectAll("path");
-		// classNodes & labelNodes must be part of window to use it in eventListener function.
+		// labelNodes must be part of window to use it in eventListener function.
 		window.labelNodes = labelNodes;
-		window.classNodes = classNodes;
 
 		addClickEvents();
 		options.structuresMenu().render();
@@ -917,7 +916,6 @@ module.exports = function (graphContainerSelector) {
 		var isDatatype = link.label().property().type().indexOf('Datatype') > -1;
 		var g = domainElement.nodeElement().append("g")
 			.attr('id', link.range().id())
-			.attr('node-index', link.range().index)
 			.attr('label-index', link.label().index - classNodes.length)
 			.classed('class-property-group', true)
 			.classed('type-data', isDatatype)
@@ -933,16 +931,13 @@ module.exports = function (graphContainerSelector) {
 				}
 				// find current target in classNodes
 				var clickedLabel = labelNodes[this.getAttribute('label-index')].property();
-				var clickedNode = classNodes[this.getAttribute('node-index')];
 				// save original element to highlight purpose
 				if (!clickedLabel.originalLabelElement) {
 					clickedLabel.originalLabelElement = clickedLabel.labelElement();
 				}
 				// chnage node element to clicked one
 				clickedLabel.labelElement(d3.select(this));
-				clickedNode.nodeElement(d3.select(this));
-				// TODO we need those two options together
-				executeModules(clickedNode);
+				clickedLabel.displayBoth = true;
 				executeModules(clickedLabel);
 			});
 		g.append("rect")
@@ -973,10 +968,6 @@ module.exports = function (graphContainerSelector) {
 				.classed("line-between-props", true)
 				.attr("stroke", "black")
 				.attr("stroke-width", 2);
-			// add height to box and change translations
-			// var height = parseInt(mainCircle.attr('height')) + 15;
-			// mainCircle.attr('height', height);
-			// domainElement.height(height);
 		} else {
 			// else add to counter another datype property
 			++domainElement.nodeElement().countDataypeProperties;
@@ -1129,8 +1120,6 @@ module.exports = function (graphContainerSelector) {
 	function addClickEvents() {
 		nodeElements.on("click", function (clickedNode) {
 			event.stopPropagation();
-			// to be sure that will be highlight clicked element.
-		 	clickedNode.nodeElement(d3.select(this));
 			executeModules(clickedNode);
 		});
 
@@ -1138,6 +1127,7 @@ module.exports = function (graphContainerSelector) {
 			event.stopPropagation();
 			// to be sure that will be highlight clicked element.
 			clickedProperty.labelElement(d3.select(this));
+			clickedProperty.displayBoth = false;
 			executeModules(clickedProperty);
 		});
 	}
