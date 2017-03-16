@@ -800,15 +800,17 @@ module.exports = function (graphContainerSelector) {
 				.append("g")
 				.classed("cardinality", true);
 
-			cardinalityElements.each(function (property) {
-				var success = property.drawCardinality(d3.select(this));
+				cardinalityElements.each(function (property) {
+					if (options.structuresMenu().structure === 'circle' || property.type().indexOf('Datatype') === -1) {
+						var success = property.drawCardinality(d3.select(this));
 
-				// Remove empty groups without a label.
-				if (!success) {
-					d3.select(this).remove();
-				}
-			});
-		}
+						// Remove empty groups without a label.
+						if (!success) {
+							d3.select(this).remove();
+						}
+					}
+				});
+			}
 
 		// Draw links
 		linkGroups = linkContainer.selectAll(".link")
@@ -816,16 +818,15 @@ module.exports = function (graphContainerSelector) {
 			.append("g")
 			.classed("link", true);
 
-		// sort links alphabetically in the boxes
+		// sort links by type and then alphabetically in the boxes
 		if (options.structuresMenu().structure === 'rect') {
 			linkGroups.sort(function(x,y) {
 				var xLabel = typeof x.label().property().label() === 'object' ? x.label().property().label() : { 'undefined': "Z" };
 				var yLabel = typeof y.label().property().label() === 'object' ? y.label().property().label() : { 'undefined': "Z" };
-
-				return d3.ascending(yLabel.undefined, xLabel.undefined);
-			})
+				// first objectProperties. then datatypeProperties
+				return d3.ascending(x.property().type(), y.property().type()) || d3.descending(xLabel.undefined, yLabel.undefined);
+			});
 		}
-
 		if (options.structuresMenu().structure === 'rect') {
 			linkGroups.each(function (link) {
 				// if range is objectProperty of class it has grey background.
@@ -850,8 +851,9 @@ module.exports = function (graphContainerSelector) {
 
 		// Select the path for direct access to receive a better performance
 		linkPathElements = linkGroups.selectAll("path");
-		// labelNodes must be part of window to use it in eventListener function.
+		// classNodes & labelNodes must be part of window to use it in eventListener function.
 		window.labelNodes = labelNodes;
+		window.classNodes = classNodes;
 
 		addClickEvents();
 		options.structuresMenu().render();
@@ -895,7 +897,7 @@ module.exports = function (graphContainerSelector) {
 				mainCircle = circle;
 			}
 			if (!circle.attr('height')) {
-				var newHeight = isEmbededInsideContainer ? 60 : 47;
+				var newHeight = isEmbededInsideContainer ? 75 : 62;
 				if (circle.classed('white')) {
 					circle.attr('height', newHeight + 8);
 					domainElement.height(newHeight + 8);
@@ -912,10 +914,15 @@ module.exports = function (graphContainerSelector) {
 		// check if it's needed to resize container
 		resizeContainerWhenTextIsLonger(domainElement, txt);
 		// create new text element from property
+		var isDatatype = link.label().property().type().indexOf('Datatype') > -1;
 		var g = domainElement.nodeElement().append("g")
 			.attr('id', link.range().id())
-			.attr('label-index', link.label().index - 29)
+			.attr('node-index', link.range().index)
+			.attr('label-index', link.label().index - classNodes.length)
 			.classed('class-property-group', true)
+			.classed('type-data', isDatatype)
+			.classed('type-object', !isDatatype)
+			.classed('node', true)
 			.classed('label', true)
 			.on("click", function() {
 				event.stopPropagation();
@@ -926,12 +933,16 @@ module.exports = function (graphContainerSelector) {
 				}
 				// find current target in classNodes
 				var clickedLabel = labelNodes[this.getAttribute('label-index')].property();
+				var clickedNode = classNodes[this.getAttribute('node-index')];
 				// save original element to highlight purpose
 				if (!clickedLabel.originalLabelElement) {
 					clickedLabel.originalLabelElement = clickedLabel.labelElement();
 				}
 				// chnage node element to clicked one
 				clickedLabel.labelElement(d3.select(this));
+				clickedNode.nodeElement(d3.select(this));
+				// TODO we need those two options together
+				executeModules(clickedNode);
 				executeModules(clickedLabel);
 			});
 		g.append("rect")
@@ -941,10 +952,35 @@ module.exports = function (graphContainerSelector) {
 			.text(txt)
 			.classed("class-property", true)
 			.classed("text", true);
+		// if it's datatype
+		if (isDatatype) {
+			drawDatatypeProperties(domainElement, mainCircle);
+		}
 		// set transforms to text
 		recalculateTextTransforms(domainElement.nodeElement(), mainCircle);
-		// compute line position in the container
-		computeLine(domainElement.nodeElement(), mainCircle);
+		// compute lines position in the container
+		computeLines(domainElement.nodeElement(), mainCircle);
+	}
+
+	/**
+	 * Compute count of datatype elements and draw the line between properties
+	 */
+	function drawDatatypeProperties(domainElement, mainCircle) {
+		// first time create line between object and datatype properties
+		if (!domainElement.nodeElement().countDataypeProperties) {
+			domainElement.nodeElement().countDataypeProperties = 1;
+			domainElement.nodeElement().append('line')
+				.classed("line-between-props", true)
+				.attr("stroke", "black")
+				.attr("stroke-width", 2);
+			// add height to box and change translations
+			// var height = parseInt(mainCircle.attr('height')) + 15;
+			// mainCircle.attr('height', height);
+			// domainElement.height(height);
+		} else {
+			// else add to counter another datype property
+			++domainElement.nodeElement().countDataypeProperties;
+		}
 	}
 
 	/**
@@ -955,12 +991,16 @@ module.exports = function (graphContainerSelector) {
 		var translateX = circle.attr('width') ? -(circle.attr('width') / 2) + 4 : -(container.node().getBoundingClientRect().width / 3);
 		// get all text elements which are class properties
 		var propertyGroups = container.selectAll('.class-property-group');
-		propertyGroups.each(function(text, index) {
+		propertyGroups.each(function(group, index) {
 			var propertyElement = d3.select(this);
 			var text = propertyElement.select('text');
 			var rect = propertyElement.select('rect');
 			// set translate Y to display text properly inside class box
-			var translateY = (parseInt(circle.attr('height')) / 2) - ((index + 0.8 - (text[0].length / 2)) * 15);
+			var translateY = (parseInt(circle.attr('height')) / 2) - ((index + 1.5 - (text[0].length / 2)) * 15);
+			// add space between object and datatype properties
+			if (propertyElement.attr('class').indexOf('type-data') > -1) {
+				translateY += 10;
+			}
 			propertyElement.attr("transform", "translate(" + translateX + "," + translateY + ")");
 			// make text clickable by using rect
 			rect
@@ -997,9 +1037,9 @@ module.exports = function (graphContainerSelector) {
 	}
 
 	/**
-	 * Compute line size and translation
+	 * Compute lines size and translation
 	 */
-	function computeLine(container, circle) {
+	function computeLines(container, circle) {
 		var line = container.select('line.uml-line');
 		var isEmbededInsideContainer = !!container.select('.embedded').node();
 		var textLength = container.selectAll('.class-property')[0].length;
@@ -1013,22 +1053,35 @@ module.exports = function (graphContainerSelector) {
 		ratio = ratio > 4.5 && !isEmbededInsideContainer ? 4.5 : ratio;
 		// reset ratio when the list of properties is very long
 		ratio = textLength > 12 ? 0 : ratio;
-		// create factor which is needed to compute line position
-		var factor = (8.5 * ratio) - (5 * textLength);
+		// create factor which is needed to compute lines positions
+		var factor = (8 * ratio) - (5 * textLength);
+		var factor2 = (11 * ratio) + (8 * (textLength - container.countDataypeProperties));
 		// add extra value for containers with embeded inside
 		if (isEmbededInsideContainer) {
-			container.select('text:not(.class-property)').attr('transform', 'translate(0,' + -(2 * ratio) + ')');
-			container.select('.embedded').attr('transform', 'translate(-5,' + -(2 * ratio) + ')');
-			factor += 10;
+			container.select('text:not(.class-property)').attr('transform', 'translate(0,' + -(3 * ratio) + ')');
+			container.select('.embedded').attr('transform', 'translate(-5,' + -(3 * ratio) + ')');
+			factor += 15;
 		}
 		// calculate line "y" position
 		var translateY = parseInt(-(circleWidth - factor));
+		var translateYBetweenProps = parseInt(-(circleWidth - factor2));
+		var shorterValue = circleWidth / 3.57;
+		var longerValue = circleWidth - 3;
+		var datatypeProperties = container.countDataypeProperties || 0;
 		line
-			.attr("x1", circleWidth / 3.57)
-			.attr("y1", circleWidth - 3)
-			.attr("x2", circleWidth - 3)
-			.attr("y2", circleWidth / 3.57)
+			.attr("x1", shorterValue)
+			.attr("y1", longerValue)
+			.attr("x2", longerValue)
+			.attr("y2", shorterValue)
 			.attr("transform", "translate(0," + translateY + ")rotate(45)");
+		// make it hidden if the only properties in box are datatypes
+		container.select('line.line-between-props')
+			.classed('hidden', textLength - datatypeProperties === 0)
+			.attr("x1", shorterValue)
+			.attr("y1", longerValue)
+			.attr("x2", longerValue)
+			.attr("y2", shorterValue)
+			.attr("transform", "translate(0," + translateYBetweenProps + ")rotate(45)");
 	}
 
 	/**
@@ -1076,6 +1129,8 @@ module.exports = function (graphContainerSelector) {
 	function addClickEvents() {
 		nodeElements.on("click", function (clickedNode) {
 			event.stopPropagation();
+			// to be sure that will be highlight clicked element.
+		 	clickedNode.nodeElement(d3.select(this));
 			executeModules(clickedNode);
 		});
 
