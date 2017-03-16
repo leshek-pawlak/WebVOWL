@@ -793,9 +793,7 @@ module.exports = function (graphContainerSelector) {
 		nodeElements.each(function (node) {
 			var element = d3.select(this);
 			// hide class properties rects on UML structure graph.
-			if (options.structuresMenu().structure === 'rect' && node.type().indexOf('rdfs') > -1) {
-				element.classed('hidden', true);
-			}
+			element.classed('hidden', options.structuresMenu().structure === 'rect' && (node.type().indexOf('rdfs') > -1 || node.referenceClass));
 			node.draw(element);
 			// if we need to draw UML structure
 			if (options.structuresMenu().structure === 'rect') {
@@ -817,13 +815,14 @@ module.exports = function (graphContainerSelector) {
 			.call(dragBehaviour);
 
 		labelGroupElements.each(function (label) {
-			if (options.structuresMenu().structure === 'circle' || label.property().type().indexOf('Datatype') === -1) {
-				// hide labels for 'datatypes' for UML structure
-				var success = label.draw(d3.select(this));
-				// Remove empty groups without a label.
-				if (!success) {
-					d3.select(this).remove();
-				}
+			if (options.structuresMenu().structure === 'rect' && (label.link().range().referenceClass || label.property().type().indexOf('Datatype') > -1)) {
+				return;
+			}
+			// hide labels for 'datatypes' for UML structure
+			var success = label.draw(d3.select(this));
+			// Remove empty groups without a label.
+			if (!success) {
+				d3.select(this).remove();
 			}
 		});
 
@@ -873,15 +872,8 @@ module.exports = function (graphContainerSelector) {
 				// first objectProperties. then datatypeProperties
 				return d3.ascending(x.property().type(), y.property().type()) || d3.descending(xLabel.undefined, yLabel.undefined);
 			});
-		}
-		if (options.structuresMenu().structure === 'rect') {
 			linkGroups.each(function (link) {
-				// if range is objectProperty of class it has grey background.
-				// put it on properties list and keep it as graph element.
-				if (link.range().nodeElement().select('circle.class').node() && link.range().nodeElement().select('circle.class').style('fill') === 'rgb(208, 208, 208)') {
-					drawUmlStructure(link);
-					link.draw(d3.select(this), markerContainer);
-				} else if (link.range().attributes().indexOf('datatype') > -1) {
+				if (link.range().type().indexOf('rdfs') > -1 || link.range().referenceClass) {
 					drawUmlStructure(link);
 				} else {
 					link.draw(d3.select(this), markerContainer);
