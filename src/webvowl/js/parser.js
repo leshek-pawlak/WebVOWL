@@ -253,6 +253,8 @@ module.exports = function (graph) {
 						.iri(element.iri)
 						.backgroundColor(element.backgroundColor)
 						.tags(element.tags);
+					
+					node.referenceClass = !!element.referenceClass;
 
 					if(typeof element.x !== "undefined" && typeof element.y !== "undefined") {
 						setDefinedPosition(node, element.x, element.y);
