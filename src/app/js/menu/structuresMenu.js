@@ -116,8 +116,12 @@ module.exports = function (graph) {
         if (!circle.attr('width')) {
           circle.attr('width', r * 2);
         }
-        circle.attr('x', -(parseInt(circle.attr('width')) / 2));
-        circle.attr('y',  -(parseInt(circle.attr('height')) / 2));
+        if (!circle.attr('x')) {
+          circle.attr('x', -(parseInt(circle.attr('width')) / 2));
+        }
+        if (!circle.attr('y')) {
+          circle.attr('y',  -(parseInt(circle.attr('height')) / 2));
+        }
       });
     }
 
