@@ -800,13 +800,14 @@ module.exports = function (graphContainerSelector) {
 				.classed("cardinality", true);
 
 				cardinalityElements.each(function (property) {
-					if (options.structuresMenu().structure === 'circle' || property.type().indexOf('Datatype') === -1) {
-						var success = property.drawCardinality(d3.select(this));
+					if (options.structuresMenu().structure === 'rect' && (property.range().referenceClass || property.type().indexOf('Datatype') > -1)) {
+						return;
+					}
+					var success = property.drawCardinality(d3.select(this));
 
-						// Remove empty groups without a label.
-						if (!success) {
-							d3.select(this).remove();
-						}
+					// Remove empty groups without a label.
+					if (!success) {
+						d3.select(this).remove();
 					}
 				});
 			}
@@ -831,7 +832,9 @@ module.exports = function (graphContainerSelector) {
 				} else {
 					link.draw(d3.select(this), markerContainer);
 				}
-				computePropertySize(link);
+				// compute box size for domain and range
+				computePropertySize(link.range().nodeElement());
+				computePropertySize(link.domain().nodeElement());
 				// if pin exists compute transation
 				computePin(link);
 			});
@@ -850,18 +853,23 @@ module.exports = function (graphContainerSelector) {
 		options.structuresMenu().render();
 	}
 
-	function computePropertySize(link) {
-		var circle = link.range().nodeElement().select('circle:not(.pin):not(.symbol):not(.nofill)');
-		var text = link.range().nodeElement().select('text');
-		var isEmbededInsideContainer = !!link.range().nodeElement().select('.embedded').node();
-		if (!circle.node() || !text.node() || isEmbededInsideContainer){
+	function computePropertySize(container) {
+		var circle = container.select('circle:not(.pin):not(.symbol):not(.nofill)');
+		var text = container.select('text');
+		var isEmbededInsideContainer = !!container.select('.embedded').node();
+		if (!circle.node() || !text.node()){
 			return;
 		}
 		if (!circle.attr('height')) {
-			circle.attr('height', (text.node().getBoundingClientRect().height + 15) / zoomFactor);
+			var newHeight = (text.node().getBoundingClientRect().height + 15) / zoomFactor;
+			circle.attr('height', newHeight > 40 ? newHeight : 40);
 		}
 		if (!circle.attr('width')) {
-			circle.attr('width', (text.node().getBoundingClientRect().width + 15) / zoomFactor);
+			var newWidth = (text.node().getBoundingClientRect().width + 15) / zoomFactor;
+			circle.attr('width', newWidth > 100 ? newWidth : 100);
+		}
+		if (isEmbededInsideContainer) {
+			calculateEmbededElement(container, circle);
 		}
 	}
 
@@ -888,7 +896,7 @@ module.exports = function (graphContainerSelector) {
 				mainCircle = circle;
 			}
 			if (!circle.attr('height')) {
-				var newHeight = isEmbededInsideContainer ? 75 : 62;
+				var newHeight = 62;
 				if (circle.classed('white')) {
 					circle.attr('height', newHeight + 8);
 					domainElement.height(newHeight + 8);
@@ -898,8 +906,14 @@ module.exports = function (graphContainerSelector) {
 				}
 			} else {
 				var height = parseInt(circle.attr('height')) + 15;
+				if (isEmbededInsideContainer) {
+					height = height > 62 ? height : 62;
+				}
 				circle.attr('height', height);
 				domainElement.height(height);
+				if (isEmbededInsideContainer) {
+					calculateEmbededElement(domainElement.nodeElement(), circle);
+				}
 			}
 		}
 		// check if it's needed to resize container
@@ -949,6 +963,17 @@ module.exports = function (graphContainerSelector) {
 		computeLines(domainElement.nodeElement(), mainCircle);
 	}
 
+	function calculateEmbededElement(container, circle) {
+		var textLength = container.selectAll('.class-property')[0].length;
+		var ratio = getRatio(container, circle);
+		var translateY = 1.8 * ratio;
+		if (textLength > 0) {
+			translateY *= -0.7;
+		}
+		container.select('text:not(.class-property)').attr('transform', 'translate(0,' + translateY + ')');
+		container.select('.embedded').attr('transform', 'translate(-5,' + translateY + ')');
+	}
+
 	/**
 	 * Compute count of datatype elements and draw the line between properties
 	 */
@@ -974,13 +999,19 @@ module.exports = function (graphContainerSelector) {
 		var translateX = circle.attr('width') ? -(circle.attr('width') / 2) + 4 : -(container.node().getBoundingClientRect().width / 3);
 		// get all text elements which are class properties
 		var propertyGroups = container.selectAll('.class-property-group');
+		var isEmbededInsideContainer = !!container.select('.embedded').node();
 		propertyGroups.each(function(group, index) {
 			var propertyElement = d3.select(this);
-			var text = propertyElement.select('text');
 			var rect = propertyElement.select('rect');
 			// set translate Y to display text properly inside class box
-			var translateY = (parseInt(circle.attr('height')) / 2) - ((index + 1.5 - (text[0].length / 2)) * 15);
+			var translateY = (parseInt(circle.attr('height')) / 2) - ((index + 1) * 15);
+			if (propertyGroups[0].length === 1) {
+				translateY += 6;
+			}
 			// add space between object and datatype properties
+			if (isEmbededInsideContainer) {
+				translateY += 4;
+			}
 			if (propertyElement.attr('class').indexOf('type-data') > -1) {
 				translateY += 10;
 			}
@@ -1019,6 +1050,22 @@ module.exports = function (graphContainerSelector) {
 		}
 	}
 
+	function getRatio(container, circle) {
+		var line = container.select('line.uml-line');
+		var isEmbededInsideContainer = !!container.select('.embedded').node();
+		var textLength = container.selectAll('.class-property')[0].length;
+		// First we find the rect under container to get properly size object.
+		var circleWidth = circle.attr('width') ? parseInt(circle.attr('width')) : container.node().getBoundingClientRect().width;
+		var circleHeight = circle.attr('height') ? parseInt(circle.attr('height')) : container.node().getBoundingClientRect().height;
+		// we find line under the class title. we need to compute where should it be placed.
+		var ratio = circleWidth / circleHeight;
+		// reduce ratio when element is too long and hasn't embeded element inside container
+		ratio = ratio > 4.5 && !isEmbededInsideContainer ? 4.5 : ratio;
+		// reset ratio when the list of properties is very long
+		ratio = textLength > 12 ? 0 : ratio;
+
+		return ratio;
+	}
 	/**
 	 * Compute lines size and translation
 	 */
@@ -1026,31 +1073,21 @@ module.exports = function (graphContainerSelector) {
 		var line = container.select('line.uml-line');
 		var isEmbededInsideContainer = !!container.select('.embedded').node();
 		var textLength = container.selectAll('.class-property')[0].length;
-		// First we find the rect under container to get properly size object.
 		var circleWidth = circle.attr('width') ? parseInt(circle.attr('width')) : container.node().getBoundingClientRect().width;
-		var circleHeight = parseInt(circle.attr('height'));
-
-		// we find line under the class title. we need to compute where should it be placed.
-		var ratio = circleWidth / circleHeight;
-		// reduce ratio when element is too long and hasn't embeded element inside container
-		ratio = ratio > 4.5 && !isEmbededInsideContainer ? 4.5 : ratio;
-		// reset ratio when the list of properties is very long
-		ratio = textLength > 12 ? 0 : ratio;
+		var ratio = getRatio(container, circle);
+		var datatypeProperties = container.countDataypeProperties || 0;
 		// create factor which is needed to compute lines positions
 		var factor = (8 * ratio) - (5 * textLength);
-		var factor2 = (11 * ratio) + (8 * (textLength - container.countDataypeProperties));
+		var factor2 = factor + (15 * (textLength - datatypeProperties)) + 14;
 		// add extra value for containers with embeded inside
 		if (isEmbededInsideContainer) {
-			container.select('text:not(.class-property)').attr('transform', 'translate(0,' + -(3 * ratio) + ')');
-			container.select('.embedded').attr('transform', 'translate(-5,' + -(3 * ratio) + ')');
-			factor += 15;
+			factor += 8;
 		}
 		// calculate line "y" position
 		var translateY = parseInt(-(circleWidth - factor));
 		var translateYBetweenProps = parseInt(-(circleWidth - factor2));
 		var shorterValue = circleWidth / 3.57;
 		var longerValue = circleWidth - 3;
-		var datatypeProperties = container.countDataypeProperties || 0;
 		line
 			.attr("x1", shorterValue)
 			.attr("y1", longerValue)
