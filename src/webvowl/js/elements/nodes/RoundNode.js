@@ -126,7 +126,12 @@ module.exports = (function () {
 
 		this.drawHalo = function () {
 			that.halo(true);
-			haloGroupElement = drawTools.drawHalo(that.nodeElement(), that.actualRadius(), this.removeHalo);
+			if (graph.options().structuresMenu().structure === 'rect') {
+				var offset = 15;
+				haloGroupElement = drawTools.drawRectHalo(that, this.width(), this.height(), offset);
+			} else {
+				haloGroupElement = drawTools.drawHalo(that.nodeElement(), that.actualRadius(), this.removeHalo);
+			}
 		};
 
 		/**
