@@ -161,9 +161,21 @@ module.exports = function (grunt) {
 					spawn: false
 				}
 			}
-		}
+		},
+		run: {
+	    xml2json: {
+				args: ['./util/Xml2JsonParser/xml2json.js'],
+	      options: {
+	        passArgs: [
+	          'pathToXmlfile',
+						'exportFolder'
+	        ]
+	      }
+	    }
+	  }
 	});
 
+	grunt.loadNpmTasks('grunt-run');
 
 	grunt.registerTask("default", ["release"]);
 	grunt.registerTask("pre-js", ["clean:deploy", "clean:zip", "copy"]);
