@@ -968,7 +968,7 @@ module.exports = function (graphContainerSelector) {
 		var ratio = getRatio(container, circle);
 		var translateY = 1.8 * ratio;
 		if (textLength > 0) {
-			translateY *= -0.7;
+			translateY *= -0.7 * textLength;
 		}
 		container.select('text:not(.class-property)').attr('transform', 'translate(0,' + translateY + ')');
 		container.select('.embedded').attr('transform', 'translate(-5,' + translateY + ')');
@@ -992,6 +992,21 @@ module.exports = function (graphContainerSelector) {
 	}
 
 	/**
+	 * Checks if all nodes inside node have class "type-data" (for UML view)
+	 */
+	function isAllElementsDatatype(elements) {
+		var result = true;
+		elements.each(function() {
+			var propertyElement = d3.select(this);
+			if (propertyElement.attr('class').indexOf('type-data') === -1) {
+				result = false;
+			}
+		});
+
+		return result;
+	}
+
+	/**
 	 * Compute text elements transforms
 	 */
 	function recalculateTextTransforms(container, circle) {
@@ -1000,6 +1015,7 @@ module.exports = function (graphContainerSelector) {
 		// get all text elements which are class properties
 		var propertyGroups = container.selectAll('.class-property-group');
 		var isEmbededInsideContainer = !!container.select('.embedded').node();
+		var allAreDatatype = isAllElementsDatatype(propertyGroups);
 		propertyGroups.each(function(group, index) {
 			var propertyElement = d3.select(this);
 			var rect = propertyElement.select('rect');
@@ -1012,7 +1028,7 @@ module.exports = function (graphContainerSelector) {
 			if (isEmbededInsideContainer) {
 				translateY += 4;
 			}
-			if (propertyElement.attr('class').indexOf('type-data') > -1) {
+			if (!allAreDatatype && propertyElement.attr('class').indexOf('type-data') > -1) {
 				translateY += 10;
 			}
 			propertyElement.attr("transform", "translate(" + translateX + "," + translateY + ")");
@@ -1062,7 +1078,7 @@ module.exports = function (graphContainerSelector) {
 		// reduce ratio when element is too long and hasn't embeded element inside container
 		ratio = ratio > 4.5 && !isEmbededInsideContainer ? 4.5 : ratio;
 		// reset ratio when the list of properties is very long
-		ratio = textLength > 12 ? 0 : ratio;
+		ratio = ratio < 1.5 ? -1 : ratio;
 
 		return ratio;
 	}
@@ -1081,7 +1097,7 @@ module.exports = function (graphContainerSelector) {
 		var factor2 = factor + (15 * (textLength - datatypeProperties)) + 14;
 		// add extra value for containers with embeded inside
 		if (isEmbededInsideContainer) {
-			factor += 8;
+			factor += 10;
 		}
 		// calculate line "y" position
 		var translateY = parseInt(-(circleWidth - factor));
