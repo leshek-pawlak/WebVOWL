@@ -12,6 +12,15 @@ var options = commandLineArgs(optionDefinitions);
 var exportFolder = options.exportFolder || 'src/app/data';
 var pathToXmlfile = options.pathToXmlfile || 'src/app/xml/model-output.xml';
 
+// extend of object
+
+// add property to object when it's not null or undefined
+Object.prototype.addPropertyIfExists = function(propertyName, object) {
+  if (object[propertyName]) {
+    this[propertyName] = object[propertyName];
+  }
+}
+
 // application
 fs.readFile(pathToXmlfile, 'utf8', function (err, data) {
   if (err) {
@@ -31,10 +40,24 @@ fs.readFile(pathToXmlfile, 'utf8', function (err, data) {
   });
 });
 
+// get subClasses and superClassess
+function getRelationClassess(classes) {
+  var relationClasses = [];
+  if (classes.length) {
+    for (var i = 0; i < classes.length; i++) {
+      relationClasses.push(classes[i]._uri);
+    }
+  } else if (typeof classes === 'object') {
+    relationClasses.push(classes._uri);
+  }
+
+  return relationClasses;
+}
+
 function parseJson(json) {
-  var classes = json.owl_Ontology["skos_member-List"].owl_class;
-  var datatypeProperties = json.owl_Ontology["skos_member-List"].owl_DatatypeProperty;
-  var objectProperties = json.owl_Ontology["skos_member-List"].owl_ObjectProperty;
+  var classes = json.owl_Ontology['skos_member-List'].owl_class;
+  var datatypeProperties = json.owl_Ontology['skos_member-List'].owl_DatatypeProperty;
+  var objectProperties = json.owl_Ontology['skos_member-List'].owl_ObjectProperty;
   var result = {
     _comment: json.owl_Ontology.rdfs_comment + ', ' + json.owl_Ontology._uri,
     namespace: [
@@ -67,53 +90,7 @@ function parseJson(json) {
       individualCount: 0,
     },
     class: [],
-    classAttribute: [
-      // {
-      //   id: 'class25',
-      //   label: {
-      //     undefined: 'Country',
-      //   },
-      //   iri: 'http://someUrlHere#Country',
-      //   instances: 0,
-      //   subClasses: [
-      //     'class21',
-      //   ],
-      //   superClasses: [
-      //     'class11',
-      //   ],
-      //   annotations: {
-      //     seeAlso: [
-      //       {
-      //         identifier: 'seeAlso',
-      //         language: 'undefined',
-      //         value: 'http://another/url/here?ID=46',
-      //         type: 'iri',
-      //       },
-      //     ],
-      //   },
-      //   individuals: [
-      //     {
-      //       iri: 'http://someUrlHere#AccountableRochePartyPDMA',
-      //       labels: {
-      //         undefined: 'test label',
-      //       },
-      //       annotations: {
-      //         label: [
-      //           {
-      //             identifier: 'label',
-      //             language: 'undefined',
-      //             value: 'PDMA',
-      //             type: 'label',
-      //           },
-      //         ],
-      //       },
-      //     },
-      //   ],
-      //   backgroundColor: '#d0d0d0',
-      //   x: 568.7106102686425,
-      //   y: -286.22831535513427,
-      // },
-    ],
+    classAttribute: [],
     datatype: [],
     datatypeAttribute: [],
     property: [],
@@ -126,6 +103,59 @@ function parseJson(json) {
       id: 'class' + classes[i]._hash,
       // type: '?',
     });
+
+    var classAttribute = {
+      id: 'class' + classes[i]._hash,
+      label: {
+        undefined: classes[i].skos_prefLabel || classes[i].rdfs_label,
+      },
+      iri: classes[i]._uri,
+      instances: 0,
+      // backgroundColor: '#d0d0d0',
+      // x: 0,
+      // y: 0,
+      //   annotations: {
+      //     seeAlso: [
+      //       {
+      //         identifier: 'seeAlso',
+      //         language: 'undefined',
+      //         value: 'http://another/url/here?ID=46',
+      //         type: 'iri',
+      //       },
+      //     ],
+      //   },
+    };
+    // add variables only when it's defined in xml file.
+    if (classes[i].rdfs_subClassOf) {
+      classAttribute.subClasses = getRelationClassess(classes[i].rdfs_subClassOf);
+    }
+    if (classes[i].rdfs_superClassOf) {
+      classAttribute.superClasses = getRelationClassess(classes[i].rdfs_superClassOf);
+    }
+    if (classes[i].instance && classes[i].instance_prefLabel) {
+      classAttribute.instances = classes[i].instance.length;
+      var individuals = [];
+      for (var k = 0; k < classes[i].instance.length; ++k) {
+        individuals.push({
+          iri: classes[i].instance[k]._uri,
+          labels: {
+            undefined: classes[i].instance_prefLabel[k],
+          },
+          // annotations: {
+          //   label: [
+          //     {
+          //       identifier: 'label',
+          //       language: 'undefined',
+          //       value: classes[i].instance_prefLabel[k],
+          //       type: 'label'
+          //     }
+          //   ]
+          // }
+        });
+      }
+      classAttribute.individuals = individuals;
+    }
+    result.classAttribute.push(classAttribute);
   }
 
   // add datatype properties to result json.
@@ -143,36 +173,41 @@ function parseJson(json) {
 
   // add object properties to result json.
   for (var i = 0; i < objectProperties.length; i++) {
-    result.propertyAttribute.push({
-      id: 'property' + objectProperties[i]._hash,
-      label: {
-        undefined: objectProperties[i].skos_prefLabel,
-      },
-      iri: objectProperties[i]._uri,
-      // domain: '?',
-      // range: '?',
-      // cardinality: 0,
-      // minCardinality: 0,
-      // maxCardinality: 0,
-      // annotations: {
-      //   definition: [
-      //     {
-      //       identifier: 'definition',
-      //       language: 'undefined',
-      //       value: '?',
-      //       type: 'label'
-      //     }
-      //   ],
-      //   seeAlso: [
-      //     {
-      //       identifier: 'seeAlso',
-      //       language: 'undefined',
-      //       value: '?',
-      //       type: 'iri'
-      //     },
-      //   ]
-      // },
-    });
+    var propertyAttribute = {
+        id: 'property' + objectProperties[i]._hash,
+        label: {
+          undefined: objectProperties[i].skos_prefLabel,
+        },
+        iri: objectProperties[i]._uri,
+        // annotations: {
+        //   definition: [
+        //     {
+        //       identifier: 'definition',
+        //       language: 'undefined',
+        //       value: '?',
+        //       type: 'label'
+        //     }
+        //   ],
+        //   seeAlso: [
+        //     {
+        //       identifier: 'seeAlso',
+        //       language: 'undefined',
+        //       value: '?',
+        //       type: 'iri'
+        //     },
+        //   ]
+        // },
+    };
+    if (objectProperties[i].rdfs_domain) {
+      propertyAttribute.domain = objectProperties[i].rdfs_domain._uri;
+    }
+    if (objectProperties[i].rdfs_range) {
+      propertyAttribute.range = objectProperties[i].rdfs_range._uri;
+    }
+    propertyAttribute.addPropertyIfExists('cardinality', objectProperties[i]);
+    propertyAttribute.addPropertyIfExists('maxCardinality', objectProperties[i]);
+    propertyAttribute.addPropertyIfExists('minCardinality', objectProperties[i]);
+    result.propertyAttribute.push(propertyAttribute);
   }
 
   return JSON.stringify(result);
