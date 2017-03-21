@@ -1129,7 +1129,7 @@ module.exports = function (graphContainerSelector) {
 			var circle = d3.select(this);
 			if (!circle.attr('width')) {
 				// set minimal box width
-				circle.attr('width', 100 * zoomFactor);
+				circle.attr('width', textWidth);
 			}
 			var circleWidth = parseInt(circle.attr('width'));
 			if (circle.classed('white') && circleWidth < textWidth + 12) {
