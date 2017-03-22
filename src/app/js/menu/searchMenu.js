@@ -45,7 +45,16 @@ module.exports = function (graph) {
 		var i;
 		if (graph.options().structuresMenu().structure === 'rect') {
 			for (i = 0; i < labelDictionary.length; i++) {
-				if (labelDictionary[i].id().indexOf('class') > -1 && !labelDictionary[i].referenceClass) {
+				var isHidden = true;
+				if (labelDictionary[i].labelElement && labelDictionary[i].labelElement()) {
+					// check if link range element has property referenceClass on true
+					isHidden = labelDictionary[i].range().referenceClass;
+				} else if (labelDictionary[i].nodeElement && labelDictionary[i].nodeElement()) {
+					// if node element is hidden then also make it unsearchable
+					isHidden = labelDictionary[i].nodeElement().classed('hidden');
+				}
+				// only for visible nodes and labels
+				if (!isHidden) {
 					var lEntry = labelDictionary[i].labelForCurrentLanguage();
 					idList.push(labelDictionary[i].id());
 					stringList.push(lEntry);
