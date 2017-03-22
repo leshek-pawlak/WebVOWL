@@ -63,6 +63,7 @@ module.exports = function (graph) {
 
       render();
       graph.update();
+      graph.options().searchMenu().requestDictionaryUpdate();
     }
 
     function clear() {

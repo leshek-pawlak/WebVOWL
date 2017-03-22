@@ -43,11 +43,20 @@ module.exports = function (graph) {
 		var stringList = [];
 
 		var i;
-		for (i = 0; i < labelDictionary.length; i++) {
-			var lEntry = labelDictionary[i].labelForCurrentLanguage();
-			idList.push(labelDictionary[i].id());
-			stringList.push(lEntry);
-
+		if (graph.options().structuresMenu().structure === 'rect') {
+			for (i = 0; i < labelDictionary.length; i++) {
+				if (labelDictionary[i].id().indexOf('class') > -1 && !labelDictionary[i].referenceClass) {
+					var lEntry = labelDictionary[i].labelForCurrentLanguage();
+					idList.push(labelDictionary[i].id());
+					stringList.push(lEntry);
+				}
+			}
+		} else {
+			for (i = 0; i < labelDictionary.length; i++) {
+				var lEntry = labelDictionary[i].labelForCurrentLanguage();
+				idList.push(labelDictionary[i].id());
+				stringList.push(lEntry);
+			}
 		}
 		mergedStringsList = [];
 		mergedIdList = [];
