@@ -8,6 +8,6 @@
   "paused": true,
   "datatypeFilterEnabled": true,
   "objectPropertyFilterEnabled": false,
-  "forceFullLabels": false,
+  "forceFullLabels": true,
   "labelMaxTextLineLength": 55
 }
