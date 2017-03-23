@@ -163,7 +163,43 @@ module.exports = function (graph) {
 		var title = languageTools.textInLanguage(ontologyInfo.title, graph.language());
 		d3.select("#title").text(title || "No title available");
 		d3.select("#about").attr("href", ontologyInfo.iri).attr("target", "_blank").text(ontologyInfo.iri);
-		d3.select("#version").text(ontologyInfo.version || "--");
+		// if model has versions property
+		if (ontologyInfo.versions) {
+			d3.select("#version").text(null);
+			var select = d3.select("#version").append('select')
+				.attr('size', 1)
+				.attr('id', 'versions')
+				.on("change", function () {
+					location.hash = d3.event.target.value;
+			});
+			// sort by version number
+			var sortedVersions = ontologyInfo.versions.sort(function(x, y) {
+				return x.version - y.version;
+			});
+			var currentVersionIndex = null;
+			// add versions from JSON file
+			for (var i = 0; i < sortedVersions.length; i++) {
+				var hash = '#' + sortedVersions[i].fileName;
+				if (hash === location.hash) {
+					currentVersionIndex = i;
+					// add one previous version if exists
+					if (i > 0) {
+						select.append('option')
+						.attr('value', '#' + sortedVersions[i-1].fileName)
+						.text(sortedVersions[i-1].version)
+					}
+				}
+				// add current and every later version
+				if (currentVersionIndex) {
+					select.append('option')
+						.attr('value', hash)
+						.attr('selected', currentVersionIndex === i ? 'selected' : null)
+						.text(sortedVersions[i].version)
+				}
+			}
+		} else {
+			d3.select("#version").text(ontologyInfo.version || "--");
+		}
 		var authors = ontologyInfo.author;
 		if (typeof authors === "string") {
 			// Stay compatible with author info as strings after change in january 2015
