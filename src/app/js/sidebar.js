@@ -227,7 +227,11 @@ module.exports = function (graph) {
 			})
 			.append("span")
 			.each(function (d) {
-				appendIriLabel(d3.select(this), d.value, d.type === "iri" ? d.value : undefined);
+				if (d.type === 'html') {
+					d3.select(this).appendHTML(d.value);
+				} else {
+					appendIriLabel(d3.select(this), d.value, d.type === "iri" ? d.value : undefined);
+				}
 			});
 	}
 
