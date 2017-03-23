@@ -668,13 +668,13 @@ a#pause-button:not(.paused)::before {
 .small-whitespace-separator {
 	height: 3px;
 }
-#language {
+#language, #versions {
 	background: transparent;
 	border: 1px solid #34495E;
 	color: #ecf0f1;
-}
-#language option {
-	background-color: #24323e;
+	option {
+		background-color: #24323e;
+	}
 }
 .converter-form:not(:first-child) {
 	margin-top: 5px;
