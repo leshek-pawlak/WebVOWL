@@ -50,11 +50,21 @@ module.exports = function (graphContainerSelector) {
 		nodeMap = [],
     locationId = 0,
 		zoom,
-		isInitialBoot = true;
+		isInitialBoot = true,
+		hiddenTextInsideBoxes = false;
 
 	/**
 	 * Recalculates the positions of nodes, links, ... and updates them.
 	 */
+	 	function toggleTextInsideBoxes() {
+			// 0.95 is the latest zoom value where the text inside box looks good.
+		 	if ((zoomFactor < 0.95 && !hiddenTextInsideBoxes) || (zoomFactor >= 0.95 && hiddenTextInsideBoxes)) {
+				// toggle hiddenTextInsideBoxes
+				hiddenTextInsideBoxes = !hiddenTextInsideBoxes;
+				// toggle visible of text inside boxes
+		 		d3.selectAll('text.class-property').classed('hidden', hiddenTextInsideBoxes);
+			}
+	 	}
 
     function updateHaloRadius() {
         if (pulseNodeIds && pulseNodeIds.length > 0) {
@@ -291,6 +301,7 @@ module.exports = function (graphContainerSelector) {
 		zoomFactor = d3.event.scale;
 		graphTranslation = d3.event.translate;
     updateHaloRadius();
+		toggleTextInsideBoxes();
 	}
 
 	/**
