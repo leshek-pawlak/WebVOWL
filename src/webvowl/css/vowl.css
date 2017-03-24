@@ -188,3 +188,9 @@ marker path {
   padding-top: 20px;
   border-top: 2px solid rgba(255, 255, 255, 0.5);
 }
+
+.uml-line, .line-between-props {
+  fill: none;
+  stroke: black;
+  stroke-width: 2;
+}

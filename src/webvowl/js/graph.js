@@ -54,6 +54,13 @@ module.exports = function (graphContainerSelector) {
 		isInitialBoot = true,
 		hiddenTextInsideBoxes = false;
 
+		var umlBoxTitleHeight = 25,
+		umlSpaceBetweenProperties = 5,
+		umlTextHeight = 15,
+		umlEmbeddedExtraFactor = 15,
+		umlMinEmbeddedContainerHeight = 62,
+		umlLineBetweenPropsFactor = umlSpaceBetweenProperties + 1;
+
 	/**
 	 * Recalculates the positions of nodes, links, ... and updates them.
 	 */
@@ -808,10 +815,7 @@ module.exports = function (graphContainerSelector) {
 			if (options.structuresMenu().structure === 'rect') {
 				var circle = node.nodeElement().select('circle:not(.pin):not(.symbol):not(.nofill)');
 				if (circle.node()) {
-					node.nodeElement().append('line')
-						.classed("uml-line", true)
-						.attr("stroke", "black")
-						.attr("stroke-width", 2);
+					node.nodeElement().append('rect').classed("uml-line", true);
 				}
 			}
 		});
@@ -880,7 +884,7 @@ module.exports = function (graphContainerSelector) {
 				var xLabel = typeof x.label().property().label() === 'object' ? x.label().property().label() : { 'undefined': "Z" };
 				var yLabel = typeof y.label().property().label() === 'object' ? y.label().property().label() : { 'undefined': "Z" };
 				// first objectProperties. then datatypeProperties
-				return d3.ascending(x.property().type(), y.property().type()) || d3.descending(xLabel.undefined, yLabel.undefined);
+				return d3.descending(x.property().type(), y.property().type()) || d3.ascending(xLabel.undefined, yLabel.undefined);
 			});
 			linkGroups.each(function (link) {
 				if (link.range().type().indexOf('rdfs') > -1 || link.range().referenceClass) {
@@ -917,11 +921,11 @@ module.exports = function (graphContainerSelector) {
 			return;
 		}
 		if (!circle.attr('height')) {
-			var newHeight = (text.node().getBoundingClientRect().height + 15) / zoomFactor;
-			circle.attr('height', newHeight > 40 ? newHeight : 40);
+			var newHeight = ((text.node().getBoundingClientRect().height + umlTextHeight) / zoomFactor) + umlSpaceBetweenProperties;
+			circle.attr('height', newHeight);
 		}
 		if (!circle.attr('width')) {
-			var newWidth = (text.node().getBoundingClientRect().width + 15) / zoomFactor;
+			var newWidth = (text.node().getBoundingClientRect().width + umlTextHeight) / zoomFactor;
 			circle.attr('width', newWidth > 100 ? newWidth : 100);
 		}
 		if (isEmbededInsideContainer) {
@@ -934,6 +938,8 @@ module.exports = function (graphContainerSelector) {
 	 */
 	function drawUmlStructure(link) {
 		var domainElement = link.domain();
+		var container = domainElement.nodeElement();
+		// concatenate the label
 		var label = '(no label)';
 		if (link.label().property().label()) {
 			label = link.label().property().label()[language];
@@ -942,41 +948,27 @@ module.exports = function (graphContainerSelector) {
 		if (link.label().property().generateCardinalityText()) {
 			text += ' [' + link.label().property().generateCardinalityText() + ']';
 		}
-		var circles = domainElement.nodeElement().selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
-		var isEmbededInsideContainer = !!domainElement.nodeElement().select('.embedded').node();
-		var mainCircle = d3.select(circles[0][0]);
+		var circles = container.selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
+		var isEmbededInsideContainer = !!container.select('.embedded').node();
+		var circle = d3.select(circles[0][0]);
 		var txt = label + ' : ' + text;
 		for (var i = 0; i < circles[0].length; ++i) {
-			var circle = d3.select(circles[0][i]);
-			if (!circle.classed('white')) {
-				mainCircle = circle;
+			circle = d3.select(circles[0][i]);
+			var height = parseInt(circle.attr('height')) + umlTextHeight;
+			if (isEmbededInsideContainer) {
+				height = height > umlMinEmbeddedContainerHeight ? height : umlMinEmbeddedContainerHeight;
 			}
-			if (!circle.attr('height')) {
-				var newHeight = 62;
-				if (circle.classed('white')) {
-					circle.attr('height', newHeight + 8);
-					domainElement.height(newHeight + 8);
-				} else {
-					circle.attr('height', newHeight);
-					domainElement.height(newHeight);
-				}
-			} else {
-				var height = parseInt(circle.attr('height')) + 15;
-				if (isEmbededInsideContainer) {
-					height = height > 62 ? height : 62;
-				}
-				circle.attr('height', height);
-				domainElement.height(height);
-				if (isEmbededInsideContainer) {
-					calculateEmbededElement(domainElement.nodeElement(), circle);
-				}
+			circle.attr('height', height);
+			domainElement.height(height);
+			if (isEmbededInsideContainer) {
+				calculateEmbededElement(container, circle);
 			}
 		}
 		// check if it's needed to resize container
 		resizeContainerWhenTextIsLonger(domainElement, txt);
 		// create new text element from property
 		var isDatatype = link.label().property().type().indexOf('Datatype') > -1;
-		var g = domainElement.nodeElement().append("g")
+		var g = container.append("g")
 			.attr('id', link.range().id())
 			.attr('label-index', link.label().index - classNodes.length)
 			.classed('class-property-group', true)
@@ -1004,28 +996,26 @@ module.exports = function (graphContainerSelector) {
 			});
 		g.append("rect")
 			.attr('width', getTextWidth(txt))
-			.attr('height', 15);
+			.attr('height', umlTextHeight);
 		g.append("text")
 			.text(txt)
 			.classed("class-property", true)
 			.classed("text", true);
 		// if it's datatype
 		if (isDatatype) {
-			drawDatatypeProperties(domainElement, mainCircle);
+			drawDatatypeProperties(domainElement, circle);
 		}
 		// set transforms to text
-		recalculateTextTransforms(domainElement.nodeElement(), mainCircle);
+		recalculateTextTransforms(container, circle);
 		// compute lines position in the container
-		computeLines(domainElement.nodeElement(), mainCircle);
+		computeLines(container, circle);
 	}
 
 	function calculateEmbededElement(container, circle) {
 		var textLength = container.selectAll('.class-property')[0].length;
-		var ratio = getRatio(container, circle);
-		var translateY = 1.8 * ratio;
-		if (textLength > 0) {
-			translateY *= -0.7 * textLength;
-		}
+		// First we find the rect under container to get properly size object.
+		var circleHeight = circle.attr('height') ? parseInt(circle.attr('height')) : container.node().getBoundingClientRect().height;
+		var translateY = -(circleHeight / 2) + umlBoxTitleHeight;
 		container.select('text:not(.class-property)').attr('transform', 'translate(0,' + translateY + ')');
 		container.select('.embedded').attr('transform', 'translate(-5,' + translateY + ')');
 	}
@@ -1037,10 +1027,7 @@ module.exports = function (graphContainerSelector) {
 		// first time create line between object and datatype properties
 		if (!domainElement.nodeElement().countDataypeProperties) {
 			domainElement.nodeElement().countDataypeProperties = 1;
-			domainElement.nodeElement().append('line')
-				.classed("line-between-props", true)
-				.attr("stroke", "black")
-				.attr("stroke-width", 2);
+			domainElement.nodeElement().append('rect').classed("line-between-props", true);
 		} else {
 			// else add to counter another datype property
 			++domainElement.nodeElement().countDataypeProperties;
@@ -1075,17 +1062,15 @@ module.exports = function (graphContainerSelector) {
 		propertyGroups.each(function(group, index) {
 			var propertyElement = d3.select(this);
 			var rect = propertyElement.select('rect');
-			// set translate Y to display text properly inside class box
-			var translateY = (parseInt(circle.attr('height')) / 2) - ((index + 1) * 15);
-			if (propertyGroups[0].length === 1) {
-				translateY += 6;
-			}
-			// add space between object and datatype properties
+			// set translate Y to display text properly inside class box.
+			var translateY = -(parseInt(circle.attr('height')) / 2) + ((index + 1) * umlTextHeight) + umlBoxTitleHeight;
+			// add space between object and datatype properties.
 			if (isEmbededInsideContainer) {
-				translateY += 4;
+				translateY += umlEmbeddedExtraFactor;
 			}
+			// add gap between object and datatype properties.
 			if (!allAreDatatype && propertyElement.attr('class').indexOf('type-data') > -1) {
-				translateY += 10;
+				translateY += umlSpaceBetweenProperties;
 			}
 			propertyElement.attr("transform", "translate(" + translateX + "," + translateY + ")");
 			// make text clickable by using rect
@@ -1107,73 +1092,54 @@ module.exports = function (graphContainerSelector) {
 		}
 	}
 
-	function computePinTransform(container) {
-		var circle = container.nodeElement().select('circle:not(.pin):not(.symbol):not(.nofill)');
-		var pinContainer = container.nodeElement().select('g.hidden-in-export');
+	function computePinTransform(domainElement) {
+		var container = domainElement.nodeElement();
+		var circle = container.select('circle:not(.pin):not(.symbol):not(.nofill)');
+		var pinContainer = container.select('g.hidden-in-export');
 		if (!circle.node() || !pinContainer.node()){
 			return;
 		}
 		var translateX = circle.attr('width') ? parseInt(circle.attr('width')) / 2 : circle.node().getBoundingClientRect().width / 2;
 		var translateY = circle.attr('height') ? parseInt(circle.attr('height')) / 2 : circle.node().getBoundingClientRect().height / 5;
-		container.width(translateX * 2);
-		container.height(translateY * 2);
 		if (pinContainer.node()) {
 			pinContainer.attr('transform', 'translate(' + (translateX - 10)  + ',' + -(translateY - 5) + ')');
 		}
 	}
 
-	function getRatio(container, circle) {
-		var line = container.select('line.uml-line');
-		var isEmbededInsideContainer = !!container.select('.embedded').node();
-		var textLength = container.selectAll('.class-property')[0].length;
-		// First we find the rect under container to get properly size object.
-		var circleWidth = circle.attr('width') ? parseInt(circle.attr('width')) : container.node().getBoundingClientRect().width;
-		var circleHeight = circle.attr('height') ? parseInt(circle.attr('height')) : container.node().getBoundingClientRect().height;
-		// we find line under the class title. we need to compute where should it be placed.
-		var ratio = circleWidth / circleHeight;
-		// reduce ratio when element is too long and hasn't embeded element inside container
-		ratio = ratio > 4.5 && !isEmbededInsideContainer ? 4.5 : ratio;
-		// reset ratio when the list of properties is very long
-		ratio = ratio < 1.5 ? -1 : ratio;
-
-		return ratio;
-	}
 	/**
 	 * Compute lines size and translation
 	 */
 	function computeLines(container, circle) {
-		var line = container.select('line.uml-line');
+		var line = container.select('.uml-line');
+		var lineBetweenProps = container.select('.line-between-props');
 		var isEmbededInsideContainer = !!container.select('.embedded').node();
 		var textLength = container.selectAll('.class-property')[0].length;
 		var circleWidth = circle.attr('width') ? parseInt(circle.attr('width')) : container.node().getBoundingClientRect().width;
-		var ratio = getRatio(container, circle);
+		var circleHeight = circle.attr('height') ? parseInt(circle.attr('height')) : container.node().getBoundingClientRect().height;
 		var datatypeProperties = container.countDataypeProperties || 0;
-		// create factor which is needed to compute lines positions
-		var factor = (8 * ratio) - (5 * textLength);
-		var factor2 = factor + (15 * (textLength - datatypeProperties)) + 14;
+		// create factors which are needed to compute lines positions
+		var factor = umlBoxTitleHeight;
+		var factor2 = factor + (umlTextHeight * (textLength - datatypeProperties) + umlLineBetweenPropsFactor);
 		// add extra value for containers with embeded inside
 		if (isEmbededInsideContainer) {
-			factor += 10;
+			factor += umlEmbeddedExtraFactor;
 		}
-		// calculate line "y" position
-		var translateY = parseInt(-(circleWidth - factor));
-		var translateYBetweenProps = parseInt(-(circleWidth - factor2));
-		var shorterValue = circleWidth / 3.57;
-		var longerValue = circleWidth - 3;
+		// calculate lines positions
+		var x = -(circleWidth / 2);
 		line
-			.attr("x1", shorterValue)
-			.attr("y1", longerValue)
-			.attr("x2", longerValue)
-			.attr("y2", shorterValue)
-			.attr("transform", "translate(0," + translateY + ")rotate(45)");
+			.attr("height", circleHeight)
+			.attr("width", circleWidth)
+			.attr("x", x)
+			.attr("y", -(circleHeight / 2) + factor)
+			.attr("stroke-dasharray", "" + circleWidth + "," + circleHeight * 2 + ",0");
 		// make it hidden if the only properties in box are datatypes
-		container.select('line.line-between-props')
+		lineBetweenProps
 			.classed('hidden', textLength - datatypeProperties === 0)
-			.attr("x1", shorterValue)
-			.attr("y1", longerValue)
-			.attr("x2", longerValue)
-			.attr("y2", shorterValue)
-			.attr("transform", "translate(0," + translateYBetweenProps + ")rotate(45)");
+			.attr("height", textLength * umlTextHeight)
+			.attr("width", circleWidth)
+			.attr("x", x)
+			.attr("y", -(circleHeight / 2) + factor2)
+			.attr("stroke-dasharray", "" + circleWidth + "," + circleHeight * 2 + ",0");
 	}
 
 	/**
@@ -1188,12 +1154,10 @@ module.exports = function (graphContainerSelector) {
 				circle.attr('width', textWidth);
 			}
 			var circleWidth = parseInt(circle.attr('width'));
-			if (circle.classed('white') && circleWidth < textWidth + 12) {
-				circle.attr('width', textWidth + 12);
-				container.width(textWidth + 12);
-			} else if (circleWidth < textWidth + 4) {
-				circle.attr('width', textWidth + 4);
-				container.width(textWidth + 4);
+			var textWidthExtraWidth = textWidth + 4;
+			if (circleWidth < textWidthExtraWidth) {
+				circle.attr('width', textWidthExtraWidth);
+				container.width(textWidthExtraWidth);
 			}
 		});
 	}
