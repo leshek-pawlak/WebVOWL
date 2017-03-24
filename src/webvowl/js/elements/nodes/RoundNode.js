@@ -11,7 +11,7 @@ module.exports = (function () {
 		var that = this,
 			collapsible = false,
 			radius = 50,
-			height = 50,
+			height = 34,
 			width = 100,
 			collapsingGroupElement,
 			pinGroupElement,
