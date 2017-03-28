@@ -56,9 +56,12 @@ module.exports = function (graphContainerSelector) {
 
 		var umlBoxTitleHeight = 25,
 		umlSpaceBetweenProperties = 5,
+		umlSecondLineExtraFactor = 10,
 		umlTextHeight = 15,
 		umlEmbeddedExtraFactor = 15,
 		umlMinEmbeddedContainerHeight = 62,
+		umlBoxMinHeight = 30,
+		umlBoxMinWidth = 100,
 		umlLineBetweenPropsFactor = umlSpaceBetweenProperties + 1;
 
 	/**
@@ -894,8 +897,8 @@ module.exports = function (graphContainerSelector) {
 					link.draw(d3.select(this), markerContainer);
 				}
 				// compute box size for domain and range
-				computePropertySize(link.range().nodeElement());
-				computePropertySize(link.domain().nodeElement());
+				computePropertySize(link.range());
+				computePropertySize(link.domain());
 				// if pin exists compute transation
 				computePin(link);
 			});
@@ -914,20 +917,31 @@ module.exports = function (graphContainerSelector) {
 		options.structuresMenu().render();
 	}
 
-	function computePropertySize(container) {
+	function computePropertySize(domainElement) {
+		var container = domainElement.nodeElement();
 		var circle = container.select('circle:not(.pin):not(.symbol):not(.nofill)');
 		var text = container.select('text');
 		var isEmbededInsideContainer = !!container.select('.embedded').node();
+		var textLength = container.selectAll('.class-property')[0].length;
 		if (!circle.node() || !text.node()){
 			return;
 		}
 		if (!circle.attr('height')) {
-			var newHeight = ((text.node().getBoundingClientRect().height + umlTextHeight) / zoomFactor) + umlSpaceBetweenProperties;
+			var tmpHeight = text.node().getBoundingClientRect().height > umlTextHeight ? text.node().getBoundingClientRect().height + umlSecondLineExtraFactor : umlTextHeight;
+			tmpHeight /= zoomFactor;
+			var newHeight = tmpHeight > umlBoxMinHeight ? tmpHeight : umlBoxMinHeight;
+			newHeight += umlSpaceBetweenProperties;
+			if (isEmbededInsideContainer) {
+				newHeight += umlEmbeddedExtraFactor;
+			}
 			circle.attr('height', newHeight);
+			domainElement.height(newHeight);
 		}
 		if (!circle.attr('width')) {
-			var newWidth = (text.node().getBoundingClientRect().width + umlTextHeight) / zoomFactor;
-			circle.attr('width', newWidth > 100 ? newWidth : 100);
+			var tmpWidth = (text.node().getBoundingClientRect().width + umlTextHeight) / zoomFactor;
+			var newWidth = tmpWidth > umlBoxMinWidth ? tmpWidth : umlBoxMinWidth;
+			circle.attr('width', newWidth);
+			domainElement.width(newWidth);
 		}
 		if (isEmbededInsideContainer) {
 			calculateEmbededElement(container, circle);
