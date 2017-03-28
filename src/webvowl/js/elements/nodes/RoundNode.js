@@ -11,7 +11,7 @@ module.exports = (function () {
 		var that = this,
 			collapsible = false,
 			radius = 50,
-			height = 34,
+			height = 30,
 			width = 100,
 			collapsingGroupElement,
 			pinGroupElement,
@@ -69,7 +69,7 @@ module.exports = (function () {
 			if (graph.options().structuresMenu().structure === 'rect') {
 				return that.width();
 			}
-			
+
 			var availableWidth = this.actualRadius() * 2;
 
 			// if the text is not placed in the center of the circle, it can't have the full width
