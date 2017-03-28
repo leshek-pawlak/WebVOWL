@@ -70,8 +70,8 @@ module.exports = function (graphContainerSelector) {
 				// toggle hiddenTextInsideBoxes
 				hiddenTextInsideBoxes = !hiddenTextInsideBoxes;
 				// toggle visible of text inside boxes
-		 		d3.selectAll('text.class-property').classed('hidden', hiddenTextInsideBoxes);
 			}
+			d3.selectAll('text.class-property').classed('hidden', hiddenTextInsideBoxes);
 	 	}
 
     function updateHaloRadius() {
@@ -508,6 +508,7 @@ module.exports = function (graphContainerSelector) {
 				}
 			}
 		}
+		toggleTextInsideBoxes();
 	};
 
 	graph.paused = function (p) {
