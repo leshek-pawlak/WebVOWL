@@ -170,7 +170,7 @@ module.exports = function (graph) {
 				.attr('size', 1)
 				.attr('id', 'versions')
 				.on("change", function () {
-					location.hash = d3.event.target.value;
+					location.href = d3.event.target.value;
 			});
 			// sort by version number
 			var sortedVersions = ontologyInfo.versions.sort(function(x, y) {
@@ -179,20 +179,19 @@ module.exports = function (graph) {
 			var currentVersionIndex = null;
 			// add versions from JSON file
 			for (var i = 0; i < sortedVersions.length; i++) {
-				var hash = '#' + sortedVersions[i].fileName;
-				if (hash === location.hash) {
+				if (sortedVersions[i].url === location.href) {
 					currentVersionIndex = i;
 					// add one previous version if exists
 					if (i > 0) {
 						select.append('option')
-						.attr('value', '#' + sortedVersions[i-1].fileName)
+						.attr('value', sortedVersions[i-1].url)
 						.text(sortedVersions[i-1].version)
 					}
 				}
 				// add current and every later version
 				if (currentVersionIndex) {
 					select.append('option')
-						.attr('value', hash)
+						.attr('value', sortedVersions[i].url)
 						.attr('selected', currentVersionIndex === i ? 'selected' : null)
 						.text(sortedVersions[i].version)
 				}
