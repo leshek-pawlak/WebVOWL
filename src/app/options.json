@@ -6,7 +6,7 @@
   "minMagnification": 0.5,
   "maxMagnification": 4,
   "paused": true,
-  "datatypeFilterEnabled": true,
+  "datatypeFilterEnabled": false,
   "objectPropertyFilterEnabled": false,
   "forceFullLabels": true,
   "labelMaxTextLineLength": 55
