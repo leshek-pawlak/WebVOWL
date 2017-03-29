@@ -9,5 +9,8 @@
   "datatypeFilterEnabled": false,
   "objectPropertyFilterEnabled": false,
   "forceFullLabels": true,
-  "labelMaxTextLineLength": 55
+  "labelMaxTextLineLength": 55,
+  "hiddenTextInsideBoxes": false,
+  "umlBoxMinHeight": 30,
+  "umlBoxMinWidth": 100
 }

@@ -33,13 +33,15 @@ module.exports = function () {
 		navigationMenu,
 		scaleNodesByIndividuals = false,
 		paused = true,
-		datatypeFilterEnabled = true,
+		datatypeFilterEnabled = false,
 		objectPropertyFilterEnabled = false,
 		forceFullLabels = false,
 		labelMaxTextLineLength = 45,
 		cardinalityVisible = true,
-		cardinalityPlacement = "CLASS";
-
+		cardinalityPlacement = "CLASS",
+		hiddenTextInsideBoxes = false,
+		umlBoxMinHeight = 30,
+		umlBoxMinWidth = 100;
 
 	options.sidebar= function(s){
 		if (!arguments.length) return sidebar;
@@ -146,7 +148,7 @@ module.exports = function () {
 		segmentsModule = p;
 		return options;
 	};
-	
+
 	options.pickAndPinModule = function (p) {
 		if (!arguments.length) return pickAndPinModule;
 		pickAndPinModule = p;
@@ -223,8 +225,8 @@ module.exports = function () {
 		if (!arguments.length) return paused;
 		paused = p;
 		return options;
-	};	
-	
+	};
+
 
 	options.structuresMenu = function (p) {
 		if (!arguments.length) return structuresMenu;
@@ -237,13 +239,13 @@ module.exports = function () {
 		datatypeFilterEnabled = p;
 		return options;
 	};
-	
+
 	options.objectPropertyFilterEnabled = function (p) {
 		if (!arguments.length) return objectPropertyFilterEnabled;
 		objectPropertyFilterEnabled = p;
 		return options;
 	};
-	
+
 	options.forceFullLabels = function (p) {
 		if (!arguments.length) return forceFullLabels;
 		forceFullLabels = p;
@@ -270,6 +272,24 @@ module.exports = function () {
 
 	options.rewriteFrom = function (otherOptions) {
 		rewriteFrom(otherOptions, options);
+	};
+
+	options.hiddenTextInsideBoxes = function (p) {
+		if (!arguments.length) return hiddenTextInsideBoxes;
+		hiddenTextInsideBoxes = p;
+		return options;
+	};
+
+	options.umlBoxMinHeight = function (p) {
+		if (!arguments.length) return umlBoxMinHeight;
+		umlBoxMinHeight = p;
+		return options;
+	};
+
+	options.umlBoxMinWidth = function (p) {
+		if (!arguments.length) return umlBoxMinWidth;
+		umlBoxMinWidth = p;
+		return options;
 	};
 
 	function rewriteFrom(srcOptions, destOptions) {
