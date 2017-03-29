@@ -50,8 +50,7 @@ module.exports = function (graphContainerSelector) {
 		nodeMap = [],
     locationId = 0,
 		zoom,
-		isInitialBoot = true,
-		hiddenTextInsideBoxes = false;
+		isInitialBoot = true;
 
 		var umlBoxTitleHeight = 25,
 		umlSpaceBetweenProperties = 5,
@@ -59,14 +58,13 @@ module.exports = function (graphContainerSelector) {
 		umlTextHeight = 15,
 		umlEmbeddedExtraFactor = 15,
 		umlMinEmbeddedContainerHeight = 62,
-		umlBoxMinHeight = 30,
-		umlBoxMinWidth = 100,
 		umlLineBetweenPropsFactor = umlSpaceBetweenProperties + 1;
 
 	/**
 	 * Recalculates the positions of nodes, links, ... and updates them.
 	 */
 	 	function toggleTextInsideBoxes() {
+			var hiddenTextInsideBoxes = options.hiddenTextInsideBoxes();
 			// 0.95 is the latest zoom value where the text inside box looks good.
 		 	if ((zoomFactor < 0.95 && !hiddenTextInsideBoxes) || (zoomFactor >= 0.95 && hiddenTextInsideBoxes)) {
 				// toggle hiddenTextInsideBoxes
@@ -884,7 +882,7 @@ module.exports = function (graphContainerSelector) {
 		if (!circle.attr('height')) {
 			var tmpHeight = text.node().getBoundingClientRect().height > umlTextHeight ? text.node().getBoundingClientRect().height + umlSecondLineExtraFactor : umlTextHeight;
 			tmpHeight /= zoomFactor;
-			var newHeight = tmpHeight > umlBoxMinHeight ? tmpHeight : umlBoxMinHeight;
+			var newHeight = tmpHeight > options.umlBoxMinHeight() ? tmpHeight : options.umlBoxMinHeight();
 			newHeight += umlSpaceBetweenProperties;
 			if (isEmbededInsideContainer) {
 				newHeight += umlEmbeddedExtraFactor;
@@ -894,7 +892,7 @@ module.exports = function (graphContainerSelector) {
 		}
 		if (!circle.attr('width')) {
 			var tmpWidth = (text.node().getBoundingClientRect().width + umlTextHeight) / zoomFactor;
-			var newWidth = tmpWidth > umlBoxMinWidth ? tmpWidth : umlBoxMinWidth;
+			var newWidth = tmpWidth > options.umlBoxMinWidth() ? tmpWidth : options.umlBoxMinWidth();
 			circle.attr('width', newWidth);
 			domainElement.width(newWidth);
 		}
