@@ -10,7 +10,7 @@
   "objectPropertyFilterEnabled": false,
   "forceFullLabels": true,
   "labelMaxTextLineLength": 55,
-  "hiddenTextInsideBoxes": false,
+  "hideTextInsideBoxes": true,
   "umlBoxMinHeight": 30,
   "umlBoxMinWidth": 100
 }
