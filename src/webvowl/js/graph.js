@@ -51,6 +51,7 @@ module.exports = function (graphContainerSelector) {
 		nodeMap = [],
     locationId = 0,
 		zoom,
+		hiddenTextInsideBoxes = false,
 		isInitialBoot = true;
 
 		var umlBoxTitleHeight = 25,
@@ -65,7 +66,9 @@ module.exports = function (graphContainerSelector) {
 	 * Recalculates the positions of nodes, links, ... and updates them.
 	 */
 	 	function toggleTextInsideBoxes() {
-			var hiddenTextInsideBoxes = options.hiddenTextInsideBoxes();
+			if (!options.hideTextInsideBoxes()) {
+				return;
+			}
 			// 0.95 is the latest zoom value where the text inside box looks good.
 		 	if ((zoomFactor < 0.95 && !hiddenTextInsideBoxes) || (zoomFactor >= 0.95 && hiddenTextInsideBoxes)) {
 				// toggle hiddenTextInsideBoxes

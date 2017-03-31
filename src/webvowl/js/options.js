@@ -39,7 +39,7 @@ module.exports = function () {
 		labelMaxTextLineLength = 45,
 		cardinalityVisible = true,
 		cardinalityPlacement = "CLASS",
-		hiddenTextInsideBoxes = false,
+		hideTextInsideBoxes = true,
 		umlBoxMinHeight = 30,
 		umlBoxMinWidth = 100;
 
@@ -274,9 +274,9 @@ module.exports = function () {
 		rewriteFrom(otherOptions, options);
 	};
 
-	options.hiddenTextInsideBoxes = function (p) {
-		if (!arguments.length) return hiddenTextInsideBoxes;
-		hiddenTextInsideBoxes = p;
+	options.hideTextInsideBoxes = function (p) {
+		if (!arguments.length) return hideTextInsideBoxes;
+		hideTextInsideBoxes = p;
 		return options;
 	};
 
