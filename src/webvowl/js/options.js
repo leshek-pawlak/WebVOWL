@@ -24,7 +24,6 @@ module.exports = function () {
 		filterMenu,
 		modeMenu,
 		pausedMenu,
-		pickAndPinModule,
 		resetMenu,
 		searchMenu,
 		ontologyMenu,
@@ -146,12 +145,6 @@ module.exports = function () {
 	options.segmentsModule = function (p) {
 		if (!arguments.length) return segmentsModule;
 		segmentsModule = p;
-		return options;
-	};
-
-	options.pickAndPinModule = function (p) {
-		if (!arguments.length) return pickAndPinModule;
-		pickAndPinModule = p;
 		return options;
 	};
 
