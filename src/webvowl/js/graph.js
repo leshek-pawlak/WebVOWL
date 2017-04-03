@@ -256,7 +256,7 @@ module.exports = function (graphContainerSelector) {
 
     }
 
-    function recalculatePositions() {
+  function recalculatePositions() {
 		// Set node positions
 		nodeElements.attr("transform", function (node) {
 			return "translate(" + node.x + "," + node.y + ")";
@@ -300,7 +300,7 @@ module.exports = function (graphContainerSelector) {
 			});
 		}
 
-        updateHaloRadius();
+    updateHaloRadius();
 	}
 
 	/**
@@ -769,7 +769,17 @@ module.exports = function (graphContainerSelector) {
 		nodeElements.each(function (node) {
 			var element = d3.select(this);
 			// hide class properties rects on UML structure graph.
-			element.classed('hidden', options.structuresMenu().structure === 'rect' && (node.type().indexOf('rdfs') > -1 || node.referenceClass));
+			if (options.structuresMenu().structure === 'rect' && (node.type().indexOf('rdfs') > -1 || node.referenceClass)) {
+				element.classed('hidden', true);
+				if (node.pinned()) {
+					node.setToPinned = true;
+					node.pinned(false);
+				}
+			} else if (node.setToPinned) {
+				node.px = node.backupX;
+				node.py = node.backupY;
+				node.pinned(true);
+			}
 			node.draw(element);
 			// if we need to draw UML structure
 			if (options.structuresMenu().structure === 'rect') {
