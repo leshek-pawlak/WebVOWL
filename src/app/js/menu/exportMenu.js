@@ -138,7 +138,7 @@ module.exports = function (graph) {
 
 	function hasBackgroundColorSet(element) {
 		var data = element.datum();
-		return data.backgroundColor && !!data.backgroundColor();
+		return data && data.backgroundColor && !!data.backgroundColor();
 	}
 
 	/**
@@ -162,7 +162,7 @@ module.exports = function (graph) {
 						element.style(styleName, null);
 					}
 				}
-				if (element.datum && element.datum().type){
+				if (element.datum && element.datum() && element.datum().type){
 					if (element.datum().type()==="rdfs:subClassOf") {
 						element.style("fill", null);
 					}
