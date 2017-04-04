@@ -1153,7 +1153,7 @@ module.exports = function (graphContainerSelector) {
 		// calculate lines positions
 		var x = -(circleWidth / 2);
 		line
-			.attr("height", circleHeight)
+			.attr("height", 2)
 			.attr("width", circleWidth)
 			.attr("x", x)
 			.attr("y", -(circleHeight / 2) + factor)
@@ -1161,7 +1161,7 @@ module.exports = function (graphContainerSelector) {
 		// make it hidden if the only properties in box are datatypes
 		lineBetweenProps
 			.classed('hidden', textLength - datatypeProperties === 0)
-			.attr("height", textLength * umlTextHeight)
+			.attr("height", 2)
 			.attr("width", circleWidth)
 			.attr("x", x)
 			.attr("y", -(circleHeight / 2) + factor2)
