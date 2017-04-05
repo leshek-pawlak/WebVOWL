@@ -68,13 +68,19 @@ module.exports = function (graphContainerSelector) {
 			if (!options.hideTextInsideBoxes()) {
 				return;
 			}
+			var breakpoint = 0.8;
 			// 0.95 is the latest zoom value where the text inside box looks good.
-		 	if ((zoomFactor < 0.95 && !hiddenTextInsideBoxes) || (zoomFactor >= 0.95 && hiddenTextInsideBoxes)) {
+		 	if ((zoomFactor < breakpoint && !hiddenTextInsideBoxes) || (zoomFactor >= breakpoint && hiddenTextInsideBoxes)) {
 				// toggle hiddenTextInsideBoxes
 				hiddenTextInsideBoxes = !hiddenTextInsideBoxes;
 			}
 			// toggle visible of text inside boxes
-			d3.selectAll('.class-property-group').classed('hidden-text', hiddenTextInsideBoxes);
+			var opacity = zoomFactor > 1 ? 1 : zoomFactor;
+			// smaller opacity only for text.
+			if (opacity < 1 && opacity > breakpoint) {
+				opacity /= 5;
+			}
+			d3.selectAll('.class-property-group').classed('hidden-text', hiddenTextInsideBoxes).attr('style', 'opacity:' + opacity);
 	 	}
 
     function updateHaloRadius() {
