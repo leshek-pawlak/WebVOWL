@@ -33,7 +33,7 @@ a#locateSearchResult{
 	display:none;
 }
 
-#structuresRadios label {
+#styleRadios label {
 	cursor: pointer;
 	display: block;
 	padding: 8px 5px;

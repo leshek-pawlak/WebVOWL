@@ -1,29 +1,29 @@
 /**
- * Contains the logic for connecting the changing structure with the website.
+ * Contains the logic for connecting the changing style with the website.
  *
- * @param graph required for calling a refresh after a structure change
+ * @param graph required for calling a refresh after a style change
  * @returns {{}}
  */
 module.exports = function (graph) {
 
-    var structuresMenu = {},
+    var styleMenu = {},
         DEFAULT_VIEW = 'circle',
-        allStructures;
+        allStyles;
 
-    structuresMenu.structure = DEFAULT_VIEW;
+    styleMenu.style = DEFAULT_VIEW;
     /**
-     * Connects the website with graph structures.
-     * @param choosedView save as structure
+     * Connects the website with graph styles.
+     * @param choosedView save as style
      */
-    structuresMenu.setup = function () {
-      allStructures = d3.selectAll('#structuresRadios input');
+    styleMenu.setup = function () {
+      allStyles = d3.selectAll('#styleRadios input');
 
-      allStructures.each(function () {
+      allStyles.each(function () {
         var radio = d3.select(this);
         radio.on("click", function() { changeView(radio.attr('value')); });
       });
 
-      d3.select('#structuresRadios input[value="'+ structuresMenu.structure +'"]').property('checked', true).on("click")();
+      d3.select('#styleRadios input[value="'+ styleMenu.style +'"]').property('checked', true).on("click")();
 
       if (d3.selectAll('circle')[0].length > 0) {
         prepareCircles();
@@ -36,27 +36,27 @@ module.exports = function (graph) {
     };
 
     /**
-     * Resets the structure (and also structureed elements) to their default.
+     * Resets the style (and also styleed elements) to their default.
      */
-    structuresMenu.reset = function () {
+    styleMenu.reset = function () {
       clear();
 
-      structuresMenu.setup();
+      styleMenu.setup();
     };
 
     /**
-     * Setup and render the current structure. It's useful for graph.update
+     * Setup and render the current style. It's useful for graph.update
      */
-    structuresMenu.render = function() {
-      structuresMenu.setup();
+    styleMenu.render = function() {
+      styleMenu.setup();
       render();
     };
 
     function changeView(choosedView) {
-      if (choosedView === structuresMenu.structure) return;
-      structuresMenu.structure = choosedView;
+      if (choosedView === styleMenu.style) return;
+      styleMenu.style = choosedView;
 
-      allStructures.each(function () {
+      allStyles.each(function () {
         var radio = d3.select(this);
         radio.property('checked', radio.property('value') === choosedView);
       });
@@ -74,7 +74,7 @@ module.exports = function (graph) {
       d3.selectAll('.elements-to-change').each(function () {
         var element = d3.select(this);
         var textElement = d3.select(getClosestTextElement(element));
-        if (structuresMenu.structure === 'rect') {
+        if (styleMenu.style === 'rect') {
           // change circle to rect
           element.property('outerHTML', element.property('outerHTML').replace(/circle/g, 'rect'));
           if (textElement.node()) {
@@ -82,7 +82,7 @@ module.exports = function (graph) {
             if (!textElement.attr('data-y')) {
               textElement.attr('data-y', textElement.attr('y'));
             }
-            // move text to the top of rect. like in UML structure.
+            // move text to the top of rect. like in UML style.
             textElement.attr('y', -(parseInt(element.attr('height')) / 2) + 5 + 'px');
           }
         } else {
@@ -127,5 +127,5 @@ module.exports = function (graph) {
       });
     }
 
-    return structuresMenu;
+    return styleMenu;
 };

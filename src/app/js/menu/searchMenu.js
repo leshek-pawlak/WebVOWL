@@ -43,7 +43,7 @@ module.exports = function (graph) {
 		var stringList = [];
 
 		var i;
-		if (graph.options().structuresMenu().structure === 'rect') {
+		if (graph.options().styleMenu().style === 'rect') {
 			for (i = 0; i < labelDictionary.length; i++) {
 				var isHidden = true;
 				if (labelDictionary[i].labelElement && labelDictionary[i].labelElement()) {
