@@ -194,3 +194,12 @@ marker path {
   stroke: black;
   stroke-width: 2;
 }
+
+.class-property-group.hidden-text {
+  rect {
+    fill: grey;
+  }
+  text {
+    display: none!important;
+  }
+}

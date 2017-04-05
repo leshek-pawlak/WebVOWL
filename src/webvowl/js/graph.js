@@ -72,9 +72,9 @@ module.exports = function (graphContainerSelector) {
 		 	if ((zoomFactor < 0.95 && !hiddenTextInsideBoxes) || (zoomFactor >= 0.95 && hiddenTextInsideBoxes)) {
 				// toggle hiddenTextInsideBoxes
 				hiddenTextInsideBoxes = !hiddenTextInsideBoxes;
-				// toggle visible of text inside boxes
 			}
-			d3.selectAll('text.class-property').classed('hidden', hiddenTextInsideBoxes);
+			// toggle visible of text inside boxes
+			d3.selectAll('.class-property-group').classed('hidden-text', hiddenTextInsideBoxes);
 	 	}
 
     function updateHaloRadius() {
