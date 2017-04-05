@@ -28,7 +28,7 @@ module.exports = function () {
 		searchMenu,
 		ontologyMenu,
 		sidebar,
-		structuresMenu,
+		styleMenu,
 		navigationMenu,
 		scaleNodesByIndividuals = false,
 		paused = true,
@@ -221,9 +221,9 @@ module.exports = function () {
 	};
 
 
-	options.structuresMenu = function (p) {
-		if (!arguments.length) return structuresMenu;
-		structuresMenu = p;
+	options.styleMenu = function (p) {
+		if (!arguments.length) return styleMenu;
+		styleMenu = p;
 		return options;
 	};
 

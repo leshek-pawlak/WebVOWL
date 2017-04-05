@@ -46,7 +46,7 @@ module.exports = (function () {
 			return this;
 		};
 
-		// Properties needed for UML structure
+		// Properties needed for UML style
 		this.height = function (p) {
 			if (!arguments.length) return height;
 			height = p;
@@ -66,7 +66,7 @@ module.exports = (function () {
 		};
 
 		this.textWidth = function (yOffset) {
-			if (graph.options().structuresMenu().structure === 'rect') {
+			if (graph.options().styleMenu().style === 'rect') {
 				return that.width();
 			}
 
@@ -89,7 +89,7 @@ module.exports = (function () {
 
 		this.toggleFocus = function () {
 			that.focused(!that.focused());
-			that.nodeElement().select(graph.options().structuresMenu().structure).classed("focused", that.focused());
+			that.nodeElement().select(graph.options().styleMenu().style).classed("focused", that.focused());
 			graph.resetSearchHighlight();
 			graph.options().searchMenu().clearText();
 
@@ -108,7 +108,7 @@ module.exports = (function () {
 		};
 
 		this.distanceToBorder = function (dx, dy) {
-			if (graph.options().structuresMenu().structure === 'rect') {
+			if (graph.options().styleMenu().style === 'rect') {
 				return rectangularElementTools.distanceToBorder(that, dx, dy);
 			}
 
@@ -126,7 +126,7 @@ module.exports = (function () {
 
 		this.drawHalo = function () {
 			that.halo(true);
-			if (graph.options().structuresMenu().structure === 'rect') {
+			if (graph.options().styleMenu().style === 'rect') {
 				var offset = 15;
 				haloGroupElement = drawTools.drawRectHalo(that, this.width(), this.height(), offset);
 			} else {
@@ -141,7 +141,7 @@ module.exports = (function () {
 			var dx, dy;
 			that.pinned(true);
 
-			if (graph.options().structuresMenu().structure === 'rect') {
+			if (graph.options().styleMenu().style === 'rect') {
 				dx = (0.5 * width) - 10;
 				dy = (-0.5 * height) + 5;
 			} else {

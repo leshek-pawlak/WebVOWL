@@ -768,8 +768,8 @@ module.exports = function (graphContainerSelector) {
 
 		nodeElements.each(function (node) {
 			var element = d3.select(this);
-			// hide class properties rects on UML structure graph.
-			if (options.structuresMenu().structure === 'rect' && (node.type().indexOf('rdfs') > -1 || node.referenceClass)) {
+			// hide class properties rects on UML style graph.
+			if (options.styleMenu().style === 'rect' && (node.type().indexOf('rdfs') > -1 || node.referenceClass)) {
 				element.classed('hidden', true);
 				if (node.pinned()) {
 					node.setToPinned = true;
@@ -781,8 +781,8 @@ module.exports = function (graphContainerSelector) {
 				node.pinned(true);
 			}
 			node.draw(element);
-			// if we need to draw UML structure
-			if (options.structuresMenu().structure === 'rect') {
+			// if we need to draw UML style
+			if (options.styleMenu().style === 'rect') {
 				var circle = node.nodeElement().select('circle:not(.pin):not(.symbol):not(.nofill)');
 				if (circle.node()) {
 					node.nodeElement().append('rect').classed("uml-line", true);
@@ -798,10 +798,10 @@ module.exports = function (graphContainerSelector) {
 			.call(dragBehaviour);
 
 		labelGroupElements.each(function (label) {
-			if (options.structuresMenu().structure === 'rect' && (label.link().range().referenceClass || label.property().type().indexOf('Datatype') > -1)) {
+			if (options.styleMenu().style === 'rect' && (label.link().range().referenceClass || label.property().type().indexOf('Datatype') > -1)) {
 				return;
 			}
-			// hide labels for 'datatypes' for UML structure
+			// hide labels for 'datatypes' for UML style
 			var success = label.draw(d3.select(this));
 			// Remove empty groups without a label.
 			if (!success) {
@@ -830,7 +830,7 @@ module.exports = function (graphContainerSelector) {
 				.classed("cardinality", true);
 
 				cardinalityElements.each(function (property) {
-					if (options.structuresMenu().structure === 'rect' && (property.range().referenceClass || property.type().indexOf('Datatype') > -1)) {
+					if (options.styleMenu().style === 'rect' && (property.range().referenceClass || property.type().indexOf('Datatype') > -1)) {
 						return;
 					}
 					var success = property.drawCardinality(d3.select(this));
@@ -849,7 +849,7 @@ module.exports = function (graphContainerSelector) {
 			.classed("link", true);
 
 		// sort links by type and then alphabetically in the boxes
-		if (options.structuresMenu().structure === 'rect') {
+		if (options.styleMenu().style === 'rect') {
 			linkGroups.sort(function(x,y) {
 				var xLabel = typeof x.label().property().label() === 'object' ? x.label().property().label() : { 'undefined': "Z" };
 				var yLabel = typeof y.label().property().label() === 'object' ? y.label().property().label() : { 'undefined': "Z" };
@@ -858,7 +858,7 @@ module.exports = function (graphContainerSelector) {
 			});
 			linkGroups.each(function (link) {
 				if (link.range().type().indexOf('rdfs') > -1 || link.range().referenceClass) {
-					drawUmlStructure(link);
+					drawUmlStyle(link);
 				} else {
 					link.draw(d3.select(this), markerContainer);
 				}
@@ -880,7 +880,7 @@ module.exports = function (graphContainerSelector) {
 		window.labelNodes = labelNodes;
 
 		addClickEvents();
-		options.structuresMenu().render();
+		options.styleMenu().render();
 	}
 
 	function computePropertySize(domainElement) {
@@ -917,7 +917,7 @@ module.exports = function (graphContainerSelector) {
 	/**
 	 * It renders properties inside the class.
 	 */
-	function drawUmlStructure(link) {
+	function drawUmlStyle(link) {
 		var domainElement = link.domain();
 		var container = domainElement.nodeElement();
 		// concatenate the label
