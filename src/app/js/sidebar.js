@@ -179,7 +179,8 @@ module.exports = function (graph) {
 			var currentVersionIndex = null;
 			// add versions from JSON file
 			for (var i = 0; i < sortedVersions.length; i++) {
-				if (sortedVersions[i].url === location.href) {
+				// check if current version
+				if (sortedVersions[i].version === ontologyInfo.version) {
 					currentVersionIndex = i;
 					// add one previous version if exists
 					if (i > 0) {
