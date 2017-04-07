@@ -31,7 +31,7 @@ module.exports = function () {
 		styleMenu,
 		navigationMenu,
 		scaleNodesByIndividuals = false,
-		paused = true,
+		paused = false,
 		datatypeFilterEnabled = false,
 		objectPropertyFilterEnabled = false,
 		forceFullLabels = false,
@@ -40,13 +40,13 @@ module.exports = function () {
 		cardinalityPlacement = "CLASS",
 		hideTextInsideBoxes = true,
 		umlBoxMinHeight = 30,
-		umlBoxMinWidth = 100;
+		umlBoxMinWidth = 100,
+		defaultGraphStyle = "rect";
 
 	options.sidebar= function(s){
 		if (!arguments.length) return sidebar;
 		sidebar = s;
 		return options;
-
 	};
 
 	options.navigationMenu= function (m){
@@ -282,6 +282,12 @@ module.exports = function () {
 	options.umlBoxMinWidth = function (p) {
 		if (!arguments.length) return umlBoxMinWidth;
 		umlBoxMinWidth = p;
+		return options;
+	};
+
+	options.defaultGraphStyle = function (p) {
+		if (!arguments.length) return defaultGraphStyle;
+		defaultGraphStyle = p;
 		return options;
 	};
 
