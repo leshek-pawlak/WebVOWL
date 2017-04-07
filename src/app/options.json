@@ -5,12 +5,13 @@
   "datatypeDistance": 120,
   "minMagnification": 0.5,
   "maxMagnification": 4,
-  "paused": true,
+  "paused": false,
   "datatypeFilterEnabled": false,
   "objectPropertyFilterEnabled": false,
   "forceFullLabels": true,
   "labelMaxTextLineLength": 55,
   "hideTextInsideBoxes": true,
   "umlBoxMinHeight": 30,
-  "umlBoxMinWidth": 100
+  "umlBoxMinWidth": 100,
+  "defaultGraphStyle": "rect"
 }

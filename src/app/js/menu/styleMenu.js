@@ -6,11 +6,9 @@
  */
 module.exports = function (graph) {
 
-    var styleMenu = {},
-        DEFAULT_VIEW = 'circle',
-        allStyles;
+    var styleMenu = {}, allStyles;
 
-    styleMenu.style = DEFAULT_VIEW;
+    styleMenu.style = graph.options().defaultGraphStyle();
     /**
      * Connects the website with graph styles.
      * @param choosedView save as style
@@ -67,7 +65,7 @@ module.exports = function (graph) {
     }
 
     function clear() {
-      changeView(DEFAULT_VIEW);
+      changeView(graph.options().defaultGraphStyle());
     }
 
     function render() {
