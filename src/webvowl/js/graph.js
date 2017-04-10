@@ -889,11 +889,21 @@ module.exports = function (graphContainerSelector) {
 		options.styleMenu().render();
 	}
 
+	function getWhiteCircleSybling(parentElement) {
+		if (parentElement.selectAll('circle')[0].length > 1) {
+			return parentElement.select('.white');
+		}
+
+		return null;
+	}
+
 	function computePropertySize(domainElement) {
 		var container = domainElement.nodeElement();
+		var whiteCircle = getWhiteCircleSybling(container);
 		var circle = container.select('circle:not(.pin):not(.symbol):not(.nofill)');
 		var text = container.select('text');
-		var isEmbededInsideContainer = !!container.select('.embedded').node();
+		// get only embedded elements with "symbol" inside another rect
+		var isEmbededInsideContainer = !!container.select('.embedded:not(.white)').node();
 		var textLength = container.selectAll('.class-property')[0].length;
 		if (!circle.node() || !text.node()){
 			return;
@@ -907,12 +917,20 @@ module.exports = function (graphContainerSelector) {
 				newHeight += umlEmbeddedExtraFactor;
 			}
 			circle.attr('height', newHeight);
+			if (whiteCircle) {
+				newHeight += 2;
+				whiteCircle.attr('height', newHeight);
+			}
 			domainElement.height(newHeight);
 		}
 		if (!circle.attr('width')) {
 			var tmpWidth = (text.node().getBoundingClientRect().width + umlTextHeight) / zoomFactor;
 			var newWidth = tmpWidth > options.umlBoxMinWidth() ? tmpWidth : options.umlBoxMinWidth();
 			circle.attr('width', newWidth);
+			if (whiteCircle) {
+				newWidth += 8;
+				whiteCircle.attr('width', newWidth);
+			}
 			domainElement.width(newWidth);
 		}
 		if (isEmbededInsideContainer) {
@@ -926,6 +944,7 @@ module.exports = function (graphContainerSelector) {
 	function drawUmlStyle(link) {
 		var domainElement = link.domain();
 		var container = domainElement.nodeElement();
+		var whiteCircle = getWhiteCircleSybling(container);
 		// concatenate the label
 		var label = '(no label)';
 		if (link.label().property().label()) {
@@ -936,6 +955,7 @@ module.exports = function (graphContainerSelector) {
 			text += ' [' + link.label().property().generateCardinalityText() + ']';
 		}
 		var circles = container.selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
+		// get also .white embedded elements
 		var isEmbededInsideContainer = !!container.select('.embedded').node();
 		var circle = d3.select(circles[0][0]);
 		var txt = label + ' : ' + text;
@@ -946,13 +966,17 @@ module.exports = function (graphContainerSelector) {
 				height = height > umlMinEmbeddedContainerHeight ? height : umlMinEmbeddedContainerHeight;
 			}
 			circle.attr('height', height);
+			if (whiteCircle) {
+				height += 8;
+				whiteCircle.attr('height', height);
+			}
 			domainElement.height(height);
 			if (isEmbededInsideContainer) {
 				calculateEmbededElement(container, circle);
 			}
 		}
 		// check if it's needed to resize container
-		resizeContainerWhenTextIsLonger(domainElement, txt);
+		resizeContainerWhenTextIsLonger(domainElement, txt, whiteCircle);
 		// create new text element from property
 		var isDatatype = link.label().property().type().indexOf('Datatype') > -1;
 		var g = container.append("g")
@@ -994,8 +1018,8 @@ module.exports = function (graphContainerSelector) {
 		}
 		// set transforms to text
 		recalculateTextTransforms(container, circle);
-		// compute lines position in the container
-		computeLines(container, circle);
+		// compute transforms for lines and ".white" rects position in the container
+		computeTransforms(container, circle);
 	}
 
 	function calculateEmbededElement(container, circle) {
@@ -1004,7 +1028,8 @@ module.exports = function (graphContainerSelector) {
 		var circleHeight = circle.attr('height') ? parseInt(circle.attr('height')) : container.node().getBoundingClientRect().height;
 		var translateY = -(circleHeight / 2) + umlBoxTitleHeight;
 		container.select('text:not(.class-property)').attr('transform', 'translate(0,' + translateY + ')');
-		container.select('.embedded').attr('transform', 'translate(-5,' + translateY + ')');
+		// we don't want to add embedded transform for .white elements
+		container.select('.embedded:not(.white)').attr('transform', 'translate(-5,' + translateY + ')');
 	}
 
 	/**
@@ -1044,6 +1069,7 @@ module.exports = function (graphContainerSelector) {
 		var translateX = circle.attr('width') ? -(circle.attr('width') / 2) + 4 : -(container.node().getBoundingClientRect().width / 3);
 		// get all text elements which are class properties
 		var propertyGroups = container.selectAll('.class-property-group');
+		// we want to calculate it also for .white.embedded elements
 		var isEmbededInsideContainer = !!container.select('.embedded').node();
 		var allAreDatatype = isAllElementsDatatype(propertyGroups);
 		propertyGroups.each(function(group, index) {
@@ -1094,11 +1120,12 @@ module.exports = function (graphContainerSelector) {
 	}
 
 	/**
-	 * Compute lines size and translation
+	 * Compute transforms for lines and ".white" rects size and translation
 	 */
-	function computeLines(container, circle) {
+	function computeTransforms(container, circle) {
 		var line = container.select('.uml-line');
 		var lineBetweenProps = container.select('.line-between-props');
+		// compute it also for .white.embedded elements.
 		var isEmbededInsideContainer = !!container.select('.embedded').node();
 		var textLength = container.selectAll('.class-property')[0].length;
 		var circleWidth = circle.attr('width') ? parseInt(circle.attr('width')) : container.node().getBoundingClientRect().width;
@@ -1132,18 +1159,25 @@ module.exports = function (graphContainerSelector) {
 	/**
 	 * Compare text width with the container width. Resize when it's needed.
 	 */
-	function resizeContainerWhenTextIsLonger(container, text) {
+	function resizeContainerWhenTextIsLonger(container, text, whiteCircle) {
 		var textWidth = getTextWidth(text);
 		container.nodeElement().selectAll('circle:not(.pin):not(.symbol):not(.nofill)').each(function() {
 			var circle = d3.select(this);
 			if (!circle.attr('width')) {
 				// set minimal box width
 				circle.attr('width', textWidth);
+				if (whiteCircle) {
+					whiteCircle.attr('width', textWidth + 8);
+				}
 			}
 			var circleWidth = parseInt(circle.attr('width'));
 			var textWidthExtraWidth = textWidth + 4;
 			if (circleWidth < textWidthExtraWidth) {
 				circle.attr('width', textWidthExtraWidth);
+				if (whiteCircle) {
+					textWidthExtraWidth += 8;
+					whiteCircle.attr('width', textWidthExtraWidth);
+				}
 				container.width(textWidthExtraWidth);
 			}
 		});

@@ -6,7 +6,10 @@
  */
 module.exports = function (graph) {
 
-    var styleMenu = {}, allStyles;
+    var styleMenu = {},
+      allStyles,
+      minHeight = graph.options().umlBoxMinHeight(),
+      minWidth = graph.options().umlBoxMinWidth();
 
     styleMenu.style = graph.options().defaultGraphStyle();
     /**
@@ -121,6 +124,15 @@ module.exports = function (graph) {
         }
         if (!circle.attr('y')) {
           circle.attr('y',  -(parseInt(circle.attr('height')) / 2));
+          if (!circle.attr('height')) {
+            var tmpHeight = textElement.getBoundingClientRect().height + 8;
+            var newHeight = tmpHeight > minHeight ? tmpHeight : minHeight;
+            circle.attr('height', newHeight);
+          }
+          if (!circle.attr('width')) {
+            var newWidth = r * 2;
+            circle.attr('width', newWidth > minWidth ? newWidth : minWidth);
+          }
         }
       });
     }

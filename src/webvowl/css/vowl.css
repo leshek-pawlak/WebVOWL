@@ -203,3 +203,11 @@ marker path {
     display: none!important;
   }
 }
+/* remove tranforms for rect in .white boxes */
+rect.white {
+  transform: none !important;
+  /* reduce tranforms for text in .white boxes */
+  ~ text.text {
+    transform: translate(0, -2px);
+  }
+}
