@@ -55,11 +55,24 @@ function getRelationClassess(classes) {
 }
 
 function parseJson(json) {
-  var classes = json.owl_Ontology['skos_member-List'].owl_class;
-  var datatypeProperties = json.owl_Ontology['skos_member-List'].owl_DatatypeProperty;
-  var objectProperties = json.owl_Ontology['skos_member-List'].owl_ObjectProperty;
+  var firstKeyName = Object.keys(json)[0];
+  var mainKeys = Object.keys(json[firstKeyName]['skos_member-List']);
+  var classKey, datatypeKey, objectKey;
+  for (var i = 0; i < mainKeys.length; ++i) {
+    var toLowerCase = mainKeys[i].toLowerCase();
+    if (toLowerCase.indexOf('class') > -1) {
+      classKey = mainKeys[i];
+    } else if (toLowerCase.indexOf('datatype') > -1) {
+      datatypeKey = mainKeys[i];
+    } else if (toLowerCase.indexOf('object') > -1) {
+      objectKey = mainKeys[i];
+    }
+  }
+  var classes = json[firstKeyName]['skos_member-List'][classKey];
+  var datatypeProperties = json[firstKeyName]['skos_member-List'][datatypeKey];
+  var objectProperties = json[firstKeyName]['skos_member-List'][objectKey];
   var result = {
-    _comment: json.owl_Ontology.rdfs_comment + ', ' + json.owl_Ontology._uri,
+    _comment: json[firstKeyName].rdfs_comment + ', ' + json[firstKeyName]._uri,
     namespace: [
       // '?',
     ],
@@ -67,11 +80,11 @@ function parseJson(json) {
       languages: [
         'undefined',
       ],
-      iri: json.owl_Ontology._uri,
+      iri: json[firstKeyName]._uri,
       title: {
-        undefined: json.owl_Ontology.rdfs_label,
+        undefined: json[firstKeyName].rdfs_label,
       },
-      version: json.owl_Ontology._hash,
+      version: json[firstKeyName]._hash,
       author: [
         // '?',
       ],
@@ -132,14 +145,16 @@ function parseJson(json) {
     if (classes[i].rdfs_superClassOf) {
       classAttribute.superClasses = getRelationClassess(classes[i].rdfs_superClassOf);
     }
-    if (classes[i].instance && classes[i].instance_prefLabel) {
+    if (classes[i].instance) {
       classAttribute.instances = classes[i].instance.length;
       var individuals = [];
       for (var k = 0; k < classes[i].instance.length; ++k) {
+        var url = classes[i].instance[k]._uri;
+        var hash = url.substring(url.indexOf('#')+1);
         individuals.push({
           iri: classes[i].instance[k]._uri,
           labels: {
-            undefined: classes[i].instance_prefLabel[k],
+            undefined: classes[i].instance_prefLabel ? classes[i].instance_prefLabel[k] : hash,
           },
           // annotations: {
           //   label: [
