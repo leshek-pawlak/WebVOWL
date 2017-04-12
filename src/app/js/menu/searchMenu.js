@@ -33,11 +33,13 @@ module.exports = function (graph) {
 		searchLineEdit.node().value = "";
 	};
 
-	function addLabelsForAllLanguages(element, idList, stringList) {
+	function addLabelsForAllLanguages(labels, id, idList, stringList) {
 		for (var i = 0; i < graph.languages.length; i++) {
-			var lEntry = element.label()[graph.languages[i]];
-			idList.push(element.id());
-			stringList.push(lEntry);
+			var lEntry = labels[graph.languages[i]];
+			if (lEntry) {
+				idList.push(id);
+				stringList.push(lEntry);
+			}
 		}
 	}
 
@@ -56,18 +58,26 @@ module.exports = function (graph) {
 				if (labelDictionary[i].labelElement && labelDictionary[i].labelElement()) {
 					// check if link range element has property referenceClass on true
 					isHidden = labelDictionary[i].range().referenceClass;
+					// if the range element has referenceClass add its label, but id take from parent class
+					if (isHidden) {
+						addLabelsForAllLanguages(labelDictionary[i].range().label(), labelDictionary[i].domain().id(), idList, stringList);
+					}
 				} else if (labelDictionary[i].nodeElement && labelDictionary[i].nodeElement()) {
 					// if node element is hidden then also make it unsearchable
 					isHidden = labelDictionary[i].nodeElement().classed('hidden');
+					// if the node is referenceClass - add label with id of parent class if it's not a referenceClass too.
+					if (isHidden && !labelDictionary[i].links()[0].domain().referenceClass) {
+						addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].links()[0].domain().id(), idList, stringList);
+					}
 				}
 				// only for visible nodes and labels
 				if (!isHidden) {
-					addLabelsForAllLanguages(labelDictionary[i], idList, stringList);
+					addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].id(), idList, stringList);
 				}
 			}
 		} else {
 			for (i = 0; i < labelDictionary.length; i++) {
-				addLabelsForAllLanguages(labelDictionary[i], idList, stringList);
+				addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].id(), idList, stringList);
 			}
 		}
 		mergedStringsList = [];
