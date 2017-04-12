@@ -43,7 +43,8 @@ module.exports = function () {
 		umlBoxMinWidth = 100,
 		defaultGraphStyle = "rect",
 		centerOnLoad = true,
-		centerOnFoundElement = true;
+		centerOnFoundElement = true,
+		addIriCenterToUrl = true;
 
 	options.sidebar= function(s){
 		if (!arguments.length) return sidebar;
@@ -302,6 +303,12 @@ module.exports = function () {
 	options.centerOnFoundElement = function (p) {
 		if (!arguments.length) return centerOnFoundElement;
 		centerOnFoundElement = p;
+		return options;
+	};
+
+	options.addIriCenterToUrl = function (p) {
+		if (!arguments.length) return addIriCenterToUrl;
+		addIriCenterToUrl = p;
 		return options;
 	};
 
