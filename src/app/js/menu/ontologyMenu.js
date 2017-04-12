@@ -70,6 +70,8 @@ module.exports = function (graph) {
 
 				updateNavigationHrefs();
 				parseUrlAndLoadOntology();
+				// remove param if exists
+				webvowl.updateParam('IRIcenter');
 			}
 		});
 
