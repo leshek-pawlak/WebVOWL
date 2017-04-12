@@ -459,6 +459,8 @@ module.exports = function (graphContainerSelector) {
 			}
 		}
 		graph.update();
+		// we have to wait to load sidebar
+		centerOnElementFromUrl();
 	};
 
 
@@ -548,6 +550,45 @@ module.exports = function (graphContainerSelector) {
 			.scale(1);
 	};
 
+	function centerOnElementFromUrl() {
+		var IriCenter = findGetParameter('IRIcenter');
+		var IriLanguage = 'IRI-based';
+		if (IriCenter) {
+			// find node and center
+			graph.getUpdateDictionary().map(function(element, index) {
+				if (element.label()[IriLanguage] === IriCenter) {
+					var posXY = getScreenCoords(element.x, element.y, graphTranslation, zoomFactor);
+					var x = posXY.x;
+					var y = posXY.y;
+					var w = graph.options().width();
+					var h = graph.options().height();
+					var nx = x - 0.5 * w;
+					var ny = y - 0.5 * h;
+
+					var wX = -(nx - graphTranslation[0]);
+					var wY = -(ny - graphTranslation[1]);
+
+					graphTranslation[0] = wX;
+					graphTranslation[1] = wY;
+
+					/** make the transition **/
+					graphContainer.transition()
+							.tween("attr.translate", function () {
+									return function (t) {
+											var tr = d3.transform(graphContainer.attr("transform"));
+											x = tr.translate[0];
+											y = tr.translate[1];
+											graphTranslation[0] = x;
+											graphTranslation[1] = y;
+									};
+							})
+							.attr("transform", "translate(" + graphTranslation + ")scale(" + zoomFactor + ")")
+							.duration(0);
+					zoom.translate([graphTranslation[0], graphTranslation[1]]);
+				}
+			})
+		}
+	}
 	/**
 	 * Calculate the link distance of a single link part.
 	 * The visible link distance does not contain e.g. radii of round nodes.
@@ -1522,6 +1563,20 @@ module.exports = function (graphContainerSelector) {
 		}
 
 		return false;
+	}
+
+	// get parameter from URL
+	function findGetParameter(parameterName) {
+    var result = null,
+        tmp = [];
+    location.search
+			.substr(1)
+      .split("&")
+      .forEach(function (item) {
+      	tmp = item.split("=");
+    		if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+    });
+    return result;
 	}
 
 	return graph;
