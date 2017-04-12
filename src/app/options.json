@@ -15,5 +15,6 @@
   "umlBoxMinWidth": 100,
   "defaultGraphStyle": "rect",
   "centerOnLoad": true,
-  "centerOnFoundElement": true
+  "centerOnFoundElement": true,
+  "addIriCenterToUrl": true
 }
