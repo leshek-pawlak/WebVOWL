@@ -514,7 +514,7 @@ module.exports = function (graphContainerSelector) {
 	};
 
 	function centerOnElementFromUrl() {
-		var IriCenter = findGetParameter('IRIcenter');
+		var IriCenter = webvowl.findGetParameter('IRIcenter');
 		var IriLanguage = 'IRI-based';
 		if (IriCenter) {
 			// find node and center
@@ -665,7 +665,9 @@ module.exports = function (graphContainerSelector) {
             // move the center of the viewport to this location
 
             var node = force.nodes()[pulseNodeIds[locationId]];
-						insertParam('IRIcenter', node.label()['IRI-based']);
+						if (graph.options().addIriCenterToUrl() && typeof node.label === 'function') {
+							webvowl.updateParam('IRIcenter', node.label()['IRI-based']);
+						}
             console.log("--------------------------\nCurrent Location Id" + locationId);
             locationId++;
             locationId = locationId % pulseNodeIds.length;
@@ -1523,47 +1525,7 @@ module.exports = function (graphContainerSelector) {
 		return false;
 	}
 
-	// get parameter from URL
-	function findGetParameter(parameterName) {
-    var result = null,
-        tmp = [];
-    location.search
-			.substr(1)
-      .split("&")
-      .forEach(function (item) {
-      	tmp = item.split("=");
-    		if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-    });
-    return result;
-	}
 
-	// set parameter to URL
-	function insertParam(key, value) {
-    key = encodeURI(key);
-		value = encodeURI(value);
-    var kvp = location.search.substr(1).split('&');
-    var i = kvp.length;
-		var x;
-		while(i--) {
-      x = kvp[i].split('=');
-      if (x[0] === key) {
-        x[1] = value;
-        kvp[i] = x.join('=');
-        break;
-      }
-    }
-
-    if (i < 0) {
-			kvp[kvp.length] = [key,value].join('=');
-		}
-		var path = '?' + kvp[0];
-		if (kvp.length > 1) {
-			path += kvp.join('&');
-		}
-		path += location.hash;
-    // change url without reload the page
-		history.pushState(null, null, path);
-	}
 
 	return graph;
 };
