@@ -438,6 +438,10 @@ module.exports = function (graph) {
 				handleAutoCompletion();
 			}
 			searchMenu.hideSearchEntries();
+			if (graph.options().centerOnFoundElement()) {
+				// center screen on the first result
+				graph.locateSearchResult();
+			}
 		};
 	}
 

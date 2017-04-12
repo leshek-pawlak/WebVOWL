@@ -41,7 +41,9 @@ module.exports = function () {
 		hideTextInsideBoxes = true,
 		umlBoxMinHeight = 30,
 		umlBoxMinWidth = 100,
-		defaultGraphStyle = "rect";
+		defaultGraphStyle = "rect",
+		centerOnLoad = true,
+		centerOnFoundElement = true;
 
 	options.sidebar= function(s){
 		if (!arguments.length) return sidebar;
@@ -288,6 +290,18 @@ module.exports = function () {
 	options.defaultGraphStyle = function (p) {
 		if (!arguments.length) return defaultGraphStyle;
 		defaultGraphStyle = p;
+		return options;
+	};
+
+	options.centerOnLoad = function (p) {
+		if (!arguments.length) return centerOnLoad;
+		centerOnLoad = p;
+		return options;
+	};
+
+	options.centerOnFoundElement = function (p) {
+		if (!arguments.length) return centerOnFoundElement;
+		centerOnFoundElement = p;
 		return options;
 	};
 

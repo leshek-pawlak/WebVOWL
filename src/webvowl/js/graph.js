@@ -420,8 +420,10 @@ module.exports = function (graphContainerSelector) {
 			}
 		}
 		graph.update();
-		// we have to wait to load sidebar
-		centerOnElementFromUrl();
+		if (graph.options().centerOnLoad()) {
+			// we have to wait to load sidebar
+			centerOnElementFromUrl();
+		}
 	};
 
 
