@@ -709,6 +709,7 @@ module.exports = function (graphContainerSelector) {
             // move the center of the viewport to this location
 
             var node = force.nodes()[pulseNodeIds[locationId]];
+						insertParam('IRIcenter', node.label()['IRI-based']);
             console.log("--------------------------\nCurrent Location Id" + locationId);
             locationId++;
             locationId = locationId % pulseNodeIds.length;
@@ -1579,6 +1580,34 @@ module.exports = function (graphContainerSelector) {
     		if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
     });
     return result;
+	}
+
+	// set parameter to URL
+	function insertParam(key, value) {
+    key = encodeURI(key);
+		value = encodeURI(value);
+    var kvp = location.search.substr(1).split('&');
+    var i = kvp.length;
+		var x;
+		while(i--) {
+      x = kvp[i].split('=');
+      if (x[0] === key) {
+        x[1] = value;
+        kvp[i] = x.join('=');
+        break;
+      }
+    }
+
+    if (i < 0) {
+			kvp[kvp.length] = [key,value].join('=');
+		}
+		var path = '?' + kvp[0];
+		if (kvp.length > 1) {
+			path += kvp.join('&');
+		}
+		path += location.hash;
+    // change url without reload the page
+		history.pushState(null, null, path);
 	}
 
 	return graph;
