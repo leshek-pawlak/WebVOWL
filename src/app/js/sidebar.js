@@ -107,6 +107,8 @@ module.exports = function (graph) {
 
 	function setLanguages(languages) {
 		languages = languages || [];
+		// save languages array to graph
+		graph.languages = languages;
 
 		// Put the default and unset label on top of the selection labels
 		languages.sort(function (a, b) {

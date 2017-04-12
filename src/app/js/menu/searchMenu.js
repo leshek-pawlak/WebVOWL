@@ -33,6 +33,13 @@ module.exports = function (graph) {
 		searchLineEdit.node().value = "";
 	};
 
+	function addLabelsForAllLanguages(element, idList, stringList) {
+		for (var i = 0; i < graph.languages.length; i++) {
+			var lEntry = element.label()[graph.languages[i]];
+			idList.push(element.id());
+			stringList.push(lEntry);
+		}
+	}
 
 	function updateSearchDictionary() {
 		labelDictionary = graph.getUpdateDictionary();
@@ -55,16 +62,12 @@ module.exports = function (graph) {
 				}
 				// only for visible nodes and labels
 				if (!isHidden) {
-					var lEntry = labelDictionary[i].labelForCurrentLanguage();
-					idList.push(labelDictionary[i].id());
-					stringList.push(lEntry);
+					addLabelsForAllLanguages(labelDictionary[i], idList, stringList);
 				}
 			}
 		} else {
 			for (i = 0; i < labelDictionary.length; i++) {
-				var lEntry = labelDictionary[i].labelForCurrentLanguage();
-				idList.push(labelDictionary[i].id());
-				stringList.push(lEntry);
+				addLabelsForAllLanguages(labelDictionary[i], idList, stringList);
 			}
 		}
 		mergedStringsList = [];
