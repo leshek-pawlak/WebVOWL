@@ -421,8 +421,10 @@ module.exports = function (graphContainerSelector) {
 		}
 		graph.update();
 		if (graph.options().centerOnLoad()) {
-			// we have to wait to load sidebar
-			centerOnElementFromUrl();
+			setTimeout(function() {
+				// we have to wait to load sidebar
+				centerOnElementFromUrl();
+			});
 		}
 	};
 
@@ -520,7 +522,8 @@ module.exports = function (graphContainerSelector) {
 			// find node and center
 			graph.getUpdateDictionary().map(function(element, index) {
 				if (element.label()[IriLanguage] === IriCenter) {
-					var posXY = getScreenCoords(element.x, element.y, graphTranslation, zoomFactor);
+					var node = element.x ? element : element.link().label();
+					var posXY = getScreenCoords(node.x, node.y, graphTranslation, zoomFactor);
 					var x = posXY.x;
 					var y = posXY.y;
 					var w = graph.options().width();
@@ -665,8 +668,8 @@ module.exports = function (graphContainerSelector) {
             // move the center of the viewport to this location
 
             var node = force.nodes()[pulseNodeIds[locationId]];
-						if (graph.options().addIriCenterToUrl() && typeof node.label === 'function') {
-							webvowl.updateParam('IRIcenter', node.label()['IRI-based']);
+						if (graph.options().addIriCenterToUrl()) {
+							webvowl.updateParam('IRIcenter', typeof node.label === 'function' ? node.label()['IRI-based'] : node.property().label()['IRI-based']);
 						}
             console.log("--------------------------\nCurrent Location Id" + locationId);
             locationId++;
