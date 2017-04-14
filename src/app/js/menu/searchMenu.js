@@ -43,6 +43,14 @@ module.exports = function (graph) {
 		}
 	}
 
+	function addIndividualsToDictionary(node, id, idList, stringList) {
+		if (graph.options().addIndividualsToDictionary() && node.individuals) {
+			for (var i = 0; i < node.individuals().length; i++) {
+				addLabelsForAllLanguages(node.individuals()[i].label(), id, idList, stringList);
+			}
+		}
+	}
+
 	function updateSearchDictionary() {
 		labelDictionary = graph.getUpdateDictionary();
 		dictionaryUpdateRequired = false;
@@ -61,6 +69,7 @@ module.exports = function (graph) {
 					// if the range element has referenceClass add its label, but id take from parent class
 					if (isHidden) {
 						addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].domain().id(), idList, stringList);
+						addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].domain().id(), idList, stringList);
 					}
 				} else if (labelDictionary[i].nodeElement) {
 					// if node element is hidden then also make it unsearchable
@@ -68,16 +77,19 @@ module.exports = function (graph) {
 					// if the node is referenceClass - add label with id of parent class if it's not a referenceClass too.
 					if (isHidden && !labelDictionary[i].links()[0].domain().referenceClass) {
 						addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].links()[0].domain().id(), idList, stringList);
+						addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].links()[0].domain().id(), idList, stringList);
 					}
 				}
 				// only for visible nodes and labels
 				if (!isHidden) {
 					addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].id(), idList, stringList);
+					addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].id(), idList, stringList);
 				}
 			}
 		} else {
 			for (i = 0; i < labelDictionary.length; i++) {
 				addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].id(), idList, stringList);
+				addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].id(), idList, stringList);
 			}
 		}
 		mergedStringsList = [];
