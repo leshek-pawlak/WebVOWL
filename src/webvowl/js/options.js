@@ -44,7 +44,8 @@ module.exports = function () {
 		defaultGraphStyle = "rect",
 		centerOnLoad = true,
 		centerOnFoundElement = true,
-		addIriCenterToUrl = true;
+		addIriCenterToUrl = true,
+		addIndividualsToDictionary = true;
 
 	options.sidebar= function(s){
 		if (!arguments.length) return sidebar;
@@ -309,6 +310,12 @@ module.exports = function () {
 	options.addIriCenterToUrl = function (p) {
 		if (!arguments.length) return addIriCenterToUrl;
 		addIriCenterToUrl = p;
+		return options;
+	};
+
+	options.addIndividualsToDictionary = function (p) {
+		if (!arguments.length) return addIndividualsToDictionary;
+		addIndividualsToDictionary = p;
 		return options;
 	};
 

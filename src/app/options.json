@@ -16,5 +16,6 @@
   "defaultGraphStyle": "rect",
   "centerOnLoad": true,
   "centerOnFoundElement": true,
-  "addIriCenterToUrl": true
+  "addIriCenterToUrl": true,
+  "addIndividualsToDictionary": true
 }
