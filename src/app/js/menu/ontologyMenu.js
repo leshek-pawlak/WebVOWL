@@ -116,7 +116,7 @@ module.exports = function (graph) {
 
 		} else if (hashParameter.substr(0, urlKey.length) === urlKey) {
 			var url = decodeURIComponent(hashParameter.slice(urlKey.length));
-			loadOntologyFromURL("read?json=" + encodeURIComponent(url), url);
+			loadOntologyFromURL(encodeURIComponent(url), url);
 
 		} else if (hashParameter.substr(0, iriKey.length) === iriKey) {
 			var iri = decodeURIComponent(hashParameter.slice(iriKey.length));
@@ -140,6 +140,7 @@ module.exports = function (graph) {
 	}
 
 	function loadOntologyFromURL(relativePath,requestedURL){
+		var relativePath = requestedURL.replace('http://[.?]+/', '');
 		fileToLoad=requestedURL;
 		var cachedOntology = cachedConversions[relativePath];
 		var trimmedRequestedUri = requestedURL.replace(/\/$/g, "");
