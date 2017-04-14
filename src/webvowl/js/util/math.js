@@ -70,6 +70,14 @@ module.exports = (function () {
 			fixPoint1 = {"x": node.x + x1, "y": node.y + y1},
 			fixPoint2 = {"x": node.x + x2, "y": node.y + y2};
 
+		// calculate loop for boxes view
+		if (node.nodeElement().select('rect').node()) {
+			var x = node.width() / 2;
+			var y = node.height() / 2;
+			fixPoint1 = {"x": node.x - x, "y": node.y - y};
+			fixPoint2 = {"x": node.x + x, "y": node.y - y};
+		}
+
 		return loopFunction([fixPoint1, link.label(), fixPoint2]);
 	};
 
