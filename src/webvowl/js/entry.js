@@ -67,7 +67,7 @@ function findGetParameter(parameterName) {
 // set, overwrite or delete parameter in URL
 function updateParam(key, value) {
 	var kvp = location.search.substr(1).split('&');
-	var path = '/';
+	var path = location.pathname;
 	key = encodeURI(key);
 	if (value) {
 		value = encodeURI(value);
