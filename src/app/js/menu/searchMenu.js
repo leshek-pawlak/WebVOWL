@@ -55,14 +55,14 @@ module.exports = function (graph) {
 		if (graph.options().styleMenu().style === 'rect') {
 			for (i = 0; i < labelDictionary.length; i++) {
 				var isHidden = true;
-				if (labelDictionary[i].labelElement && labelDictionary[i].labelElement()) {
+				if (labelDictionary[i].labelElement) {
 					// check if link range element has property referenceClass on true
-					isHidden = labelDictionary[i].range().referenceClass;
+					isHidden = labelDictionary[i].range().referenceClass || labelDictionary[i].range().type().indexOf('Datatype') > -1;
 					// if the range element has referenceClass add its label, but id take from parent class
 					if (isHidden) {
-						addLabelsForAllLanguages(labelDictionary[i].range().label(), labelDictionary[i].domain().id(), idList, stringList);
+						addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].domain().id(), idList, stringList);
 					}
-				} else if (labelDictionary[i].nodeElement && labelDictionary[i].nodeElement()) {
+				} else if (labelDictionary[i].nodeElement) {
 					// if node element is hidden then also make it unsearchable
 					isHidden = labelDictionary[i].nodeElement().classed('hidden');
 					// if the node is referenceClass - add label with id of parent class if it's not a referenceClass too.
