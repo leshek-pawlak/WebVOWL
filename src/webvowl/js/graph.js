@@ -1084,10 +1084,7 @@ module.exports = function (graphContainerSelector) {
 			.on("click", function() {
 				event.stopPropagation();
 				// mark as selected nodes inside nodes
-				var focused = d3.select('.focused')
-				if (focused.node()) {
-					focused.classed('focused', false);
-				}
+				d3.selectAll('.focused').classed('focused', false);
 				// find current target in classNodes
 				var clickedLabel = labelNodes[this.getAttribute('label-index')].property();
 				// save original element to highlight purpose
