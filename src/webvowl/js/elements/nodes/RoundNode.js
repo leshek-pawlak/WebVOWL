@@ -89,10 +89,10 @@ module.exports = (function () {
 
 		this.toggleFocus = function () {
 			that.focused(!that.focused());
+			d3.selectAll('.focused').classed('focused', false);
 			that.nodeElement().select(graph.options().styleMenu().style).classed("focused", that.focused());
 			graph.resetSearchHighlight();
 			graph.options().searchMenu().clearText();
-
 		};
 
 		this.actualRadius = function () {

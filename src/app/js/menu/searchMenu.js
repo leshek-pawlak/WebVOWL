@@ -33,20 +33,24 @@ module.exports = function (graph) {
 		searchLineEdit.node().value = "";
 	};
 
-	function addLabelsForAllLanguages(labels, id, idList, stringList) {
+	function addLabelsForAllLanguages(node, id, idList, stringList, rectElement) {
+		var labels = node.label();
 		for (var i = 0; i < graph.languages.length; i++) {
 			var lEntry = labels[graph.languages[i]];
 			if (lEntry) {
+				if (rectElement) {
+					rectElement.classed(lEntry.replace(/ /g, ''), true);
+				}
 				idList.push(id);
 				stringList.push(lEntry);
 			}
 		}
 	}
 
-	function addIndividualsToDictionary(node, id, idList, stringList) {
+	function addIndividualsToDictionary(node, id, idList, stringList, rectElement) {
 		if (graph.options().addIndividualsToDictionary() && node.individuals) {
 			for (var i = 0; i < node.individuals().length; i++) {
-				addLabelsForAllLanguages(node.individuals()[i].label(), id, idList, stringList);
+				addLabelsForAllLanguages(node.individuals()[i], id, idList, stringList, rectElement);
 			}
 		}
 	}
@@ -68,27 +72,31 @@ module.exports = function (graph) {
 					isHidden = labelDictionary[i].range().referenceClass || labelDictionary[i].range().type().indexOf('Datatype') > -1;
 					// if the range element has referenceClass add its label, but id take from parent class
 					if (isHidden) {
-						addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].domain().id(), idList, stringList);
-						addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].domain().id(), idList, stringList);
+						var rectElement = labelDictionary[i].domain().nodeElement().select('#' + labelDictionary[i].range().id() + ' rect');
+						addLabelsForAllLanguages(labelDictionary[i], labelDictionary[i].domain().id(), idList, stringList, rectElement);
+						addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].domain().id(), idList, stringList, rectElement);
 					}
 				} else if (labelDictionary[i].nodeElement) {
 					// if node element is hidden then also make it unsearchable
 					isHidden = labelDictionary[i].nodeElement().classed('hidden');
 					// if the node is referenceClass - add label with id of parent class if it's not a referenceClass too.
 					if (isHidden && !labelDictionary[i].links()[0].domain().referenceClass) {
-						addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].links()[0].domain().id(), idList, stringList);
-						addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].links()[0].domain().id(), idList, stringList);
+						var rectElement = labelDictionary[i].links()[0].domain().nodeElement().select('#' + labelDictionary[i].links()[0].range().id() + ' rect');
+						addLabelsForAllLanguages(labelDictionary[i], labelDictionary[i].links()[0].domain().id(), idList, stringList, rectElement);
+						addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].links()[0].domain().id(), idList, stringList, rectElement);
 					}
 				}
 				// only for visible nodes and labels
 				if (!isHidden) {
-					addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].id(), idList, stringList);
-					addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].id(), idList, stringList);
+					var element = labelDictionary[i].nodeElement ? labelDictionary[i].nodeElement() : labelDictionary[i].labelElement();
+					var rectElement = element.select('#' + labelDictionary[i].id() + ' rect');
+					addLabelsForAllLanguages(labelDictionary[i], labelDictionary[i].id(), idList, stringList, rectElement);
+					addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].id(), idList, stringList, rectElement);
 				}
 			}
 		} else {
 			for (i = 0; i < labelDictionary.length; i++) {
-				addLabelsForAllLanguages(labelDictionary[i].label(), labelDictionary[i].id(), idList, stringList);
+				addLabelsForAllLanguages(labelDictionary[i], labelDictionary[i].id(), idList, stringList);
 				addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].id(), idList, stringList);
 			}
 		}
@@ -449,6 +457,8 @@ module.exports = function (graph) {
 	function handleClick(elementId){
 
 		return function(){
+			// clear focused element
+			d3.selectAll('.focused').classed('focused', false);
 			var id = elementId;
 			var correspondingIds = mergedIdList[id];
 
@@ -467,6 +477,8 @@ module.exports = function (graph) {
 				// center screen on the first result
 				graph.locateSearchResult();
 			}
+			// if sarched is "individual" from selection details or class inside another class.
+			d3.selectAll('.' + autoComStr.replace(/ /g, '')).classed('focused', true);
 		};
 	}
 
