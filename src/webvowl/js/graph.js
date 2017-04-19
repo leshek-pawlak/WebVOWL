@@ -236,20 +236,16 @@ module.exports = function (graphContainerSelector) {
                 }
                 halo.attr("r", newRadius);
             } else {
-            	if (node.property().inverse()){
-                    defaultRadius=0.5*container.width()+14;
-                    container.getHalos().select("circle").attr("cx",0)
-                    									 .attr("cy",14);
-				}else{
-					defaultRadius=0.5*container.width();
+            	if (node.property && node.property().inverse()){
+                defaultRadius=0.5*container.width()+14;
+                container.getHalos().select("circle").attr("cx",0).attr("cy",14);
+							} else{
+								defaultRadius=0.5*container.width();
             	}
-                if (newRadius<defaultRadius) newRadius=defaultRadius;
-                halo.attr("r", newRadius);
+              if (newRadius<defaultRadius) newRadius=defaultRadius;
+              halo.attr("r", newRadius);
             }
-
-
         } else { // node is in viewport , render original;
-
             // reset the halo to original radius
             defaultRadius = node.actualRadius() + 15;
             if (!nodeIsRect) {
