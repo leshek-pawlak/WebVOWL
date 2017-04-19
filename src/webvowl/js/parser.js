@@ -282,6 +282,13 @@ module.exports = function (graph) {
 					if (element.individuals) {
 						element.individuals.forEach(function (individual) {
 							var individualNode = new Prototype(graph);
+							// extract lack labels from annotations
+							if (individual.annotations && individual.annotations.label) {
+								var labels = individual.annotations.label;
+								for (var i = 0; i < labels.length; i++) {
+									individual.labels[labels[i].language] = labels[i].value;
+								}
+							}
 							individualNode.label(individual.labels)
 								.iri(individual.iri);
 
