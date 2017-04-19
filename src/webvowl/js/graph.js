@@ -1017,7 +1017,7 @@ module.exports = function (graphContainerSelector) {
 			label = link.label().property().label()[language];
 		}
 		var text = link.range().labelForCurrentLanguage();
-		if (link.label().property().generateCardinalityText()) {
+		if (options.cardinalityVisible() && link.label().property().generateCardinalityText()) {
 			text += ' [' + link.label().property().generateCardinalityText() + ']';
 		}
 		var circles = container.selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
