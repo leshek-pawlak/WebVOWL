@@ -38,7 +38,6 @@ module.exports = function () {
 		labelMaxTextLineLength = 45,
 		cardinalityVisible = true,
 		cardinalityPlacement = "CLASS",
-		hideTextInsideBoxes = true,
 		umlBoxMinHeight = 30,
 		umlBoxMinWidth = 100,
 		defaultGraphStyle = "rect",
@@ -269,12 +268,6 @@ module.exports = function () {
 
 	options.rewriteFrom = function (otherOptions) {
 		rewriteFrom(otherOptions, options);
-	};
-
-	options.hideTextInsideBoxes = function (p) {
-		if (!arguments.length) return hideTextInsideBoxes;
-		hideTextInsideBoxes = p;
-		return options;
 	};
 
 	options.umlBoxMinHeight = function (p) {

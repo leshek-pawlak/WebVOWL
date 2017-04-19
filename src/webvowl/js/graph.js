@@ -62,28 +62,6 @@ module.exports = function (graphContainerSelector) {
 		umlMinEmbeddedContainerHeight = 62,
 		umlLineBetweenPropsFactor = umlSpaceBetweenProperties + 1;
 
-	/**
-	 * Recalculates the positions of nodes, links, ... and updates them.
-	 */
-	 	function toggleTextInsideBoxes() {
-			if (!options.hideTextInsideBoxes()) {
-				return;
-			}
-			var breakpoint = 0.8;
-			// 0.95 is the latest zoom value where the text inside box looks good.
-		 	if ((zoomFactor < breakpoint && !hiddenTextInsideBoxes) || (zoomFactor >= breakpoint && hiddenTextInsideBoxes)) {
-				// toggle hiddenTextInsideBoxes
-				hiddenTextInsideBoxes = !hiddenTextInsideBoxes;
-			}
-			// toggle visible of text inside boxes
-			var opacity = zoomFactor > 1 ? 1 : zoomFactor;
-			// smaller opacity only for text.
-			if (opacity < 1 && opacity > breakpoint) {
-				opacity /= 5;
-			}
-			d3.selectAll('.class-property-group').classed('hidden-text', hiddenTextInsideBoxes).attr('style', 'opacity:' + opacity);
-	 	}
-
     function updateHaloRadius() {
         if (pulseNodeIds && pulseNodeIds.length > 0) {
             var forceNodes = force.nodes();
@@ -329,7 +307,6 @@ module.exports = function (graphContainerSelector) {
             graphTranslation = d3.event.translate;
             graphContainer.attr("transform", "translate(" + graphTranslation + ")scale(" + zoomFactor + ")");
             updateHaloRadius();
-		toggleTextInsideBoxes();
             return;
 		}
 		/** animate the transition **/
@@ -520,7 +497,6 @@ module.exports = function (graphContainerSelector) {
 				}
 			}
 		}
-		toggleTextInsideBoxes();
 	};
 
 	graph.paused = function (p) {
