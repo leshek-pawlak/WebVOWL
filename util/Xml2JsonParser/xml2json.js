@@ -94,11 +94,11 @@ function parseJson(json) {
     },
     metrics: {
       classCount: classes.length,
-      datatypeCount: 0,
+      datatypeCount: datatypeProperties.length,
       objectPropertyCount: objectProperties.length,
       datatypePropertyCount: datatypeProperties.length,
-      propertyCount: 0,
-      nodeCount: 0,
+      propertyCount: objectProperties.length + datatypeProperties.length,
+      nodeCount: classes.length + datatypeProperties.length,
       axiomCount: 0,
       individualCount: 0,
     },
@@ -112,15 +112,19 @@ function parseJson(json) {
 
   // add classes to result json.
   for (var i = 0; i < classes.length; i++) {
+    var id = 'class' + classes[i]._hash;
+    var type = 'owl:Class';
+    // NOTE type can be an attribute of class or 'owl:unionOf', but in xml file there are none exemples of used.
     result.class.push({
-      id: 'class' + classes[i]._hash,
-      // type: '?',
+      id: id,
+      type: type,
     });
-
+    var iriLabel = classes[i].skos_prefLabel || classes[i].rdfs_label || '';
     var classAttribute = {
-      id: 'class' + classes[i]._hash,
+      id: id,
       label: {
-        undefined: classes[i].skos_prefLabel || classes[i].rdfs_label,
+        'IRI-based': iriLabel,
+        undefined: iriLabel.replace(/([A-Z])/g, ' $1'),
       },
       iri: classes[i]._uri,
       instances: 0,
@@ -146,26 +150,28 @@ function parseJson(json) {
       classAttribute.superClasses = getRelationClassess(classes[i].rdfs_superClassOf);
     }
     if (classes[i].instance) {
+      result.metrics.individualCount += classes[i].instance.length;
       classAttribute.instances = classes[i].instance.length;
       var individuals = [];
       for (var k = 0; k < classes[i].instance.length; ++k) {
         var url = classes[i].instance[k]._uri;
         var hash = url.substring(url.indexOf('#')+1);
+        var label = classes[i].instance_prefLabel ? classes[i].instance_prefLabel[k] : hash;
         individuals.push({
           iri: classes[i].instance[k]._uri,
           labels: {
-            undefined: classes[i].instance_prefLabel ? classes[i].instance_prefLabel[k] : hash,
+            'IRI-based': label,
           },
-          // annotations: {
-          //   label: [
-          //     {
-          //       identifier: 'label',
-          //       language: 'undefined',
-          //       value: classes[i].instance_prefLabel[k],
-          //       type: 'label'
-          //     }
-          //   ]
-          // }
+          annotations: {
+            label: [
+              {
+                identifier: 'label',
+                language: 'undefined',
+                value: label.replace(classes[i].instance[k]._uri, '').replace(/([A-Z])/g, ' $1'),
+                type: 'label'
+              }
+            ]
+          }
         });
       }
       classAttribute.individuals = individuals;
@@ -175,8 +181,13 @@ function parseJson(json) {
 
   // add datatype properties to result json.
   for (var i = 0; i < datatypeProperties.length; i++) {
+    var id = 'datatype' + datatypeProperties[i]._hash;
+    result.datatype.push({
+      id: id,
+      type: 'rdfs:Datatype',
+    });
     result.datatypeAttribute.push({
-      id: 'datatype' + datatypeProperties[i]._hash,
+      id: id,
       label: {
         undefined: datatypeProperties[i].skos_prefLabel,
       },
