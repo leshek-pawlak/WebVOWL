@@ -124,7 +124,7 @@ function parseJson(json) {
       id: id,
       label: {
         'IRI-based': iriLabel,
-        undefined: iriLabel.replace(/([A-Z])/g, ' $1'),
+        undefined: iriLabel.replace(/([a-z])([A-Z])/g, '$1 $2'),
       },
       iri: classes[i]._uri,
       instances: 0,
@@ -157,6 +157,8 @@ function parseJson(json) {
         var url = classes[i].instance[k]._uri;
         var hash = url.substring(url.indexOf('#')+1);
         var label = classes[i].instance_prefLabel ? classes[i].instance_prefLabel[k] : hash;
+        // create undefined label from class url hash and IRI-based label
+        var undefinedLabel = label.replace(classes[i]._uri.substring(classes[i]._uri.indexOf('#')+1), '').replace(/([a-z])([A-Z])/g, '$1 $2');
         individuals.push({
           iri: classes[i].instance[k]._uri,
           labels: {
@@ -167,7 +169,7 @@ function parseJson(json) {
               {
                 identifier: 'label',
                 language: 'undefined',
-                value: label.replace(classes[i].instance[k]._uri, '').replace(/([A-Z])/g, ' $1'),
+                value: undefinedLabel,
                 type: 'label'
               }
             ]
