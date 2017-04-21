@@ -11,6 +11,7 @@ var optionDefinitions = [
 var options = commandLineArgs(optionDefinitions);
 var exportFolder = options.exportFolder || 'src/app/data';
 var pathToXmlfile = options.pathToXmlfile || 'src/app/xml/model-output.xml';
+var classes, datatypeProperties, objectProperties;
 
 // extend of object
 
@@ -54,6 +55,26 @@ function getRelationClassess(classes) {
   return relationClasses;
 }
 
+function findIdByUri(uri) {
+  for (var i = 0; i < classes.length; i++) {
+    if (classes[i]._uri === uri) {
+      return 'class' + classes[i]._hash;
+    }
+  }
+  for (var i = 0; i < datatypeProperties.length; i++) {
+    if (datatypeProperties[i]._uri === uri) {
+      return 'datatype' + datatypeProperties[i]._hash;
+    }
+  }
+  for (var i = 0; i < objectProperties.length; i++) {
+    if (objectProperties[i]._uri === uri) {
+      return 'property' + objectProperties[i]._hash;
+    }
+  }
+
+  return null;
+}
+
 function parseJson(json) {
   var firstKeyName = Object.keys(json)[0];
   var mainKeys = Object.keys(json[firstKeyName]['skos_member-List']);
@@ -68,9 +89,9 @@ function parseJson(json) {
       objectKey = mainKeys[i];
     }
   }
-  var classes = json[firstKeyName]['skos_member-List'][classKey];
-  var datatypeProperties = json[firstKeyName]['skos_member-List'][datatypeKey];
-  var objectProperties = json[firstKeyName]['skos_member-List'][objectKey];
+  classes = json[firstKeyName]['skos_member-List'][classKey];
+  datatypeProperties = json[firstKeyName]['skos_member-List'][datatypeKey];
+  objectProperties = json[firstKeyName]['skos_member-List'][objectKey];
   var result = {
     _comment: json[firstKeyName].rdfs_comment + ', ' + json[firstKeyName]._uri,
     namespace: [
@@ -119,7 +140,7 @@ function parseJson(json) {
       id: id,
       type: type,
     });
-    var iriLabel = classes[i].skos_prefLabel || classes[i].rdfs_label || '';
+    var iriLabel = classes[i].skos_prefLabel || classes[i].rdfs_label || classes[i]._uri.substring(classes[i]._uri.indexOf('#')+1);
     var classAttribute = {
       id: id,
       label: {
@@ -158,7 +179,7 @@ function parseJson(json) {
         var hash = url.substring(url.indexOf('#')+1);
         var label = classes[i].instance_prefLabel ? classes[i].instance_prefLabel[k] : hash;
         // create undefined label from class url hash and IRI-based label
-        var undefinedLabel = label.replace(classes[i]._uri.substring(classes[i]._uri.indexOf('#')+1), '').replace(/([a-z])([A-Z])/g, '$1 $2');
+        var undefinedLabel = label.replace(iriLabel, '').replace(/([a-z])([A-Z])/g, '$1 $2');
         individuals.push({
           iri: classes[i].instance[k]._uri,
           labels: {
@@ -184,14 +205,19 @@ function parseJson(json) {
   // add datatype properties to result json.
   for (var i = 0; i < datatypeProperties.length; i++) {
     var id = 'datatype' + datatypeProperties[i]._hash;
+    var iriLabel = datatypeProperties[i].skos_prefLabel || datatypeProperties[i].rdfs_label || datatypeProperties[i]._uri.substring(datatypeProperties[i]._uri.indexOf('#')+1);
     result.datatype.push({
       id: id,
       type: 'rdfs:Datatype',
     });
+    result.property.push({
+      id: 'property' + datatypeProperties[i]._hash,
+      type: 'owl:datatypeProperty',
+    });
     result.datatypeAttribute.push({
       id: id,
       label: {
-        undefined: datatypeProperties[i].skos_prefLabel,
+        'IRI-based': iriLabel,
       },
       iri: datatypeProperties[i]._uri,
       // x: 0,
@@ -201,10 +227,17 @@ function parseJson(json) {
 
   // add object properties to result json.
   for (var i = 0; i < objectProperties.length; i++) {
+    var id = 'property' + objectProperties[i]._hash;
+    var iriLabel = objectProperties[i].skos_prefLabel || objectProperties[i].rdfs_label || objectProperties[i]._uri.substring(objectProperties[i]._uri.indexOf('#')+1);
+    result.property.push({
+      id: id,
+      type: 'owl:objectProperty',
+    });
     var propertyAttribute = {
-        id: 'property' + objectProperties[i]._hash,
+        id: id,
         label: {
-          undefined: objectProperties[i].skos_prefLabel,
+          'IRI-based': iriLabel,
+          undefined: iriLabel.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }),
         },
         iri: objectProperties[i]._uri,
         // annotations: {
@@ -227,10 +260,10 @@ function parseJson(json) {
         // },
     };
     if (objectProperties[i].rdfs_domain) {
-      propertyAttribute.domain = objectProperties[i].rdfs_domain._uri;
+      propertyAttribute.domain = findIdByUri(objectProperties[i].rdfs_domain._uri);
     }
     if (objectProperties[i].rdfs_range) {
-      propertyAttribute.range = objectProperties[i].rdfs_range._uri;
+      propertyAttribute.range = findIdByUri(objectProperties[i].rdfs_range._uri);
     }
     propertyAttribute.addPropertyIfExists('cardinality', objectProperties[i]);
     propertyAttribute.addPropertyIfExists('maxCardinality', objectProperties[i]);
