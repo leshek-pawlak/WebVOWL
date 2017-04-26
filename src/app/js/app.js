@@ -161,9 +161,12 @@ module.exports = function () {
 
 		//@WORKAROUND
 		// check if data has classes and properties;
-		var classCount				  = parseInt(data.metrics.classCount);
-		var objectPropertyCount		  = parseInt(data.metrics.objectPropertyCount);
-		var datatypePropertyCount	  = parseInt(data.metrics.datatypePropertyCount);
+		var classCount = 0, objectPropertyCount = 0, datatypePropertyCount = 0;
+		if (data.metrics) {
+			classCount				  = parseInt(data.metrics.classCount);
+			objectPropertyCount		  = parseInt(data.metrics.objectPropertyCount);
+			datatypePropertyCount	  = parseInt(data.metrics.datatypePropertyCount);
+		}
 
 		if (classCount === 0 && objectPropertyCount===0 && datatypePropertyCount===0 ){
 			// generate message for the user;
