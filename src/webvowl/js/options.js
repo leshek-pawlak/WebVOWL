@@ -4,7 +4,7 @@ module.exports = function () {
 		graphContainerSelector,
 		classDistance = 200,
 		datatypeDistance = 120,
-		loopDistance = 100,
+		loopDistance = 150,
 		charge = -500,
 		gravity = 0.025,
 		linkStrength = 1,

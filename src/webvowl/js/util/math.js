@@ -65,22 +65,34 @@ module.exports = (function () {
 			y1 = Math.sin(arcFrom) * node.actualRadius(),
 
 			x2 = Math.cos(arcTo) * node.actualRadius(),
-			y2 = Math.sin(arcTo) * node.actualRadius(),
-
-			fixPoint1 = {"x": node.x + x1, "y": node.y + y1},
-			fixPoint2 = {"x": node.x + x2, "y": node.y + y2};
+			y2 = Math.sin(arcTo) * node.actualRadius();
 
 		// calculate loop for boxes view
 		if (node.nodeElement().select('rect').node()) {
-			var x = node.width() / 2;
-			var y = node.height() / 2;
-			fixPoint1 = {"x": node.x - x, "y": node.y - y};
-			fixPoint2 = {"x": node.x + x, "y": node.y - y};
+			x1 = resolvePointOnBox(node.width(), node.width() / 2 * (Math.cos(arcFrom - 0.5) - Math.sin(arcFrom - 0.5)));
+			x2 = resolvePointOnBox(node.width(), node.width() / 2 * (Math.cos(arcTo - 0.5) - Math.sin(arcTo - 0.5)));
+
+			y1 = resolvePointOnBox(node.height(), node.height() / 2 * (Math.cos(arcFrom - 0.5) + Math.sin(arcFrom - 0.5)));
+			y2 = resolvePointOnBox(node.height(), node.height() / 2 * (Math.cos(arcTo - 0.5) + Math.sin(arcTo - 0.5)));
 		}
 
-		return loopFunction([fixPoint1, link.label(), fixPoint2]);
+		var fixPoint1 = {"x": node.x + x1, "y": node.y + y1},
+		fixPoint2 = {"x": node.x + x2, "y": node.y + y2};
+
+		return loopFunction([fixPoint1, label, fixPoint2]);
 	};
 
+	function resolvePointOnBox(size, point) {
+		var max = size / 2;
+		var min = -max;
+		if (max < point) {
+			return max;
+		} else if (min > point) {
+			return min;
+		}
+
+		return point;
+	}
 	/**
 	 * @param angle
 	 * @returns {number} the radian of the angle
