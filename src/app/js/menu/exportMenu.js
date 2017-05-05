@@ -8,6 +8,7 @@ module.exports = function (graph) {
 		exportSvgButton,
 		exportFilename,
 		exportJsonButton,
+		exportCsvButton,
 		exportableJsonText;
 
 	/**
@@ -18,6 +19,8 @@ module.exports = function (graph) {
 			.on("click", exportSvg);
 		exportJsonButton = d3.select("#exportJson")
 			.on("click", exportJson);
+		exportCsvButton = d3.select("#exportPositionToCsv")
+			.on("click", exportPositionToCsv);
 
 		var menuEntry= d3.select("#export");
 		menuEntry.on("mouseover",function(){
@@ -319,6 +322,25 @@ module.exports = function (graph) {
 		var dataURI = "data:text/json;charset=utf-8," + encodeURIComponent(exportText);
 		exportJsonButton.attr("href", dataURI)
 			.attr("download", exportFilename + ".json");
+	}
+
+	function exportPositionToCsv() {
+		var nodeElements = graph.graphNodeElements();  // get visible nodes
+		var csvContent = "data:text/csv;charset=utf-8,iri,x,y\n";
+		nodeElements.each(function (node, index) {
+			// if boxes view make sure that only visible nodes will be added to csv file
+			if (graph.options().styleMenu().style === 'circle' || node.type().toLowerCase().indexOf('datatype') === -1 && !node.referenceClass) {
+				var data = [node.iri() || 'anonymous', node.x, node.y];
+				var dataString = data.join(",");
+				csvContent += index < nodeElements[0].length ? dataString+ "\n" : dataString;
+			}
+		});
+
+		var encodedUri = encodeURI(csvContent);
+		var link = document.createElement("a");
+		link.setAttribute("href", encodedUri);
+		link.setAttribute("download", "postionsExport_"+ Date.now() +".csv");
+		link.click();
 	}
 
 	return exportMenu;
