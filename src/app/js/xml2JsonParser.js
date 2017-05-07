@@ -15,8 +15,6 @@ module.exports = function() {
   // application
   function parseXml(xml) {
     var options = {
-      mergeCDATA: false, // extract cdata and merge with text nodes
-      xmlns: false, // include namespaces as attributes in output
       attrKey: '', // tag for attr groups
       attrsAsObject: false, // if false, key is used as prefix to name, set prefix to '' to merge children and attrs.
       childrenAsArray: false // force children into arrays
@@ -82,7 +80,7 @@ module.exports = function() {
   function createStructure() {
     // add classes to result json.
     for (var i = 0; i < classes.length; i++) {
-      var id = 'class' + classes[i]._hash;
+      var id = 'class' + classes[i]._hash._value;
       var type = 'owl:Class';
       var iriLabel = classes[i].skos_prefLabel || classes[i].rdfs_label || classes[i]._uri._value.substring(classes[i]._uri._value.indexOf('#') + 1);
       // NOTE type can be an attribute of class or 'owl:unionOf', but in xml file there are none exemples of used.
@@ -116,14 +114,14 @@ module.exports = function() {
     }
     // add datatype properties to result json.
     for (var k = 0; k < datatypeProperties.length; k++) {
-      var idDatatype = 'datatype' + datatypeProperties[k]._hash;
+      var idDatatype = 'datatype' + datatypeProperties[k]._hash._value;
       var iriDatatypeLabel = datatypeProperties[k].skos_prefLabel || datatypeProperties[k].rdfs_label || datatypeProperties[k]._uri._value.substring(datatypeProperties[k]._uri._value.indexOf('#') + 1);
       result.datatype.push({
         id: idDatatype,
         type: 'rdfs:Datatype',
       });
       result.property.push({
-        id: 'property' + datatypeProperties[k]._hash,
+        id: 'property' + datatypeProperties[k]._hash._value,
         type: 'owl:datatypeProperty',
       });
       result.datatypeAttribute.push({
@@ -138,7 +136,7 @@ module.exports = function() {
     }
     // add object properties to result json.
     for (var j = 0; j < objectProperties.length; j++) {
-      var idProperty = 'property' + objectProperties[j]._hash;
+      var idProperty = 'property' + objectProperties[j]._hash._value;
       var iriPropertyLabel = objectProperties[j].skos_prefLabel || objectProperties[j].rdfs_label || objectProperties[j]._uri._value.substring(objectProperties[j]._uri._value.indexOf('#') + 1);
       result.property.push({
         id: idProperty,
@@ -182,17 +180,17 @@ module.exports = function() {
   function findIdByUri(uri) {
     for (var i = 0; i < classes.length; i++) {
       if (classes[i]._uri._value === uri) {
-        return 'class' + classes[i]._hash;
+        return 'class' + classes[i]._hash._value;
       }
     }
     for (var k = 0; k < datatypeProperties.length; k++) {
       if (datatypeProperties[k]._uri._value === uri) {
-        return 'datatype' + datatypeProperties[k]._hash;
+        return 'datatype' + datatypeProperties[k]._hash._value;
       }
     }
     for (var j = 0; j < objectProperties.length; j++) {
       if (objectProperties[j]._uri._value === uri) {
-        return 'property' + objectProperties[j]._hash;
+        return 'property' + objectProperties[j]._hash._value;
       }
     }
 
@@ -230,7 +228,7 @@ module.exports = function() {
         title: {
           undefined: root.rdfs_label,
         },
-        version: root._hash,
+        version: root._hash._value,
         author: [
           'MODS'
         ],
@@ -259,7 +257,7 @@ module.exports = function() {
     createStructure();
     // find and parse class attributes
     for (var k = 0; k < classes.length; k++) {
-      var classAttribute = getObjectById(result.classAttribute, 'class' + classes[k]._hash);
+      var classAttribute = getObjectById(result.classAttribute, 'class' + classes[k]._hash._value);
       if (!classAttribute) {
         continue;
       }
