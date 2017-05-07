@@ -184,8 +184,12 @@ module.exports = function (graph) {
 
 				var jsonText;
 				if (loadingSuccessful) {
-					var xmlParser = xml2JsonParser();
-					jsonText = xmlParser(request.responseText);
+					if (mimeType === 'application/xml') {
+						var xmlParser = xml2JsonParser();
+						jsonText = xmlParser(request.responseText);
+					} else {
+						jsonText = request.responseText;
+					}
 					cachedConversions[relativePath] = jsonText;
 				} else {
 					if (error.status === 404) {
@@ -232,8 +236,12 @@ module.exports = function (graph) {
 
 				var jsonText;
 				if (loadingSuccessful) {
-					var xmlParser = xml2JsonParser();
-					jsonText = xmlParser(request.responseText);
+					if (mimeType === 'application/xml') {
+						var xmlParser = xml2JsonParser();
+						jsonText = xmlParser(request.responseText);
+					} else {
+						jsonText = request.responseText;
+					}
 					cachedConversions[relativePath] = jsonText;
 				} else {
 					if (error.status === 404) {
