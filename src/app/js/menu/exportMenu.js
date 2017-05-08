@@ -329,7 +329,7 @@ module.exports = function (graph) {
 		var csvContent = "data:text/csv;charset=utf-8,iri,x,y\n";
 		nodeElements.each(function (node, index) {
 			// if boxes view make sure that only visible nodes will be added to csv file
-			if (graph.options().styleMenu().style === 'circle' || node.type().toLowerCase().indexOf('datatype') === -1 && !node.referenceClass) {
+			if (node.pinned() && (graph.options().styleMenu().style === 'circle' || node.type().toLowerCase().indexOf('datatype') === -1 && !node.referenceClass)) {
 				var data = [node.iri() || 'anonymous', node.x, node.y];
 				var dataString = data.join(",");
 				csvContent += index < nodeElements[0].length ? dataString+ "\n" : dataString;
