@@ -226,14 +226,14 @@ module.exports = function() {
         ],
         iri: root._uri._value,
         title: {
-          undefined: root.rdfs_label,
+          undefined: root.rdfs_label._text,
         },
         version: root._hash._value,
         author: [
           'MODS'
         ],
         description: {
-          undefined: root.rdfs_comment,
+          undefined: root.rdfs_comment._text,
         }
       },
       metrics: {
