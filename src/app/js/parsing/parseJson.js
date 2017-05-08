@@ -1,6 +1,4 @@
 module.exports = function() {
-  // import
-  var xmlToJson = require('./xmlToJson');
   // global vars
   var classes, datatypeProperties, objectProperties, result;
 
@@ -11,19 +9,6 @@ module.exports = function() {
       this[propertyName] = object[propertyName];
     }
   };
-
-  // application
-  function parseXml(xml) {
-    var options = {
-      attrKey: '', // tag for attr groups
-      attrsAsObject: false, // if false, key is used as prefix to name, set prefix to '' to merge children and attrs.
-      childrenAsArray: false // force children into arrays
-    };
-    // xml to json
-    var json = xmlToJson.parseString(xml, options);
-    // parsing JSON
-    return parseJson(json);
-  }
 
   // get subClasses and superClassess
   function getRelationClassess(classElement, key) {
@@ -316,5 +301,5 @@ module.exports = function() {
     return JSON.stringify(result);
   }
 
-  return parseXml;
+  return parseJson;
 };

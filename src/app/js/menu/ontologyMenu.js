@@ -1,4 +1,4 @@
-var xml2JsonParser = require("../xml2JsonParser");
+var xml2Json = require("../parsing/xml2Json");
 var unescape = require("lodash/unescape");
 var d3promise = require("d3.promise");
 /**
@@ -185,7 +185,7 @@ module.exports = function (graph) {
 				var jsonText;
 				if (loadingSuccessful) {
 					if (mimeType === 'application/xml') {
-						var xmlParser = xml2JsonParser();
+						var xmlParser = xml2Json();
 						jsonText = xmlParser(request.responseText);
 					} else {
 						jsonText = request.responseText;
@@ -237,7 +237,7 @@ module.exports = function (graph) {
 				var jsonText;
 				if (loadingSuccessful) {
 					if (mimeType === 'application/xml') {
-						var xmlParser = xml2JsonParser();
+						var xmlParser = xml2Json();
 						jsonText = xmlParser(request.responseText);
 					} else {
 						jsonText = request.responseText;
