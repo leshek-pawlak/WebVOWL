@@ -1,6 +1,6 @@
 module.exports = function() {
   // import
-  var xmlToJson = require('../../../util/xmlToJson/xmlToJson');
+  var xmlToJson = require('../../../../util/xmlToJson/xmlToJson');
   var parseJson = require('parseJson')();
 
   // application
