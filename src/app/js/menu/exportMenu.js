@@ -330,7 +330,7 @@ module.exports = function (graph) {
 		nodeElements.each(function (node, index) {
 			// if boxes view make sure that only visible nodes will be added to csv file
 			if (node.pinned() && (graph.options().styleMenu().style === 'circle' || node.type().toLowerCase().indexOf('datatype') === -1 && !node.referenceClass)) {
-				var data = [node.iri() || 'anonymous', node.x, node.y];
+				var data = [node.iri() || 'anonymous', parseFloat(node.x).toFixed(2), parseFloat(node.y).toFixed(2)];
 				var dataString = data.join(",");
 				csvContent += index < nodeElements[0].length ? dataString+ "\n" : dataString;
 			}
