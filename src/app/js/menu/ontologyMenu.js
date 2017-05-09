@@ -1,4 +1,5 @@
 var xml2Json = require("../parsing/xml2Json");
+var ttl2Json = require("../parsing/ttl2Json");
 var unescape = require("lodash/unescape");
 var d3promise = require("d3.promise");
 /**
@@ -134,6 +135,8 @@ module.exports = function (graph) {
 				var newPromise = d3promise.xml(pathWithoutExtentsion + ".xml");
 				newPromise.then(function() {
 					loadOntologyFromUri(pathWithoutExtentsion + ".xml", hashParameter, 'application/xml');
+				}, function(error) {
+					loadOntologyFromUri(pathWithoutExtentsion + ".ttl", hashParameter, 'application/ttl');
 				});
 			});
 
@@ -239,6 +242,9 @@ module.exports = function (graph) {
 					if (mimeType === 'application/xml') {
 						var xmlParser = xml2Json();
 						jsonText = xmlParser(request.responseText);
+					} else if (mimeType === 'application/ttl') {
+						var ttlParser = ttl2Json();
+						jsonText = ttlParser(request.responseText);
 					} else {
 						jsonText = request.responseText;
 					}
