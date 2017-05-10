@@ -12,6 +12,7 @@ module.exports = function() {
     };
     // xml to json
     var json = xmlToJson.parseString(xml, options);
+    console.log(json);
     // parsing JSON
     return parseJson(json);
   }
