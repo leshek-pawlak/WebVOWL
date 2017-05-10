@@ -111,15 +111,17 @@ module.exports = function() {
     } else if (typeOfElement) {
       var arrayPath = getPathToPutObject(typeOfElement, json);
       var obj = json;
-      console.log('arrayPath', arrayPath);
       for (var i = arrayPath.length - 1; i > 0; --i) {
-        obj = obj[arrayPath[i]];
+        if (isNaN(parseInt(arrayPath[i]))) {
+          obj = obj[arrayPath[i]];
+        }
       }
-      console.log('arrayPath[0]', arrayPath[0]);
-      if (!obj[arrayPath[0]] || !obj[arrayPath[0]].length) {
-        obj[arrayPath[0]] = [];
+      if (obj[arrayPath[0]]) {
+        if (!obj[arrayPath[0]].length) {
+          obj[arrayPath[0]] = [];
+        }
+        obj[arrayPath[0]].push(element);
       }
-      obj[arrayPath[0]].push(element);
     }
 
     return json;
@@ -130,7 +132,7 @@ module.exports = function() {
     Object.keys(element).map(function(elementKey, index) {
       if (typeof res === 'object' && typeof element[elementKey] === 'object') {
         var recusiveKey = getPathToPutObject(key, element[elementKey], res);
-        if (recusiveKey.length > 0 && !element[recusiveKey[recusiveKey.length - 1]]) {
+        if (recusiveKey.length > 0 && !element[recusiveKey[recusiveKey.length - 1]] && isNaN(parseInt(elementKey))) {
           res.push(elementKey);
         }
       }
@@ -138,7 +140,7 @@ module.exports = function() {
         res.push(elementKey);
       }
     });
-    console.log('res: ', res);
+    // console.log('res', res);
     return res;
   }
 
