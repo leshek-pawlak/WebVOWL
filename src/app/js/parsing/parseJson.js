@@ -62,12 +62,22 @@ module.exports = function() {
     return null;
   }
 
+  function getHash(url) {
+    if (typeof url === 'object') {
+      url = url._value;
+    }
+    return url.substring(url.indexOf('#') + 1);
+  }
+
   function createStructure() {
     // add classes to result json.
     for (var i = 0; i < classes.length; i++) {
-      var id = 'class' + classes[i]._hash._value;
+      var classHashKey = findKeyName('hash', classes[i]);
+      var classLabelKey = findKeyName('label', classes[i]);
+      var id = 'class';
+      id += classHashKey ? classes[i][classHashKey]._value || classes[i][classHashKey] : '';
       var type = 'owl:Class';
-      var iriLabel = classes[i].skos_prefLabel || classes[i].rdfs_label || classes[i]._uri._value.substring(classes[i]._uri._value.indexOf('#') + 1);
+      var iriLabel = classLabelKey ? classes[i][classLabelKey] : getHash(classes[i]._uri);
       // NOTE type can be an attribute of class or 'owl:unionOf', but in xml file there are none exemples of used.
       result.class.push({
         id: id,
@@ -79,7 +89,7 @@ module.exports = function() {
           'IRI-based': iriLabel,
           undefined: iriLabel.replace(/([a-z])([A-Z])/g, '$1 $2'),
         },
-        iri: classes[i]._uri._value,
+        iri: classes[i]._uri._value || classes[i]._uri,
         instances: 0,
         // backgroundColor: '#d0d0d0',
         // x: 0,
@@ -114,7 +124,7 @@ module.exports = function() {
         label: {
           'IRI-based': iriDatatypeLabel,
         },
-        iri: datatypeProperties[k]._uri._value,
+        iri: datatypeProperties[k]._uri._value || datatypeProperties[k]._uri,
         // x: 0,
         // y: 0,
       });
@@ -135,7 +145,7 @@ module.exports = function() {
             return str.toUpperCase();
           }),
         },
-        iri: objectProperties[j]._uri._value,
+        iri: objectProperties[j]._uri._value || objectProperties[j]._uri,
         // annotations: {
         //   definition: [
         //     {
@@ -182,10 +192,23 @@ module.exports = function() {
     return null;
   }
 
+  function findKeyName(key, obj) {
+    var result = null;
+    key = key.toLowerCase();
+    Object.keys(obj).map(function(objKey, index) {
+      if (objKey.toLowerCase().indexOf(key) > -1) {
+        result = objKey;
+      }
+    });
+
+    return result;
+  }
+
   function parseJson(json) {
     var firstKeyName = Object.keys(json);
     var root = json[firstKeyName];
-    var mainKeys = Object.keys(root['skos_member-List']);
+    var listKey = findKeyName('list', root);
+    var mainKeys = Object.keys(root[listKey]);
     var classKey, datatypeKey, objectKey;
     for (var i = 0; i < mainKeys.length; ++i) {
       var toLowerCase = mainKeys[i].toLowerCase();
@@ -197,9 +220,12 @@ module.exports = function() {
         objectKey = mainKeys[i];
       }
     }
-    classes = root['skos_member-List'][classKey];
-    datatypeProperties = root['skos_member-List'][datatypeKey];
-    objectProperties = root['skos_member-List'][objectKey];
+    classes = root[listKey][classKey];
+    datatypeProperties = root[listKey][datatypeKey];
+    objectProperties = root[listKey][objectKey];
+    var headerTitleKey = findKeyName('label', root);
+    var headerHashKey = findKeyName('hash', root);
+    var headerCommentKey = findKeyName('comment', root);
     result = {
       _comment: "Created with OWL2VOWL (version 0.2.0), http://vowl.visualdataweb.org",
       namespace: [
@@ -209,16 +235,16 @@ module.exports = function() {
         languages: [
           'undefined',
         ],
-        iri: root._uri._value,
+        iri: root._uri._value || root._uri,
         title: {
-          undefined: root.rdfs_label._text,
+          undefined: headerTitleKey ? root[headerTitleKey]._text || root[headerTitleKey] : 'title' ,
         },
-        version: root._hash._value,
+        version: headerHashKey ? root[headerHashKey]._value || root[headerHashKey] : 'version',
         author: [
           'MODS'
         ],
         description: {
-          undefined: root.rdfs_comment._text,
+          undefined: headerCommentKey ? root[headerCommentKey]._text || root[headerCommentKey] : 'description',
         }
       },
       metrics: {
@@ -242,7 +268,9 @@ module.exports = function() {
     createStructure();
     // find and parse class attributes
     for (var k = 0; k < classes.length; k++) {
-      var classAttribute = getObjectById(result.classAttribute, 'class' + classes[k]._hash._value);
+      var classHashKey = findKeyName('hash', classes[k]);
+      var classHashValue = classHashKey ? classes[k][classHashKey]._value || classes[k][classHashKey] : '';
+      var classAttribute = getObjectById(result.classAttribute, 'class' + classHashValue);
       if (!classAttribute) {
         continue;
       }

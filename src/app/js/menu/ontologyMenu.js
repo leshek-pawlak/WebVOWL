@@ -132,8 +132,8 @@ module.exports = function (graph) {
 			promise.then(function() {
 				loadOntologyFromUri(pathWithoutExtentsion + ".json", hashParameter, 'application/json');
 			}, function(error) {
-				var newPromise = d3promise.xml(pathWithoutExtentsion + ".xml");
-				newPromise.then(function() {
+				var xmlPromise = d3promise.xml(pathWithoutExtentsion + ".xml");
+				xmlPromise.then(function() {
 					loadOntologyFromUri(pathWithoutExtentsion + ".xml", hashParameter, 'application/xml');
 				}, function(error) {
 					loadOntologyFromUri(pathWithoutExtentsion + ".ttl", hashParameter, 'application/ttl');
@@ -162,7 +162,8 @@ module.exports = function (graph) {
 		// check if requested url is a json;
 		var isJSON=requestedURL.toLowerCase().endsWith(".json");
 		var isXML=requestedURL.toLowerCase().endsWith(".xml");
-		if (!isJSON && !isXML){
+		var isTTL=requestedURL.toLowerCase().endsWith(".ttl");
+		if (!isJSON && !isXML && !isTTL){
 			ontologyMenu.notValidJsonURL();
 			graph.clearGraphData();
 			return;
@@ -190,6 +191,9 @@ module.exports = function (graph) {
 					if (mimeType === 'application/xml') {
 						var xmlParser = xml2Json();
 						jsonText = xmlParser(request.responseText);
+					} else if (mimeType === 'application/ttl') {
+						var ttlParser = ttl2Json();
+						jsonText = ttlParser(request.responseText);
 					} else {
 						jsonText = request.responseText;
 					}
