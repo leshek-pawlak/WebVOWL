@@ -10,29 +10,26 @@ module.exports = function() {
     var parser = N3.Parser(),
       store = [],
       tmp = {},
-      finalJson = {};
-    parser.parse(ttl, function(error, triple, prefixes) {
-      if (triple) {
-        // save triples as js objects
-        if (isEmpty(tmp)) {
-          tmp._uri = triple.subject;
-        } else if (triple.subject !== tmp._uri) {
-          store.push(tmp);
-          tmp = {
-            _uri: triple.subject
-          };
-        }
-        tmp[triple.predicate] = triple.object;
-      } else {
-        // replace all keys in objects prefixes defined in turtle file
-        var newStore = replacePrefixesInStore(store, prefixes);
-        finalJson = createNestedStructure(newStore);
-        console.log(finalJson);
+      parsed = parser.parse(ttl);
+    // NOTE don't use N3 parser with callback. It started to be async and breaks return value!!
+    for (var i = 0; i < parsed.length; ++i) {
+      // save triples as js objects
+      if (isEmpty(tmp)) {
+        tmp._uri = parsed[i].subject;
+      } else if (parsed[i].subject !== tmp._uri) {
+        store.push(tmp);
+        tmp = {
+          _uri: parsed[i].subject,
+          _hash: getHash(parsed[i].subject)
+        };
       }
-    });
-    // parsing JSON
-    // return parseJson(json);
+      tmp[parsed[i].predicate] = parsed[i].object;
+    }
+    var newStore = replacePrefixesInStore(store, parser._prefixes);
+    // parsing JSON to graph valid JSON
+    return parseJson(createNestedStructure(newStore));
   }
+
 
   function getHash(url) {
     return url.substring(url.indexOf('#') + 1);
@@ -103,21 +100,20 @@ module.exports = function() {
     var typeOfElement = _.snakeCase(element[typeKey[0]]);
     if (isEmpty(json)) {
       element.list = {
-        owl_class: [],
-        owl_datatype_property: [],
-        owl_object_property: []
+        header: [],
+        class: [],
+        datatype_property: [],
+        object_property: []
       };
       json[typeOfElement] = element;
-    } else if (typeOfElement) {
+    } else if (typeOfElement.indexOf('class') > -1) {
       var arrayPath = getPathToPutObject(typeOfElement, json);
       var obj = json;
       for (var i = arrayPath.length - 1; i > 0; --i) {
-        if (isNaN(parseInt(arrayPath[i]))) {
-          obj = obj[arrayPath[i]];
-        }
+        obj = obj[arrayPath[i]];
       }
       if (obj[arrayPath[0]]) {
-        if (!obj[arrayPath[0]].length) {
+        if (typeof obj[arrayPath[0]] === 'string') {
           obj[arrayPath[0]] = [];
         }
         obj[arrayPath[0]].push(element);
@@ -132,15 +128,15 @@ module.exports = function() {
     Object.keys(element).map(function(elementKey, index) {
       if (typeof res === 'object' && typeof element[elementKey] === 'object') {
         var recusiveKey = getPathToPutObject(key, element[elementKey], res);
-        if (recusiveKey.length > 0 && !element[recusiveKey[recusiveKey.length - 1]] && isNaN(parseInt(elementKey))) {
+        if (recusiveKey.length > 0 && !element[recusiveKey[recusiveKey.length - 1]]) {
           res.push(elementKey);
         }
       }
-      if (elementKey.indexOf(key) > -1) {
+      if (res.length < 1 && elementKey.indexOf(key.replace(/^.+_/i, '')) > -1) {
         res.push(elementKey);
       }
     });
-    // console.log('res', res);
+
     return res;
   }
 
