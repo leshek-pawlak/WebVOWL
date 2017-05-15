@@ -325,7 +325,7 @@ module.exports = function() {
         propertyAttribute.range = findIdByUri(objectProperties[l].rdfs_range._uri);
       }
     }
-
+    console.log('5. create graphJson and fill it with information from the input json: ', result)
     return JSON.stringify(result);
   }
 
