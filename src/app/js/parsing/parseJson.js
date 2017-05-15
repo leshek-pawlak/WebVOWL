@@ -74,26 +74,37 @@ module.exports = function() {
     for (var i = 0; i < classes.length; i++) {
       var classHashKey = findKeyName('hash', classes[i]);
       var classLabelKey = findKeyName('label', classes[i]);
-      var id = 'class';
-      id += classHashKey ? classes[i][classHashKey]._value || classes[i][classHashKey] : '';
+      var id = classHashKey ? classes[i][classHashKey]._value || classes[i][classHashKey] : '';
       var type = 'owl:Class';
-      var iriLabel = classLabelKey ? classes[i][classLabelKey] : getHash(classes[i]._uri);
+      var labelObject = {}, labelFromJson = classLabelKey ? classes[i][classLabelKey] : getHash(classes[i]._uri);
+      if (labelFromJson.length > 0) {
+        // extract languages from json
+        for (var k = 0; k < labelFromJson.length; ++k) {
+          var langVal = findKeyName('language', labelFromJson[k]);
+          var text = findKeyName('text', labelFromJson[k]);
+          labelObject[getHash(labelFromJson[k][langVal]).replace(/Language/g, '')] = labelFromJson[k][text];
+        }
+      } else {
+        labelObject = {
+          'IRI-based': labelFromJson,
+          undefined: labelFromJson.replace(/([a-z])([A-Z])/g, '$1 $2'),
+        }
+      }
       // NOTE type can be an attribute of class or 'owl:unionOf', but in xml file there are none exemples of used.
       result.class.push({
         id: id,
         type: type,
       });
+      var xKey = findKeyName('coordinateX', classes[i]);
+      var yKey = findKeyName('coordinateY', classes[i]);
       var classAttribute = {
         id: id,
-        label: {
-          'IRI-based': iriLabel,
-          undefined: iriLabel.replace(/([a-z])([A-Z])/g, '$1 $2'),
-        },
+        label: labelObject,
         iri: classes[i]._uri._value || classes[i]._uri,
         instances: 0,
+        x: classes[i][xKey] || 0,
+        y: classes[i][yKey] || 0,
         // backgroundColor: '#d0d0d0',
-        // x: 0,
-        // y: 0,
         //   annotations: {
         //     seeAlso: [
         //       {
@@ -209,7 +220,7 @@ module.exports = function() {
     var root = json[firstKeyName];
     var listKey = findKeyName('list', root);
     var mainKeys = Object.keys(root[listKey]);
-    var classKey, datatypeKey, objectKey;
+    var classKey, datatypeKey, objectKey, headerKey;
     for (var i = 0; i < mainKeys.length; ++i) {
       var toLowerCase = mainKeys[i].toLowerCase();
       if (toLowerCase.indexOf('class') > -1) {
@@ -218,28 +229,45 @@ module.exports = function() {
         datatypeKey = mainKeys[i];
       } else if (toLowerCase.indexOf('object') > -1) {
         objectKey = mainKeys[i];
+      } else if (toLowerCase.indexOf('header') > -1) {
+        headerKey = mainKeys[i];
       }
     }
     classes = root[listKey][classKey];
     datatypeProperties = root[listKey][datatypeKey];
     objectProperties = root[listKey][objectKey];
+    if (headerKey) {
+      // merge root with header if exists
+      Object.assign(root, root[listKey][headerKey][0]);
+    }
     var headerTitleKey = findKeyName('label', root);
-    var headerHashKey = findKeyName('hash', root);
+    var versionKey = findKeyName('version', root);
     var headerCommentKey = findKeyName('comment', root);
+    var languageKey = findKeyName('language', root);
+    var languages = ['undefined'];
+    if (languageKey) {
+      // extract languages if exists
+      if (root[languageKey].length) {
+        languages = [];
+        for (var j = 0; j < root[languageKey].length; ++j) {
+          languages.push(getHash(root[languageKey][j]).replace(/Language/g, ''));
+        }
+      } else {
+        languages = [ root[languageKey] ];
+      }
+    }
     result = {
       _comment: "Created with OWL2VOWL (version 0.2.0), http://vowl.visualdataweb.org",
       namespace: [
         // '?',
       ],
       header: {
-        languages: [
-          'undefined',
-        ],
+        languages: languages,
         iri: root._uri._value || root._uri,
         title: {
           undefined: headerTitleKey ? root[headerTitleKey]._text || root[headerTitleKey] : 'title' ,
         },
-        version: headerHashKey ? root[headerHashKey]._value || root[headerHashKey] : 'version',
+        version: versionKey ? root[versionKey]._value || root[versionKey] : 'version',
         author: [
           'MODS'
         ],

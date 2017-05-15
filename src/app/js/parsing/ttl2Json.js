@@ -17,7 +17,7 @@ module.exports = function() {
       // save triples as js objects
       if (isEmpty(tmp)) {
         tmp._uri = parsed[i].subject;
-      } else if (parsed[i].subject !== tmp._uri || i === parsed.length - 1) {
+      } else if (parsed[i].subject !== tmp._uri) {
         store.push(tmp);
         tmp = {
           _uri: parsed[i].subject,
@@ -34,6 +34,9 @@ module.exports = function() {
         tmp[parsed[i].predicate].push(tripleObject);
       } else {
         tmp[parsed[i].predicate] = tripleObject;
+      }
+      if (i === parsed.length - 1) {
+        store.push(tmp);
       }
     }
     console.log('2. get triple.object in write type, create "key":"value" relations and add uri and hash: ', store);
