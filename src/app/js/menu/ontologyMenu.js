@@ -1,5 +1,5 @@
 var xml2Json = require("../parsing/xml2Json");
-var ttl2Json = require("../parsing/ttl2Json");
+var ttl2Json = require("../parsing/n3ToJson");
 var unescape = require("lodash/unescape");
 var d3promise = require("d3.promise");
 /**
