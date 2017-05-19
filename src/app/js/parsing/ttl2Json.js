@@ -15,6 +15,18 @@ module.exports = function() {
 
   // export function
   function parseTtl(ttl) {
+    return new Promise(function (resolve, reject) {
+      d3.xhr('../../data/webvowl.ttl', 'application/ttl', function (error, request) {
+        if (!error) {
+          resolve(createStructure(ttl, request.responseText));
+        } else {
+          reject(error);
+        }
+      });
+    });
+  }
+
+  function createStructure(ttl, dictionaryTtl) {
     var graphJson = {
         _comment: "Created with OWL2VOWL (version 0.2.0), http://vowl.visualdataweb.org",
         metrics: {
@@ -37,8 +49,20 @@ module.exports = function() {
       },
       parser = N3.Parser(),
       parsed = parser.parse(ttl),
-      store = N3.Store(parsed, {prefixes: parser._prefixes});
+      store = N3.Store(parsed, {prefixes: parser._prefixes}),
+      dictionaryParser = N3.Parser(),
+      dictionaryParsed = dictionaryParser.parse(dictionaryTtl),
+      dictionaryStore = N3.Store(dictionaryParsed, {prefixes: dictionaryParser._prefixes});
 
+    // console.log('dictionaryStore.getObjects(): ', dictionaryStore.getObjects(), 'dictionaryStore.getPredicates(): ', dictionaryStore.getPredicates(), 'dictionaryStore.getSubjects(): ', dictionaryStore.getSubjects());
+    // console.log('store.getObjects(): ', store.getObjects(), 'store.getPredicates(): ', store.getPredicates(), 'store.getSubjects(): ', store.getSubjects());
+    // get language labels
+    var languageLabels = {};
+    var languagesIri = dictionaryStore.getSubjects('webvowl:languageLabel').clean();
+    for (var i = 0; i < languagesIri.length; i++) {
+      var label = getTextValue(dictionaryStore.getObjects(languagesIri[i], 'webvowl:languageLabel').clean()[0]);
+      languageLabels[languagesIri[i]] = label;
+    }
     // add header to json
     var root = store.getSubjects(null, 'owl:Ontology').clean()[0];
     var header = store.getSubjects('rdf:type', 'webvowl:Header').clean()[0];
@@ -48,7 +72,7 @@ module.exports = function() {
     var headerLanguages = store.getObjects(header, 'webvowl:definedLanguage').clean();
     var lang = [];
     for (var i = 0; i < headerLanguages.length; i++) {
-      lang.push(getTextValue(headerLanguages[i], store._prefixes).replace('webvowl', '').replace('Language', ''));
+      lang.push(languageLabels[headerLanguages[i]]);
     }
     graphJson.header = {
       languages: lang,
@@ -64,23 +88,27 @@ module.exports = function() {
     };
     // add classes to json
     var classes = store.getSubjects('rdf:type', 'webvowl:Class').clean();
+    graphJson.metrics.classCount = classes.length;
     for (var i = 0; i < classes.length; i++) {
-      ++graphJson.metrics.classCount;
       // add label
       var labelObject = {};
       var label = store.getObjects(classes[i], 'webvowl:label').clean();
       for (var j = 0; j < label.length; j++) {
-        var text = getTextValue(store.getObjects(label[j], 'webvowl:labelText').clean()[0]);
-        var language = getTextValue(store.getObjects(label[j], 'webvowl:labelLanguage').clean()[0], store._prefixes).replace('webvowl', '').replace('Language', '');
-        labelObject[language] = text;
+        var text = getTextValue(store.getObjects(label[j], 'webvowl:content').clean()[0]);
+        var language = store.getObjects(label[j], 'webvowl:contentLanguage').clean()[0];
+        labelObject[languageLabels[language]] = text;
       }
       // create id
       var id = getTextValue(classes[i], store._prefixes);
       // get coordinates
       var coordinateX = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateX').clean()[0]);
       var coordinateY = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateY').clean()[0]);
+      // find classType
+      var classTypeIRI = store.getObjects(classes[i], 'webvowl:classType').clean()[0];
+      // get classTypes
+      var classType = getTextValue(dictionaryStore.getObjects(classTypeIRI, 'webvowl:typeLabel').clean()[0]);
       // add class to "class" in the final json
-      graphJson.class.push({id: id, type: 'owl:Class'});
+      graphJson.class.push({id: id, type: classType});
       // add class to "classAttribute" in the final json
       graphJson.classAttribute.push({
         id: id,

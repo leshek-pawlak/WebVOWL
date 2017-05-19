@@ -1,0 +1,833 @@
+# baseURI: http://gdsr.roche.com/mods/dft/1704/webvowl
+# imports: http://spinrdf.org/spl
+# imports: http://topbraid.org/spin/spinmapl
+# imports: http://www.w3.org/2004/02/skos/core
+# prefix: webvowl
+
+@prefix afn: <http://jena.hpl.hp.com/ARQ/function#> .
+@prefix arg: <http://spinrdf.org/arg#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix spin: <http://spinrdf.org/spin#> .
+@prefix spl: <http://spinrdf.org/spl#> .
+@prefix webvowl: <http://gdsr.roche.com/mods/dft/1704/webvowl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://gdsr.roche.com/mods/dft/1704/webvowl>
+  rdf:type owl:Ontology ;
+  owl:imports <http://spinrdf.org/spl> ;
+  owl:imports <http://topbraid.org/spin/spinmapl> ;
+  owl:imports <http://www.w3.org/2004/02/skos/core> ;
+  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+.
+webvowl:Annotation
+  rdf:type owl:Class ;
+  rdfs:label "Annotation"^^xsd:string ;
+.
+webvowl:Class
+  rdf:type owl:Class ;
+  rdfs:label "Class"^^xsd:string ;
+.
+webvowl:Construct_1
+  rdf:type sp:Construct ;
+  rdfs:label "Coordinate X"^^xsd:string ;
+.
+webvowl:Definition
+  rdf:type owl:Class ;
+  rdfs:label "Definition"^^xsd:string ;
+  rdfs:subClassOf webvowl:Label ;
+.
+webvowl:Description
+  rdf:type owl:Class ;
+  rdfs:label "Description"^^xsd:string ;
+.
+webvowl:FocalOntology
+  rdf:type rdfs:Class ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object webvowl:Header ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:definedLanguage ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:iri-based ;
+            sp:predicate webvowl:definedLanguage ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "iri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:iri ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "titleIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:headerTitle ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "titleIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "title"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "titleIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "version"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:version ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "author"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:author ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "descriptionIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:headerDescription ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "descriptionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "description"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "descriptionIri"^^xsd:string ;
+              ] ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object webvowl:FocalOntology ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "title"^^xsd:string ;
+              ] ;
+            sp:predicate rdfs:label ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type sp:iri ;
+                sp:arg1 [
+                    rdf:type sp:concat ;
+                    sp:arg1 [
+                        rdf:type xsd:string ;
+                        sp:arg1 spin:_this ;
+                      ] ;
+                    sp:arg2 "TitleIRI" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "titleIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "version"^^xsd:string ;
+              ] ;
+            sp:predicate owl:versionInfo ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "description"^^xsd:string ;
+              ] ;
+            sp:predicate rdfs:comment ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type sp:iri ;
+                sp:arg1 [
+                    rdf:type sp:concat ;
+                    sp:arg1 [
+                        rdf:type xsd:string ;
+                        sp:arg1 spin:_this ;
+                      ] ;
+                    sp:arg2 "DescriptionIRI" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "descriptionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression "MODS" ;
+            sp:variable [
+                sp:varName "author"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression spin:_this ;
+            sp:variable [
+                sp:varName "iri"^^xsd:string ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  rdfs:comment "The ontology that is a focal ontology will be analyzed by the SPIN rules for extraction of WebVOWL model elements."^^xsd:string ;
+  rdfs:label "Focal Ontology"^^xsd:string ;
+.
+webvowl:HTMLAnnotation
+  rdf:type owl:Class ;
+  rdfs:label "HTML Annotation"^^xsd:string ;
+  rdfs:subClassOf webvowl:Annotation ;
+.
+webvowl:Header
+  rdf:type owl:Class ;
+  rdfs:label "Header"^^xsd:string ;
+.
+webvowl:Individual
+  rdf:type owl:Class ;
+  rdfs:label "Individual"^^xsd:string ;
+.
+webvowl:Label
+  rdf:type owl:Class ;
+  rdfs:label "Label"^^xsd:string ;
+.
+webvowl:LabelAnnotation
+  rdf:type owl:Class ;
+  rdfs:label "Label Annotation"^^xsd:string ;
+  rdfs:subClassOf webvowl:Annotation ;
+.
+webvowl:Language
+  rdf:type owl:Class ;
+  rdfs:label "Language"^^xsd:string ;
+.
+webvowl:Property
+  rdf:type owl:Class ;
+  rdfs:label "Property"^^xsd:string ;
+.
+webvowl:PropertyType
+  rdf:type owl:Class ;
+  rdfs:label "Property Type"^^xsd:string ;
+.
+webvowl:Title
+  rdf:type owl:Class ;
+  rdfs:label "Title"^^xsd:string ;
+.
+webvowl:Type
+  rdf:type owl:Class ;
+  rdfs:label "Type"^^xsd:string ;
+.
+webvowl:annotation
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Class ;
+  rdfs:range webvowl:Annotation ;
+.
+webvowl:author
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:Header ;
+  rdfs:label "Author"^^xsd:string ;
+  rdfs:range xsd:string ;
+.
+webvowl:classType
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Class ;
+  rdfs:label "Class Type"^^xsd:string ;
+  rdfs:range webvowl:Type ;
+.
+webvowl:content
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:Annotation ;
+  rdfs:domain webvowl:Description ;
+  rdfs:domain webvowl:Label ;
+  rdfs:domain webvowl:Title ;
+  rdfs:label "Content"^^xsd:string ;
+  rdfs:range xsd:string ;
+.
+webvowl:contentLanguage
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Annotation ;
+  rdfs:domain webvowl:Description ;
+  rdfs:domain webvowl:Label ;
+  rdfs:domain webvowl:Title ;
+  rdfs:label "Content Language"^^xsd:string ;
+  rdfs:range webvowl:Language ;
+.
+webvowl:coordinateX
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:Class ;
+  rdfs:label "Coordinate X"^^xsd:string ;
+  rdfs:range xsd:decimal ;
+.
+webvowl:coordinateY
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:Class ;
+  rdfs:label "Coordinate Y"^^xsd:string ;
+  rdfs:range xsd:decimal ;
+.
+webvowl:definedLanguage
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Header ;
+  rdfs:label "Defined Language"^^xsd:string ;
+  rdfs:range webvowl:Language ;
+.
+webvowl:domain
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Class ;
+  rdfs:range webvowl:Class ;
+.
+webvowl:hasIndividual
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Class ;
+  rdfs:range webvowl:Individual ;
+.
+webvowl:headerDescription
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Header ;
+  rdfs:range webvowl:Description ;
+.
+webvowl:headerTitle
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Header ;
+  rdfs:range webvowl:Title ;
+.
+webvowl:iri
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:Class ;
+  rdfs:domain webvowl:Header ;
+  rdfs:label "IRI"^^xsd:string ;
+  rdfs:range xsd:anyURI ;
+.
+webvowl:iri-based
+  rdf:type webvowl:Language ;
+  webvowl:languageLabel "IRI-based"^^xsd:string ;
+.
+webvowl:label
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Class ;
+  rdfs:domain webvowl:Individual ;
+  rdfs:range webvowl:Label ;
+.
+webvowl:languageLabel
+  rdf:type owl:AnnotationProperty ;
+  rdfs:domain webvowl:Language ;
+  rdfs:label "Language Label"^^xsd:string ;
+  rdfs:subPropertyOf rdfs:label ;
+.
+webvowl:propertyType
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Property ;
+  rdfs:label "Property Type"^^xsd:string ;
+  rdfs:range webvowl:PropertyType ;
+.
+webvowl:propertyTypeDatatypeProperty
+  rdf:type webvowl:PropertyType ;
+  webvowl:typeLabel "owl:datatypeProperty"^^xsd:string ;
+.
+webvowl:propertyTypeObjectProperty
+  rdf:type webvowl:PropertyType ;
+  webvowl:typeLabel "owl:objectProperty"^^xsd:string ;
+.
+webvowl:propertyTypeSubclassOf
+  rdf:type webvowl:PropertyType ;
+  webvowl:typeLabel "rdfs:SubClassOf"^^xsd:string ;
+.
+webvowl:range
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Class ;
+  rdfs:range webvowl:Class ;
+.
+webvowl:typeLabel
+  rdf:type owl:AnnotationProperty ;
+  rdfs:domain webvowl:PropertyType ;
+  rdfs:domain webvowl:Type ;
+  rdfs:label "Type Label"^^xsd:string ;
+  rdfs:subPropertyOf rdfs:label ;
+.
+webvowl:typeOwlClass
+  rdf:type webvowl:Type ;
+  webvowl:typeLabel "owl:class"^^xsd:string ;
+.
+webvowl:undef
+  rdf:type webvowl:Language ;
+  webvowl:languageLabel "undefined"^^xsd:string ;
+.
+webvowl:version
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:Header ;
+  rdfs:label "Version"^^xsd:string ;
+  rdfs:range xsd:string ;
+.
+owl:Class
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object webvowl:Class ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:typeOwlClass ;
+            sp:predicate webvowl:classType ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "iri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:iri ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:label ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:Label ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "prefLabel"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:label ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:Label ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:iri-based ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "localname"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:annotation ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:Definition ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "definition"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object owl:Class ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "prefLabel"^^xsd:string ;
+                    ] ;
+                  sp:predicate <http://www.w3.org/2004/02/skos/core#prefLabel> ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 "PrefLabel" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "prefLabelIri"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "definition"^^xsd:string ;
+                    ] ;
+                  sp:predicate <http://www.w3.org/2004/02/skos/core#definition> ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 "Definition" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "definitionIri"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type sp:iri ;
+                sp:arg1 [
+                    rdf:type sp:concat ;
+                    sp:arg1 [
+                        rdf:type xsd:string ;
+                        sp:arg1 spin:_this ;
+                      ] ;
+                    sp:arg2 "IriLabel" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type afn:localname ;
+                sp:arg1 spin:_this ;
+              ] ;
+            sp:variable [
+                sp:varName "localname"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:FocalOntology ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "fo"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:contains ;
+                sp:arg1 [
+                    rdf:type xsd:string ;
+                    sp:arg1 spin:_this ;
+                  ] ;
+                sp:arg2 [
+                    rdf:type xsd:string ;
+                    sp:arg1 [
+                        sp:varName "fo"^^xsd:string ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression spin:_this ;
+            sp:variable [
+                sp:varName "iri"^^xsd:string ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object webvowl:Individual ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "indiv"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "indiv"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:hasIndividual ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "iri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:iri ;
+            sp:subject [
+                sp:varName "indiv"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:label ;
+            sp:subject [
+                sp:varName "indiv"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:Label ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "prefLabel"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:label ;
+            sp:subject [
+                sp:varName "indiv"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:Label ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:iri-based ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "localname"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object owl:Class ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:FocalOntology ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "fo"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:contains ;
+                sp:arg1 [
+                    rdf:type xsd:string ;
+                    sp:arg1 spin:_this ;
+                  ] ;
+                sp:arg2 [
+                    rdf:type xsd:string ;
+                    sp:arg1 [
+                        sp:varName "fo"^^xsd:string ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "indiv"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "prefLabel"^^xsd:string ;
+                    ] ;
+                  sp:predicate <http://www.w3.org/2004/02/skos/core#prefLabel> ;
+                  sp:subject [
+                      sp:varName "indiv"^^xsd:string ;
+                    ] ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 [
+                                  sp:varName "indiv"^^xsd:string ;
+                                ] ;
+                            ] ;
+                          sp:arg2 "PrefLabel" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "prefLabelIri"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type sp:iri ;
+                sp:arg1 [
+                    rdf:type sp:concat ;
+                    sp:arg1 [
+                        rdf:type xsd:string ;
+                        sp:arg1 [
+                            sp:varName "indiv"^^xsd:string ;
+                          ] ;
+                      ] ;
+                    sp:arg2 "IriLabel" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type afn:localname ;
+                sp:arg1 [
+                    sp:varName "indiv"^^xsd:string ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "localname"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                sp:varName "indiv"^^xsd:string ;
+              ] ;
+            sp:variable [
+                sp:varName "iri"^^xsd:string ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+.

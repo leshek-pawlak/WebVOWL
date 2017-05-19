@@ -193,7 +193,17 @@ module.exports = function (graph) {
 						jsonText = xmlParser(request.responseText);
 					} else if (mimeType === 'application/ttl') {
 						var ttlParser = ttl2Json();
-						jsonText = ttlParser(request.responseText);
+						ttlParser(request.responseText).then(function(data) {
+							jsonText = data
+							cachedConversions[relativePath] = jsonText;
+							loadOntologyFromText(jsonText, undefined, filename);
+							setLoadingStatus(loadingSuccessful, error ? error.response : undefined, errorInfo);
+							if (emptyGraph===true){
+								ontologyMenu.notValidJsonFile();
+								graph.clearGraphData();
+							}
+							hideLoadingInformations();
+						});
 					} else {
 						jsonText = request.responseText;
 					}
@@ -205,15 +215,17 @@ module.exports = function (graph) {
 					}
 				}
 
-				loadOntologyFromText(jsonText, undefined, filename);
-				setLoadingStatus(loadingSuccessful, error ? error.response : undefined, errorInfo);
+				if (mimeType !== 'application/ttl') {
+					loadOntologyFromText(jsonText, undefined, filename);
+					setLoadingStatus(loadingSuccessful, error ? error.response : undefined, errorInfo);
 
-				if (emptyGraph===true){
-					ontologyMenu.notValidJsonFile();
-					graph.clearGraphData();
+					if (emptyGraph===true){
+						ontologyMenu.notValidJsonFile();
+						graph.clearGraphData();
+					}
+
+					hideLoadingInformations();
 				}
-
-				hideLoadingInformations();
 			});
 		}
 	}
@@ -248,7 +260,17 @@ module.exports = function (graph) {
 						jsonText = xmlParser(request.responseText);
 					} else if (mimeType === 'application/ttl') {
 						var ttlParser = ttl2Json();
-						jsonText = ttlParser(request.responseText);
+						ttlParser(request.responseText).then(function(data) {
+							jsonText = data
+							cachedConversions[relativePath] = jsonText;
+							loadOntologyFromText(jsonText, undefined, filename);
+							setLoadingStatus(loadingSuccessful, error ? error.response : undefined, errorInfo);
+							if (emptyGraph===true){
+								ontologyMenu.notValidJsonFile();
+								graph.clearGraphData();
+							}
+							hideLoadingInformations();
+						});
 					} else {
 						jsonText = request.responseText;
 					}
@@ -273,14 +295,16 @@ module.exports = function (graph) {
 					}
 				}
 
-				loadOntologyFromText(jsonText, undefined, filename);
-				setLoadingStatus(loadingSuccessful, error ? error.response : undefined, errorInfo);
+				if (mimeType !== 'application/ttl') {
+					loadOntologyFromText(jsonText, undefined, filename);
+					setLoadingStatus(loadingSuccessful, error ? error.response : undefined, errorInfo);
 
-				if (emptyGraph===true){
-					ontologyMenu.emptyGraphError();
-					graph.clearGraphData();
+					if (emptyGraph===true){
+						ontologyMenu.emptyGraphError();
+						graph.clearGraphData();
+					}
+					hideLoadingInformations();
 				}
-				hideLoadingInformations();
 			});
 		}
 	}
