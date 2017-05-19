@@ -35,12 +35,12 @@ module.exports = function() {
       labelObject[languageLabels[language]] = text;
     }
 
-    return labelObject
+    return labelObject;
   }
 
   function createStructure(ttl, dictionaryTtl) {
     var graphJson = {
-        _comment: "Created with OWL2VOWL (version 0.2.0), http://vowl.visualdataweb.org",
+        _comment: "Created with TTL2JSON",
         metrics: {
           classCount: 0,
           datatypeCount: 0,
@@ -71,9 +71,9 @@ module.exports = function() {
     // get language labels
     var languageLabels = {};
     var languagesIri = dictionaryStore.getSubjects('webvowl:languageLabel').clean();
-    for (var i = 0; i < languagesIri.length; i++) {
-      var label = getTextValue(dictionaryStore.getObjects(languagesIri[i], 'webvowl:languageLabel').clean()[0]);
-      languageLabels[languagesIri[i]] = label;
+    for (var l = 0; l < languagesIri.length; l++) {
+      var label = getTextValue(dictionaryStore.getObjects(languagesIri[l], 'webvowl:languageLabel').clean()[0]);
+      languageLabels[languagesIri[l]] = label;
     }
     // add header to json
     var root = store.getSubjects(null, 'owl:Ontology').clean()[0];
@@ -83,8 +83,8 @@ module.exports = function() {
     // add languages to header
     var headerLanguages = store.getObjects(header, 'webvowl:definedLanguage').clean();
     var lang = [];
-    for (var i = 0; i < headerLanguages.length; i++) {
-      lang.push(languageLabels[headerLanguages[i]]);
+    for (var z = 0; z < headerLanguages.length; z++) {
+      lang.push(languageLabels[headerLanguages[z]]);
     }
     graphJson.header = {
       languages: lang,
@@ -139,8 +139,8 @@ module.exports = function() {
         label: labelObject,
         iri: classes[i],
         instances: instances.length,
-        x: coordinateX || 0,
-        y: coordinateY || 0,
+        x: coordinateX,
+        y: coordinateY,
         individuals: individuals
       });
     }
