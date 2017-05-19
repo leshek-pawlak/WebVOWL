@@ -26,6 +26,18 @@ module.exports = function() {
     });
   }
 
+  function getLabels(iri, languageLabels, store) {
+    var labelObject = {};
+    var labels = store.getObjects(iri, 'webvowl:label').clean();
+    for (var i = 0; i < labels.length; i++) {
+      var text = getTextValue(store.getObjects(labels[i], 'webvowl:content').clean()[0]);
+      var language = store.getObjects(labels[i], 'webvowl:contentLanguage').clean()[0];
+      labelObject[languageLabels[language]] = text;
+    }
+
+    return labelObject
+  }
+
   function createStructure(ttl, dictionaryTtl) {
     var graphJson = {
         _comment: "Created with OWL2VOWL (version 0.2.0), http://vowl.visualdataweb.org",
@@ -91,13 +103,7 @@ module.exports = function() {
     graphJson.metrics.classCount = classes.length;
     for (var i = 0; i < classes.length; i++) {
       // add label
-      var labelObject = {};
-      var label = store.getObjects(classes[i], 'webvowl:label').clean();
-      for (var j = 0; j < label.length; j++) {
-        var text = getTextValue(store.getObjects(label[j], 'webvowl:content').clean()[0]);
-        var language = store.getObjects(label[j], 'webvowl:contentLanguage').clean()[0];
-        labelObject[languageLabels[language]] = text;
-      }
+      var labelObject = getLabels(classes[i], languageLabels, store);
       // create id
       var id = getTextValue(classes[i], store._prefixes);
       // get coordinates
@@ -107,6 +113,24 @@ module.exports = function() {
       var classTypeIRI = store.getObjects(classes[i], 'webvowl:classType').clean()[0];
       // get classTypes
       var classType = getTextValue(dictionaryStore.getObjects(classTypeIRI, 'webvowl:typeLabel').clean()[0]);
+      // get individuals
+      var individuals = [];
+      var instances = store.getObjects(classes[i], 'webvowl:hasIndividual').clean();
+      for (var j = 0; j < instances.length; j++) {
+        var individualLabels = getLabels(instances[j], languageLabels, store);
+        individuals.push({
+          iri: instances[j],
+          labels: individualLabels,
+          // annotations: {
+          //   label: [{
+          //     identifier: 'label',
+          //     language: 'undefined',
+          //     value: individualLabels.undefined,
+          //     type: 'label'
+          //   }]
+          // }
+        });
+      }
       // add class to "class" in the final json
       graphJson.class.push({id: id, type: classType});
       // add class to "classAttribute" in the final json
@@ -114,8 +138,10 @@ module.exports = function() {
         id: id,
         label: labelObject,
         iri: classes[i],
+        instances: instances.length,
         x: coordinateX || 0,
         y: coordinateY || 0,
+        individuals: individuals
       });
     }
 
