@@ -56,10 +56,10 @@ module.exports = function () {
     filter.addTag = function(tag) {
         if(!tag) return;
 
-        var tag = String.prototype.toLowerCase.apply(tag);
+        var newTag = String.prototype.toLowerCase.apply(tag);
 
-        if(_.indexOf(tags, tag) === -1) {
-            tags.push(tag);
+        if(_.indexOf(tags, newTag) === -1) {
+            tags.push(newTag);
         }
 
     };
@@ -67,10 +67,10 @@ module.exports = function () {
     filter.removeTag = function (tagToRemove) {
         if(!tagToRemove) return;
 
-        var tagToRemove = String.prototype.toLowerCase.apply(tagToRemove);
+        var newTagToRemove = String.prototype.toLowerCase.apply(tagToRemove);
 
         _.remove(tags, function (tag) {
-            return tag ===  tagToRemove;
+            return tag ===  newTagToRemove;
         });
     };
 

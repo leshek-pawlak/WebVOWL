@@ -78,6 +78,8 @@ var config = {
     }),
     new webpack.optimize.UglifyJsPlugin(),
     new CopyWebpackPlugin([{
+        from: "src/app/options.json"
+      },{
         context: "src/app",
         from: "data/**/*"
       },
@@ -108,7 +110,7 @@ var config = {
   }
 };
 
-// use it for "release", "zip" & "production"
+// use it for "zip" & "production"
 if (!isDevelopment) {
   config.plugins.push(
     new webpack.optimize.UglifyJsPlugin({
@@ -128,13 +130,7 @@ if (!isDevelopment) {
   );
 }
 
-if (process.env.NODE_ENV === "release") {
-  config.plugins.push(
-    new Bump([
-      "package.json",
-    ])
-  );
-} else if (process.env.NODE_ENV === "zip") {
+if (process.env.NODE_ENV === "zip") {
   var gitRevisionPlugin = new GitRevisionPlugin();
   var branch = gitRevisionPlugin.branch();
   var commithash = gitRevisionPlugin.commithash();

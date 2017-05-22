@@ -7,7 +7,6 @@
   },
   "devDependencies": {
     "autoprefixer": "^6.7.7",
-    "bump-webpack-plugin": "^0.1.0",
     "clean-webpack-plugin": "^0.1.16",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.1",
@@ -38,7 +37,7 @@
   },
   "scripts": {
     "jshint": "jshint .",
-    "release": "NODE_ENV=release webpack --progress",
+    "release": "npm run build",
     "test": "karma start ./test/karma.conf.js --log-level debug --single-run",
     "build": "NODE_ENV=production webpack --progress",
     "watch": "NODE_ENV=development webpack-dev-server",

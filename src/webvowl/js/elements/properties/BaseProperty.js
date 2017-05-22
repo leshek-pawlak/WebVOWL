@@ -333,7 +333,7 @@ module.exports = (function () {
 				// if originalLabelElement exists it means that labelElement has changed.
 				// to highlight right element we need to recover it from originalLabelElement property.
 				if (that.originalLabelElement) {
-					label = that.originalLabelElement
+					label = that.originalLabelElement;
 				}
 				label.select("rect").classed("hovered", enable);
 			}

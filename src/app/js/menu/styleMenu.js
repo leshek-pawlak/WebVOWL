@@ -111,9 +111,10 @@ module.exports = function (graph) {
         var circle = d3.select(this);
         var r = circle.property('r').baseVal.value;
         var textElement = getClosestTextElement(circle);
+        var newHeight;
         circle.classed("elements-to-change", true);
         if (!circle.attr('height')) {
-          var newHeight = textElement ? textElement.getBoundingClientRect().height + 8 : 26;
+          newHeight = textElement ? textElement.getBoundingClientRect().height + 8 : 26;
           circle.attr('height', newHeight > 40 ? newHeight : 40);
         }
         if (!circle.attr('width')) {
@@ -126,7 +127,7 @@ module.exports = function (graph) {
           circle.attr('y',  -(parseInt(circle.attr('height')) / 2));
           if (!circle.attr('height')) {
             var tmpHeight = textElement.getBoundingClientRect().height + 8;
-            var newHeight = tmpHeight > minHeight ? tmpHeight : minHeight;
+            newHeight = tmpHeight > minHeight ? tmpHeight : minHeight;
             circle.attr('height', newHeight);
           }
           if (!circle.attr('width')) {

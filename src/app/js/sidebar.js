@@ -188,7 +188,7 @@ module.exports = function (graph) {
 					if (i > 0) {
 						select.append('option')
 						.attr('value', sortedVersions[i-1].url)
-						.text(sortedVersions[i-1].version)
+						.text(sortedVersions[i-1].version);
 					}
 				}
 				// add current and every later version
@@ -196,7 +196,7 @@ module.exports = function (graph) {
 					select.append('option')
 						.attr('value', sortedVersions[i].url)
 						.attr('selected', currentVersionIndex === i ? 'selected' : null)
-						.text(sortedVersions[i].version)
+						.text(sortedVersions[i].version);
 				}
 			}
 		} else {

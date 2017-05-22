@@ -145,7 +145,7 @@ module.exports = (function () {
 				dx = (0.5 * width) - 10;
 				dy = (-0.5 * height) + 5;
 			} else {
-				dx = (2 / 5) * that.actualRadius(),
+				dx = (2 / 5) * that.actualRadius();
 				dy = (-7 / 10) * that.actualRadius();
 			}
 

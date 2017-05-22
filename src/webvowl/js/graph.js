@@ -563,7 +563,7 @@ module.exports = function (graphContainerSelector) {
 							.duration(0);
 					zoom.translate([graphTranslation[0], graphTranslation[1]]);
 				}
-			})
+			});
 		}
 	}
 	/**

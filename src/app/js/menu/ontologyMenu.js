@@ -140,9 +140,9 @@ module.exports = function (graph) {
 	}
 
 	function loadOntologyFromURL(relativePath,requestedURL){
-		var relativePath = requestedURL.replace('http://[.?]+/', '');
+		var relPath = requestedURL.replace('http://[.?]+/', '');
 		fileToLoad=requestedURL;
-		var cachedOntology = cachedConversions[relativePath];
+		var cachedOntology = cachedConversions[relPath];
 		var trimmedRequestedUri = requestedURL.replace(/\/$/g, "");
 		var filename = trimmedRequestedUri.slice(trimmedRequestedUri.lastIndexOf("/") + 1);
 
