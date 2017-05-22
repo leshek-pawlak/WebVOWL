@@ -36,8 +36,11 @@ var config = {
           /util/,
 					/node_modules/,
 					/src\/webvowl\/js\/entry\.js/,
+					/src\\webvowl\\js\\entry\.js/,
 					/src\/app\/js\/browserWarning\.js/,
+					/src\\app\\js\\browserWarning\.js/,
 					/src\/app\/js\/entry\.js/,
+					/src\\app\\js\\entry\.js/,
 					/deploy/
 				], // exclude any and all files in the node_modules folder
         use: [{
