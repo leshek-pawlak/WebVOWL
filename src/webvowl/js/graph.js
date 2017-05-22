@@ -262,6 +262,7 @@ module.exports = function (graphContainerSelector) {
 				label.x = position.x;
 				label.y = position.y;
 			}
+
 			return "translate(" + label.x + "," + label.y + ")";
 		});
 		// Set link paths and calculate additional information
@@ -1028,7 +1029,9 @@ module.exports = function (graphContainerSelector) {
 		for (var i = 0; i < circles[0].length; ++i) {
 			circle = d3.select(circles[0][i]);
 			var height = parseInt(circle.attr('height')) + umlTextHeight;
-			if (isEmbededInsideContainer) {
+			if (isNaN(height)) {
+				height = umlMinEmbeddedContainerHeight;
+			} else if (isEmbededInsideContainer) {
 				height = height > umlMinEmbeddedContainerHeight ? height : umlMinEmbeddedContainerHeight;
 			}
 			circle.attr('height', height);
