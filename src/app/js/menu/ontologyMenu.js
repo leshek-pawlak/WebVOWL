@@ -1,5 +1,6 @@
+var xml2JsonParser = require("../xml2JsonParser");
 var unescape = require("lodash/unescape");
-
+var d3promise = require("d3.promise");
 /**
  * Contains the logic for the ontology listing and conversion.
  *
@@ -125,7 +126,16 @@ module.exports = function (graph) {
 
 		} else {
 			// id of an existing ontology as parameter
-			loadOntologyFromUri("data/" + hashParameter + ".json", hashParameter);
+			var pathWithoutExtentsion = "data/" + hashParameter;
+			var promise = d3promise.json(pathWithoutExtentsion + ".json");
+			promise.then(function() {
+				loadOntologyFromUri(pathWithoutExtentsion + ".json", hashParameter, 'application/json');
+			}, function(error) {
+				var newPromise = d3promise.xml(pathWithoutExtentsion + ".xml");
+				newPromise.then(function() {
+					loadOntologyFromUri(pathWithoutExtentsion + ".xml", hashParameter, 'application/xml');
+				});
+			});
 
 			ontologyOptions.each(function () {
 				var ontologyOption = d3.select(this);
@@ -139,7 +149,7 @@ module.exports = function (graph) {
 		}
 	}
 
-	function loadOntologyFromURL(relativePath,requestedURL){
+	function loadOntologyFromURL(relativePath,requestedURL, mimeType){
 		var relPath = requestedURL.replace('http://[.?]+/', '');
 		fileToLoad=requestedURL;
 		var cachedOntology = cachedConversions[relPath];
@@ -148,7 +158,8 @@ module.exports = function (graph) {
 
 		// check if requested url is a json;
 		var isJSON=requestedURL.toLowerCase().endsWith(".json");
-		if (!isJSON){
+		var isXML=requestedURL.toLowerCase().endsWith(".xml");
+		if (!isJSON && !isXML){
 			ontologyMenu.notValidJsonURL();
 			graph.clearGraphData();
 			return;
@@ -159,11 +170,10 @@ module.exports = function (graph) {
 			setLoadingStatus(true);
 		} else {
 			displayLoadingIndicators();
-			d3.xhr(relativePath, "application/json", function (error, request) {
+			// requestToFile if returns 404 try with xml type
+			d3.xhr(relativePath, mimeType, function (error, request) {
 				var loadingSuccessful = !error;
 				var errorInfo;
-
-
 				// check if error occurred or responseText is empty
 				if ((error!==null && error.status === 500) || (request && request.responseText.length===0)) {
 					hideLoadingInformations();
@@ -171,9 +181,11 @@ module.exports = function (graph) {
 					cachedConversions[relativePath]=undefined;
 					return;
 				}
+
 				var jsonText;
 				if (loadingSuccessful) {
-					jsonText = request.responseText;
+					var xmlParser = xml2JsonParser();
+					jsonText = xmlParser(request.responseText);
 					cachedConversions[relativePath] = jsonText;
 				} else {
 					if (error.status === 404) {
@@ -195,7 +207,7 @@ module.exports = function (graph) {
 		}
 	}
 
-	function loadOntologyFromUri(relativePath, requestedUri) {
+	function loadOntologyFromUri(relativePath, requestedUri, mimeType) {
 		fileToLoad=requestedUri;
 		var cachedOntology = cachedConversions[relativePath];
 		var trimmedRequestedUri = requestedUri.replace(/\/$/g, "");
@@ -206,7 +218,8 @@ module.exports = function (graph) {
 			setLoadingStatus(true);
 		} else {
 			displayLoadingIndicators();
-			d3.xhr(relativePath, "application/json", function (error, request) {
+			// requestToFile if returns 404 try with xml type
+			d3.xhr(relativePath, mimeType, function (error, request) {
 				var loadingSuccessful = !error;
 				var errorInfo;
 				if (error!==null && error.status === 500) {
@@ -219,7 +232,8 @@ module.exports = function (graph) {
 
 				var jsonText;
 				if (loadingSuccessful) {
-					jsonText = request.responseText;
+					var xmlParser = xml2JsonParser();
+					jsonText = xmlParser(request.responseText);
 					cachedConversions[relativePath] = jsonText;
 				} else {
 					if (error.status === 404) {
