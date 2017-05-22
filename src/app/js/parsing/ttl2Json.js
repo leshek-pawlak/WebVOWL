@@ -262,7 +262,7 @@ module.exports = function() {
       graphJson.propertyAttribute.push(propertyAttribute);
     }
 
-    console.log("graphJson", graphJson);
+    // console.log("graphJson", graphJson);
     // parsing JSON to graph valid JSON
     return JSON.stringify(graphJson);
   }
