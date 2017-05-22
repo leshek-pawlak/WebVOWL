@@ -1,3 +1,4 @@
+/* jshint -W117 */
 var path = require("path");
 var webpack = require("webpack");
 var HtmlReplaceWebpackPlugin = require("html-replace-webpack-plugin");
@@ -33,6 +34,7 @@ var config = {
         test: /\.js$/, // include .js files
         enforce: "pre", // preload the jshint loader
         exclude: [
+          /util/,
 					/node_modules/,
 					/src\/webvowl\/js\/entry\.js/,
 					/src\/app\/js\/browserWarning\.js/,

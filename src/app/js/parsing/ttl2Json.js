@@ -1,3 +1,4 @@
+/* jshint -W117 */
 module.exports = function() {
   // remove undefined values from array
   Array.prototype.clean = function(deleteValue) {
@@ -139,12 +140,12 @@ module.exports = function() {
     graphJson.metrics.classCount = classes.length;
     for (var i = 0; i < classes.length; i++) {
       // add label
-      var labelObject = getLabels(classes[i], languageLabels, store);
+      var classLabelObject = getLabels(classes[i], languageLabels, store);
       // create id
-      var id = getTextValue(classes[i], store._prefixes);
+      var classId = getTextValue(classes[i], store._prefixes);
       // get coordinates
-      var coordinateX = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateX').clean()[0]);
-      var coordinateY = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateY').clean()[0]);
+      var classCoordinateX = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateX').clean()[0]);
+      var classCoordinateY = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateY').clean()[0]);
       // get classTypes
       var classTypeIRI = store.getObjects(classes[i], 'webvowl:classType').clean()[0];
       var classType = getTextValue(dictionaryStore.getObjects(classTypeIRI, 'webvowl:typeLabel').clean()[0]);
@@ -161,25 +162,25 @@ module.exports = function() {
       }
       // prepare object to put to classAttribute
       var classAttribute = {
-        id: id,
-        label: labelObject,
+        id: classId,
+        label: classLabelObject,
         iri: classes[i],
         instances: instances.length,
         individuals: individuals
       };
-      if (coordinateX) {
-        classAttribute.x = coordinateX;
+      if (classCoordinateX) {
+        classAttribute.x = classCoordinateX;
       }
-      if (coordinateY) {
-        classAttribute.y = coordinateY;
+      if (classCoordinateY) {
+        classAttribute.y = classCoordinateY;
       }
       // get annotations
-      var annotations = getAnnotations(classes[i], languageLabels, store, dictionaryStore);
-      if (Object.keys(annotations).length > 0) {
-        classAttribute.annotations = annotations;
+      var classAnnotations = getAnnotations(classes[i], languageLabels, store, dictionaryStore);
+      if (Object.keys(classAnnotations).length > 0) {
+        classAttribute.annotations = classAnnotations;
       }
       // add class to "class" in the final json
-      graphJson.class.push({id: id, type: classType});
+      graphJson.class.push({id: classId, type: classType});
       // add class to "classAttribute" in the final json
       graphJson.classAttribute.push(classAttribute);
     }
@@ -187,30 +188,30 @@ module.exports = function() {
     var datatypes = store.getSubjects('rdf:type', 'webvowl:Datatype').clean();
     graphJson.metrics.datatypePropertyCount = graphJson.metrics.datatypeCount = datatypes.length;
     graphJson.metrics.nodeCount = classes.length + datatypes.length;
-    for (var i = 0; i < datatypes.length; i++) {
+    for (var d = 0; d < datatypes.length; d++) {
       // create id
-      var id = getTextValue(datatypes[i], store._prefixes);
+      var datatypeId = getTextValue(datatypes[d], store._prefixes);
       // get type from datatype
-      var datatypeTypeIRI = store.getObjects(datatypes[i], 'webvowl:datatypeType').clean()[0];
+      var datatypeTypeIRI = store.getObjects(datatypes[d], 'webvowl:datatypeType').clean()[0];
       var datatypeType = getTextValue(dictionaryStore.getObjects(datatypeTypeIRI, 'webvowl:typeLabel').clean()[0]);
       // add label
-      var labelObject = getLabels(datatypes[i], languageLabels, store);
+      var datatypeLabelObject = getLabels(datatypes[d], languageLabels, store);
       // get coordinates
-      var coordinateX = getTextValue(store.getObjects(datatypes[i], 'webvowl:coordinateX').clean()[0]);
-      var coordinateY = getTextValue(store.getObjects(datatypes[i], 'webvowl:coordinateY').clean()[0]);
+      var datatypeCoordinateX = getTextValue(store.getObjects(datatypes[d], 'webvowl:coordinateX').clean()[0]);
+      var datatypeCoordinateY = getTextValue(store.getObjects(datatypes[d], 'webvowl:coordinateY').clean()[0]);
       var datatypeAttribute = {
-        id: id,
-        label: labelObject,
-        iri: datatypes[i],
+        id: datatypeId,
+        label: datatypeLabelObject,
+        iri: datatypes[d],
       };
-      if (coordinateX) {
-        datatypeAttribute.x = coordinateX;
+      if (datatypeCoordinateX) {
+        datatypeAttribute.x = datatypeCoordinateX;
       }
-      if (coordinateY) {
-        datatypeAttribute.y = coordinateY;
+      if (datatypeCoordinateY) {
+        datatypeAttribute.y = datatypeCoordinateY;
       }
       // add datatype to "datatype" in the final json
-      graphJson.datatype.push({id: id, type: datatypeType});
+      graphJson.datatype.push({id: datatypeId, type: datatypeType});
       // add datatype to "datatypeAttribute" in the final json
       graphJson.datatypeAttribute.push(datatypeAttribute);
     }
@@ -218,45 +219,45 @@ module.exports = function() {
     var properties = store.getSubjects('rdf:type', 'webvowl:Property').clean();
     graphJson.metrics.objectPropertyCount = properties.length;
     graphJson.metrics.propertyCount = properties.length + datatypes.length;
-    for (var i = 0; i < properties.length; i++) {
+    for (var p = 0; p < properties.length; p++) {
       // create id
-      var id = getTextValue(properties[i], store._prefixes);
+      var propertyId = getTextValue(properties[p], store._prefixes);
       // get type from datatype
-      var propertyTypeIRI = store.getObjects(properties[i], 'webvowl:propertyType').clean()[0];
+      var propertyTypeIRI = store.getObjects(properties[p], 'webvowl:propertyType').clean()[0];
       var propertyType = getTextValue(dictionaryStore.getObjects(propertyTypeIRI, 'webvowl:typeLabel').clean()[0]);
       // add label
-      var labelObject = getLabels(properties[i], languageLabels, store);
+      var propertyLabelObject = getLabels(properties[p], languageLabels, store);
       // add range
-      var rangeID = getTextValueFromTtl(properties[i], 'webvowl:range', store);
+      var rangeID = getTextValueFromTtl(properties[p], 'webvowl:range', store);
       // add domain
-      var domainID = getTextValueFromTtl(properties[i], 'webvowl:domain', store);
+      var domainID = getTextValueFromTtl(properties[p], 'webvowl:domain', store);
       // add datatype to "datatype" in the final json
-      graphJson.property.push({id: id, type: propertyType});
+      graphJson.property.push({id: propertyId, type: propertyType});
       // add datatype to "datatypeAttribute" in the final json
       var propertyAttribute = {
-        id: id,
-        label: labelObject,
-        iri: properties[i],
+        id: propertyId,
+        label: propertyLabelObject,
+        iri: properties[p],
         range: rangeID,
         domain: domainID,
       };
       // add optional props (cardinality)
-      var cardinality = getTextValueFromTtl(properties[i], 'webvowl:cardinality', store);
+      var cardinality = getTextValueFromTtl(properties[p], 'webvowl:cardinality', store);
       if (cardinality) {
         propertyAttribute.cardinality = cardinality;
       }
-      var maxCardinality = getTextValueFromTtl(properties[i], 'webvowl:maxCardinality', store);
+      var maxCardinality = getTextValueFromTtl(properties[p], 'webvowl:maxCardinality', store);
       if (maxCardinality) {
         propertyAttribute.maxCardinality = maxCardinality;
       }
-      var minCardinality = getTextValueFromTtl(properties[i], 'webvowl:minCardinality', store);
+      var minCardinality = getTextValueFromTtl(properties[p], 'webvowl:minCardinality', store);
       if (minCardinality) {
         propertyAttribute.minCardinality = minCardinality;
       }
       // get annotations
-      var annotations = getAnnotations(properties[i], languageLabels, store, dictionaryStore);
-      if (Object.keys(annotations).length > 0) {
-        propertyAttribute.annotations = annotations;
+      var propertyAnnotations = getAnnotations(properties[p], languageLabels, store, dictionaryStore);
+      if (Object.keys(propertyAnnotations).length > 0) {
+        propertyAttribute.annotations = propertyAnnotations;
       }
       graphJson.propertyAttribute.push(propertyAttribute);
     }
