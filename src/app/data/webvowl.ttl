@@ -34,6 +34,14 @@ webvowl:Construct_1
   rdf:type sp:Construct ;
   rdfs:label "Coordinate X"^^xsd:string ;
 .
+webvowl:Datatype
+  rdf:type owl:Class ;
+  rdfs:label "Datatype"^^xsd:string ;
+.
+webvowl:DatatypeType
+  rdf:type owl:Class ;
+  rdfs:label "Datatype Type"^^xsd:string ;
+.
 webvowl:Definition
   rdf:type owl:Class ;
   rdfs:label "Definition"^^xsd:string ;
@@ -264,6 +272,12 @@ webvowl:author
   rdfs:label "Author"^^xsd:string ;
   rdfs:range xsd:string ;
 .
+webvowl:cardinality
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:Property ;
+  rdfs:label "Cardinality"^^xsd:string ;
+  rdfs:range xsd:integer ;
+.
 webvowl:classType
   rdf:type owl:ObjectProperty ;
   rdfs:domain webvowl:Class ;
@@ -300,6 +314,16 @@ webvowl:coordinateY
   rdfs:label "Coordinate Y"^^xsd:string ;
   rdfs:range xsd:decimal ;
 .
+webvowl:datatypeType
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Datatype ;
+  rdfs:label "Datatype Type"^^xsd:string ;
+  rdfs:range webvowl:DatatypeType ;
+.
+webvowl:datatypeTypeRdfsDatatype
+  rdf:type webvowl:DatatypeType ;
+  webvowl:typeLabel "rdfs:Datatype"^^xsd:string ;
+.
 webvowl:definedLanguage
   rdf:type owl:ObjectProperty ;
   rdfs:domain webvowl:Header ;
@@ -329,7 +353,9 @@ webvowl:headerTitle
 webvowl:iri
   rdf:type owl:DatatypeProperty ;
   rdfs:domain webvowl:Class ;
+  rdfs:domain webvowl:Datatype ;
   rdfs:domain webvowl:Header ;
+  rdfs:domain webvowl:Property ;
   rdfs:label "IRI"^^xsd:string ;
   rdfs:range xsd:anyURI ;
 .
@@ -340,7 +366,9 @@ webvowl:iri-based
 webvowl:label
   rdf:type owl:ObjectProperty ;
   rdfs:domain webvowl:Class ;
+  rdfs:domain webvowl:Datatype ;
   rdfs:domain webvowl:Individual ;
+  rdfs:domain webvowl:Property ;
   rdfs:range webvowl:Label ;
 .
 webvowl:languageLabel
@@ -348,6 +376,18 @@ webvowl:languageLabel
   rdfs:domain webvowl:Language ;
   rdfs:label "Language Label"^^xsd:string ;
   rdfs:subPropertyOf rdfs:label ;
+.
+webvowl:maxCardinality
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:Property ;
+  rdfs:label "Max Cardinality"^^xsd:string ;
+  rdfs:range xsd:integer ;
+.
+webvowl:minCardinality
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:Property ;
+  rdfs:label "Min Cardinality"^^xsd:string ;
+  rdfs:range xsd:integer ;
 .
 webvowl:propertyType
   rdf:type owl:ObjectProperty ;
@@ -374,6 +414,7 @@ webvowl:range
 .
 webvowl:typeLabel
   rdf:type owl:AnnotationProperty ;
+  rdfs:domain webvowl:DatatypeType ;
   rdfs:domain webvowl:PropertyType ;
   rdfs:domain webvowl:Type ;
   rdfs:label "Type Label"^^xsd:string ;
@@ -827,6 +868,912 @@ owl:Class
             sp:variable [
                 sp:varName "iri"^^xsd:string ;
               ] ;
+          ]
+        ) ;
+    ] ;
+.
+owl:DatatypeProperty
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object webvowl:Property ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:propertyTypeDatatypeProperty ;
+            sp:predicate webvowl:propertyType ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "iri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:iri ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:label ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:Label ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "prefLabel"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:label ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:Label ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:iri-based ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "localname"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:annotation ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:Definition ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "definition"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "domain"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:domain ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "rangeDatatypeObjectIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:range ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "minCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:minCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "maxCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:maxCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "card"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:cardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:datatypeTypeRdfsDatatype ;
+            sp:predicate webvowl:datatypeType ;
+            sp:subject [
+                sp:varName "rangeDatatypeObjectIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:Datatype ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "rangeDatatypeObjectIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "range"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:iri ;
+            sp:subject [
+                sp:varName "rangeDatatypeObjectIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "datatypeObjectLabelIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:label ;
+            sp:subject [
+                sp:varName "rangeDatatypeObjectIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:iri-based ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "datatypeObjectLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "rangeLabel"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "datatypeObjectLabelIri"^^xsd:string ;
+              ] ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object owl:DatatypeProperty ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:FocalOntology ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "fo"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:contains ;
+                sp:arg1 [
+                    rdf:type xsd:string ;
+                    sp:arg1 spin:_this ;
+                  ] ;
+                sp:arg2 [
+                    rdf:type xsd:string ;
+                    sp:arg1 [
+                        sp:varName "fo"^^xsd:string ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "prefLabel"^^xsd:string ;
+                    ] ;
+                  sp:predicate <http://www.w3.org/2004/02/skos/core#prefLabel> ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 "PrefLabel" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "prefLabelIri"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "definition"^^xsd:string ;
+                    ] ;
+                  sp:predicate <http://www.w3.org/2004/02/skos/core#definition> ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 "Definition" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "definitionIri"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type sp:iri ;
+                sp:arg1 [
+                    rdf:type sp:concat ;
+                    sp:arg1 [
+                        rdf:type xsd:string ;
+                        sp:arg1 spin:_this ;
+                      ] ;
+                    sp:arg2 "IriLabel" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type afn:localname ;
+                sp:arg1 spin:_this ;
+              ] ;
+            sp:variable [
+                sp:varName "localname"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression spin:_this ;
+            sp:variable [
+                sp:varName "iri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "range"^^xsd:string ;
+                    ] ;
+                  sp:predicate rdfs:range ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 "DatatypeObject" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "rangeDatatypeObjectIri"^^xsd:string ;
+                    ] ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 "DatatypeObjectIriLabel" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "datatypeObjectLabelIri"^^xsd:string ;
+                    ] ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type afn:localname ;
+                      sp:arg1 [
+                          sp:varName "range"^^xsd:string ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "rangeLabel"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "domain"^^xsd:string ;
+                    ] ;
+                  sp:predicate rdfs:domain ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Optional ;
+                  sp:elements (
+                      [
+                        sp:object [
+                            sp:varName "?0"^^xsd:string ;
+                          ] ;
+                        sp:predicate rdfs:subClassOf ;
+                        sp:subject [
+                            sp:varName "domain"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object owl:Restriction ;
+                        sp:predicate rdf:type ;
+                        sp:subject [
+                            sp:varName "?0"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object spin:_this ;
+                        sp:predicate owl:onProperty ;
+                        sp:subject [
+                            sp:varName "?0"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object [
+                            sp:varName "minCard"^^xsd:string ;
+                          ] ;
+                        sp:predicate owl:minCardinality ;
+                        sp:subject [
+                            sp:varName "?0"^^xsd:string ;
+                          ] ;
+                      ]
+                    ) ;
+                ]
+                [
+                  rdf:type sp:Optional ;
+                  sp:elements (
+                      [
+                        sp:object [
+                            sp:varName "?1"^^xsd:string ;
+                          ] ;
+                        sp:predicate rdfs:subClassOf ;
+                        sp:subject [
+                            sp:varName "domain"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object owl:Restriction ;
+                        sp:predicate rdf:type ;
+                        sp:subject [
+                            sp:varName "?1"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object spin:_this ;
+                        sp:predicate owl:onProperty ;
+                        sp:subject [
+                            sp:varName "?1"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object [
+                            sp:varName "maxCard"^^xsd:string ;
+                          ] ;
+                        sp:predicate owl:maxCardinality ;
+                        sp:subject [
+                            sp:varName "?1"^^xsd:string ;
+                          ] ;
+                      ]
+                    ) ;
+                ]
+                [
+                  rdf:type sp:Optional ;
+                  sp:elements (
+                      [
+                        sp:object [
+                            sp:varName "?2"^^xsd:string ;
+                          ] ;
+                        sp:predicate rdfs:subClassOf ;
+                        sp:subject [
+                            sp:varName "domain"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object owl:Restriction ;
+                        sp:predicate rdf:type ;
+                        sp:subject [
+                            sp:varName "?2"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object spin:_this ;
+                        sp:predicate owl:onProperty ;
+                        sp:subject [
+                            sp:varName "?2"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object [
+                            sp:varName "card"^^xsd:string ;
+                          ] ;
+                        sp:predicate owl:cardinality ;
+                        sp:subject [
+                            sp:varName "?2"^^xsd:string ;
+                          ] ;
+                      ]
+                    ) ;
+                ]
+              ) ;
+          ]
+        ) ;
+    ] ;
+.
+owl:ObjectProperty
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object webvowl:Property ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:propertyTypeObjectProperty ;
+            sp:predicate webvowl:propertyType ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "iri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:iri ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:label ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:Label ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "prefLabel"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "prefLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:label ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:Label ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:iri-based ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "localname"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:annotation ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:Definition ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "definition"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "domain"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:domain ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "range"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:range ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "minCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:minCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "maxCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:maxCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "card"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:cardinality ;
+            sp:subject spin:_this ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object owl:ObjectProperty ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:FocalOntology ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "fo"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:contains ;
+                sp:arg1 [
+                    rdf:type xsd:string ;
+                    sp:arg1 spin:_this ;
+                  ] ;
+                sp:arg2 [
+                    rdf:type xsd:string ;
+                    sp:arg1 [
+                        sp:varName "fo"^^xsd:string ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "prefLabel"^^xsd:string ;
+                    ] ;
+                  sp:predicate <http://www.w3.org/2004/02/skos/core#prefLabel> ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 "PrefLabel" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "prefLabelIri"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "definition"^^xsd:string ;
+                    ] ;
+                  sp:predicate <http://www.w3.org/2004/02/skos/core#definition> ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 "Definition" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "definitionIri"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type sp:iri ;
+                sp:arg1 [
+                    rdf:type sp:concat ;
+                    sp:arg1 [
+                        rdf:type xsd:string ;
+                        sp:arg1 spin:_this ;
+                      ] ;
+                    sp:arg2 "IriLabel" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "iriLabelIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type afn:localname ;
+                sp:arg1 spin:_this ;
+              ] ;
+            sp:variable [
+                sp:varName "localname"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression spin:_this ;
+            sp:variable [
+                sp:varName "iri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "range"^^xsd:string ;
+                    ] ;
+                  sp:predicate rdfs:range ;
+                  sp:subject spin:_this ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "domain"^^xsd:string ;
+                    ] ;
+                  sp:predicate rdfs:domain ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Optional ;
+                  sp:elements (
+                      [
+                        sp:object [
+                            sp:varName "?0"^^xsd:string ;
+                          ] ;
+                        sp:predicate rdfs:subClassOf ;
+                        sp:subject [
+                            sp:varName "domain"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object owl:Restriction ;
+                        sp:predicate rdf:type ;
+                        sp:subject [
+                            sp:varName "?0"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object spin:_this ;
+                        sp:predicate owl:onProperty ;
+                        sp:subject [
+                            sp:varName "?0"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object [
+                            sp:varName "minCard"^^xsd:string ;
+                          ] ;
+                        sp:predicate owl:minCardinality ;
+                        sp:subject [
+                            sp:varName "?0"^^xsd:string ;
+                          ] ;
+                      ]
+                    ) ;
+                ]
+                [
+                  rdf:type sp:Optional ;
+                  sp:elements (
+                      [
+                        sp:object [
+                            sp:varName "?1"^^xsd:string ;
+                          ] ;
+                        sp:predicate rdfs:subClassOf ;
+                        sp:subject [
+                            sp:varName "domain"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object owl:Restriction ;
+                        sp:predicate rdf:type ;
+                        sp:subject [
+                            sp:varName "?1"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object spin:_this ;
+                        sp:predicate owl:onProperty ;
+                        sp:subject [
+                            sp:varName "?1"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object [
+                            sp:varName "maxCard"^^xsd:string ;
+                          ] ;
+                        sp:predicate owl:maxCardinality ;
+                        sp:subject [
+                            sp:varName "?1"^^xsd:string ;
+                          ] ;
+                      ]
+                    ) ;
+                ]
+                [
+                  rdf:type sp:Optional ;
+                  sp:elements (
+                      [
+                        sp:object [
+                            sp:varName "?2"^^xsd:string ;
+                          ] ;
+                        sp:predicate rdfs:subClassOf ;
+                        sp:subject [
+                            sp:varName "domain"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object owl:Restriction ;
+                        sp:predicate rdf:type ;
+                        sp:subject [
+                            sp:varName "?2"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object spin:_this ;
+                        sp:predicate owl:onProperty ;
+                        sp:subject [
+                            sp:varName "?2"^^xsd:string ;
+                          ] ;
+                      ]
+                      [
+                        sp:object [
+                            sp:varName "card"^^xsd:string ;
+                          ] ;
+                        sp:predicate owl:cardinality ;
+                        sp:subject [
+                            sp:varName "?2"^^xsd:string ;
+                          ] ;
+                      ]
+                    ) ;
+                ]
+              ) ;
           ]
         ) ;
     ] ;
