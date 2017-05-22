@@ -165,10 +165,14 @@ module.exports = function() {
         label: labelObject,
         iri: classes[i],
         instances: instances.length,
-        x: coordinateX,
-        y: coordinateY,
         individuals: individuals
       };
+      if (coordinateX) {
+        classAttribute.x = coordinateX;
+      }
+      if (coordinateY) {
+        classAttribute.y = coordinateY;
+      }
       // get annotations
       var annotations = getAnnotations(classes[i], languageLabels, store, dictionaryStore);
       if (Object.keys(annotations).length > 0) {
@@ -194,16 +198,21 @@ module.exports = function() {
       // get coordinates
       var coordinateX = getTextValue(store.getObjects(datatypes[i], 'webvowl:coordinateX').clean()[0]);
       var coordinateY = getTextValue(store.getObjects(datatypes[i], 'webvowl:coordinateY').clean()[0]);
-      // add datatype to "datatype" in the final json
-      graphJson.datatype.push({id: id, type: datatypeType});
-      // add datatype to "datatypeAttribute" in the final json
-      graphJson.datatypeAttribute.push({
+      var datatypeAttribute = {
         id: id,
         label: labelObject,
         iri: datatypes[i],
-        x: coordinateX,
-        y: coordinateY,
-      });
+      };
+      if (coordinateX) {
+        datatypeAttribute.x = coordinateX;
+      }
+      if (coordinateY) {
+        datatypeAttribute.y = coordinateY;
+      }
+      // add datatype to "datatype" in the final json
+      graphJson.datatype.push({id: id, type: datatypeType});
+      // add datatype to "datatypeAttribute" in the final json
+      graphJson.datatypeAttribute.push(datatypeAttribute);
     }
     // at the end add properties
     var properties = store.getSubjects('rdf:type', 'webvowl:Property').clean();
@@ -251,61 +260,6 @@ module.exports = function() {
       }
       graphJson.propertyAttribute.push(propertyAttribute);
     }
-
-    // <http://gdsr.roche.com/mods/md/1609/study#researchGroupDescription>
-    //   rdf:type webvowl:Property ;
-    //   webvowl:cardinality "1"^^xsd:nonNegativeInteger ;
-    //   webvowl:domain <http://gdsr.roche.com/mods/md/1609/study#ResearchGroup> ;
-    //   webvowl:iri <http://gdsr.roche.com/mods/md/1609/study#researchGroupDescription> ;
-    //   webvowl:label <http://gdsr.roche.com/mods/md/1609/study#researchGroupDescriptionIriLabel> ;
-    //   webvowl:label <http://gdsr.roche.com/mods/md/1609/study#researchGroupDescriptionPrefLabel> ;
-    //   webvowl:propertyType webvowl:propertyTypeDatatypeProperty ;
-    //   webvowl:range <http://gdsr.roche.com/mods/md/1609/study#researchGroupDescriptionDatatypeObject> ;
-    // .
-
-    // {
-    //   "id": "property28",
-    //   "label": {
-    //     "IRI-based": "scientificTitle",
-    //     "undefined": "Scientfic Title"
-    //   },
-    //   "iri": "http://gdsr.roche.com/mods/md/1609/study#scientificTitle",
-    //   "annotations": {
-    //     "definition": [
-    //       {
-    //         "identifier": "definition",
-    //         "language": "undefined",
-    //         "value": "A comprehensive summary of study design and objectives, aimed at scientific audience. Scientific title may also be referred to as \"official title\" or \"protocol title.\"",
-    //         "type": "label"
-    //       }
-    //     ],
-    //     "seeAlso": [
-    //       {
-    //         "identifier": "seeAlso",
-    //         "language": "undefined",
-    //         "value": "https://mods.roche.com/ws/resource?uri=http://mods.roche.com/ui/mods-browser-app%23MODSBrowser#/stds/at/http%3A%2F%2Fmods.roche.com%2Fmods-data%23StudyScientificTitle",
-    //         "type": "iri"
-    //       },
-    //       {
-    //         "identifier": "seeAlso",
-    //         "language": "undefined",
-    //         "value": "https://gdsr.roche.com/ws/resource?uri=http://mods.roche.com/ui/mods-browser-app%23MODSBrowser#/stds/at/http%3A%2F%2Fmods.roche.com%2Fmods-data%23StudyScientificTitle",
-    //         "type": "iri"
-    //       }
-    //     ],
-    //     "customProperty": [
-    //       {
-    //         "identifier": "leszek's link",
-    //         "language": "undefined",
-    //         "value": "<a style=\"color: blue;\" href=\"http://leszekpawlak.pl\">test</a>",
-    //         "type": "html"
-    //       }
-    //     ]
-    //   },
-    //   "domain": "class11",
-    //   "range": "datatype3",
-    //   "maxCardinality": 1
-    // },
 
     console.log("graphJson", graphJson);
     // parsing JSON to graph valid JSON
