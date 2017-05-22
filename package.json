@@ -10,10 +10,11 @@
     "autoprefixer": "^6.7.7",
     "clean-webpack-plugin": "^0.1.16",
     "copy-webpack-plugin": "^4.0.1",
+    "cross-env": "^5.0.0",
     "css-loader": "^0.28.1",
+    "d3.promise": "^2.0.0",
     "extract-text-webpack-plugin": "^2.1.0",
     "git-revision-webpack-plugin": "^2.5.0",
-    "d3.promise": "^2.0.0",
     "grunt": "^1.0.1",
     "grunt-bump": "^0.8.0",
     "html-loader": "^0.4.5",
@@ -41,10 +42,10 @@
     "jshint": "jshint .",
     "release": "npm run build",
     "test": "karma start ./test/karma.conf.js --log-level debug --single-run",
-    "build": "NODE_ENV=production webpack --progress",
-    "watch": "NODE_ENV=development webpack-dev-server",
+    "build": "cross-env NODE_ENV=production webpack --progress",
+    "watch": "cross-env NODE_ENV=development webpack-dev-server",
     "webserver": "webpack-dashboard -- npm run watch",
-    "zip": "NODE_ENV=zip webpack --progress"
+    "zip": "cross-env NODE_ENV=zip webpack --progress"
   },
   "license": "MIT",
   "private": true
