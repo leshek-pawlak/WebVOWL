@@ -3,12 +3,12 @@
  * @returns {{}}
  */
 module.exports = function (graph) {
-
-	var exportMenu = {},
+  var N3 = require('n3'),
+		exportMenu = {},
 		exportSvgButton,
 		exportFilename,
 		exportJsonButton,
-		exportCsvButton,
+		exportTtlButton,
 		exportableJsonText;
 
 	/**
@@ -19,8 +19,8 @@ module.exports = function (graph) {
 			.on("click", exportSvg);
 		exportJsonButton = d3.select("#exportJson")
 			.on("click", exportJson);
-		exportCsvButton = d3.select("#exportPositionToCsv")
-			.on("click", exportPositionToCsv);
+		exportTtlButton = d3.select("#exportPositionToTtl")
+			.on("click", exportPositionToTtl);
 
 		var menuEntry= d3.select("#export");
 		menuEntry.on("mouseover",function(){
@@ -324,23 +324,37 @@ module.exports = function (graph) {
 			.attr("download", exportFilename + ".json");
 	}
 
-	function exportPositionToCsv() {
+	function getHash(url) {
+    if (typeof url === 'object') {
+      url = url._value;
+    }
+    return url.substring(url.indexOf('#') + 1);
+  }
+
+	function exportPositionToTtl() {
+		var prefixes = {
+			export: 'http://example.com/export#',
+			webvowl: 'http://gdsr.roche.com/mods/dft/1704/webvowl#',
+			xsd: 'http://www.w3.org/2001/XMLSchema#',
+		};
+		var writer = N3.Writer({ prefixes: prefixes });
 		var nodeElements = graph.graphNodeElements();  // get visible nodes
-		var csvContent = "data:text/csv;charset=utf-8,iri;x;y\n";
 		nodeElements.each(function (node, index) {
-			// if boxes view make sure that only visible nodes will be added to csv file
+			// if boxes view make sure that only visible and pinned nodes will be added to ttl file
 			if (node.pinned() && (graph.options().styleMenu().style === 'circle' || node.type().toLowerCase().indexOf('datatype') === -1 && !node.referenceClass)) {
-				var data = [node.iri() || 'anonymous', parseFloat(node.x).toFixed(2), parseFloat(node.y).toFixed(2)];
-				var dataString = data.join(";");
-				csvContent += index < nodeElements[0].length ? dataString+ "\n" : dataString;
+				var id = 'export:' + getHash(node.iri());
+				writer.addTriple(id, 'webvowl:coordinateX', '"' + parseFloat(node.x).toFixed(2).toString() + '"^^xsd:decimal');
+				writer.addTriple(id, 'webvowl:coordinateY', '"' + parseFloat(node.y).toFixed(2).toString() + '"^^xsd:decimal');
 			}
 		});
-
-		var encodedUri = encodeURI(csvContent);
-		var link = document.createElement("a");
-		link.setAttribute("href", encodedUri);
-		link.setAttribute("download", "postionsExport_"+ Date.now() +".csv");
-		link.click();
+		writer.end(function (error, result) {
+			var content = "data:text/ttl," + result;
+			var encodedUri = encodeURI(content);
+			var link = document.createElement("a");
+			link.setAttribute("href", encodedUri);
+			link.setAttribute("download", "postionsExport_"+ Date.now() +".ttl");
+			link.click();
+		});
 	}
 
 	return exportMenu;
