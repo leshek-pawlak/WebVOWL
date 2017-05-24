@@ -54,15 +54,26 @@ var config = {
       {
         test: /\.css$/,
         use: ExtractTextPlugin.extract({
-          fallback: "style-loader",
+          fallback: {
+            loader: "style-loader",
+            options: {
+              sourceMap: true,
+            }
+          },
           use: [{
               loader: "css-loader",
               options: {
                 minimize: !isDevelopment,
+                sourceMap: true,
                 importLoaders: 1
               }
             },
-            "postcss-loader",
+            {
+              loader: "postcss-loader",
+              options: {
+                sourceMap: 'inline',
+              }
+            },
           ]
         })
       }
@@ -80,7 +91,6 @@ var config = {
       filename: "css/[name].[chunkhash].css",
       allChunks: true
     }),
-    new webpack.optimize.UglifyJsPlugin(),
     new CopyWebpackPlugin([{
         from: "src/app/options.json"
       },{
@@ -118,7 +128,7 @@ var config = {
 if (!isDevelopment) {
   config.plugins.push(
     new webpack.optimize.UglifyJsPlugin({
-      sourcemap: true,
+      sourceMap: true,
       minimize: true,
       compress: {
         warnings: true
