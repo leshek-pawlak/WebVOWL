@@ -141,8 +141,8 @@ module.exports = function() {
     for (var i = 0; i < classes.length; i++) {
       // add label
       var classLabelObject = getLabels(classes[i], languageLabels, store);
-      // create id
-      var classId = getTextValue(classes[i], store._prefixes);
+      // get iri
+      var classIri = getTextValueFromTtl(classes[i], 'webvowl:iri', store);
       // get coordinates
       var classCoordinateX = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateX').clean()[0]);
       var classCoordinateY = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateY').clean()[0]);
@@ -162,9 +162,9 @@ module.exports = function() {
       }
       // prepare object to put to classAttribute
       var classAttribute = {
-        id: classId,
+        id: classes[i],
         label: classLabelObject,
-        iri: classes[i],
+        iri: classIri,
         instances: instances.length,
         individuals: individuals
       };
@@ -180,7 +180,7 @@ module.exports = function() {
         classAttribute.annotations = classAnnotations;
       }
       // add class to "class" in the final json
-      graphJson.class.push({id: classId, type: classType});
+      graphJson.class.push({id: classes[i], type: classType});
       // add class to "classAttribute" in the final json
       graphJson.classAttribute.push(classAttribute);
     }
@@ -189,8 +189,8 @@ module.exports = function() {
     graphJson.metrics.datatypePropertyCount = graphJson.metrics.datatypeCount = datatypes.length;
     graphJson.metrics.nodeCount = classes.length + datatypes.length;
     for (var d = 0; d < datatypes.length; d++) {
-      // create id
-      var datatypeId = getTextValue(datatypes[d], store._prefixes);
+      // get iri
+      var datatypeIri = getTextValueFromTtl(datatypes[d], 'webvowl:iri', store);
       // get type from datatype
       var datatypeTypeIRI = store.getObjects(datatypes[d], 'webvowl:datatypeType').clean()[0];
       var datatypeType = getTextValue(dictionaryStore.getObjects(datatypeTypeIRI, 'webvowl:typeLabel').clean()[0]);
@@ -200,9 +200,9 @@ module.exports = function() {
       var datatypeCoordinateX = getTextValue(store.getObjects(datatypes[d], 'webvowl:coordinateX').clean()[0]);
       var datatypeCoordinateY = getTextValue(store.getObjects(datatypes[d], 'webvowl:coordinateY').clean()[0]);
       var datatypeAttribute = {
-        id: datatypeId,
+        id: datatypes[d],
         label: datatypeLabelObject,
-        iri: datatypes[d],
+        iri: datatypeIri,
       };
       if (datatypeCoordinateX) {
         datatypeAttribute.x = datatypeCoordinateX;
@@ -211,7 +211,7 @@ module.exports = function() {
         datatypeAttribute.y = datatypeCoordinateY;
       }
       // add datatype to "datatype" in the final json
-      graphJson.datatype.push({id: datatypeId, type: datatypeType});
+      graphJson.datatype.push({id: datatypes[d], type: datatypeType});
       // add datatype to "datatypeAttribute" in the final json
       graphJson.datatypeAttribute.push(datatypeAttribute);
     }
@@ -220,8 +220,8 @@ module.exports = function() {
     graphJson.metrics.objectPropertyCount = properties.length;
     graphJson.metrics.propertyCount = properties.length + datatypes.length;
     for (var p = 0; p < properties.length; p++) {
-      // create id
-      var propertyId = getTextValue(properties[p], store._prefixes);
+      // get iri
+      var propertyIri = getTextValueFromTtl(properties[p], 'webvowl:iri', store);
       // get type from datatype
       var propertyTypeIRI = store.getObjects(properties[p], 'webvowl:propertyType').clean()[0];
       var propertyType = getTextValue(dictionaryStore.getObjects(propertyTypeIRI, 'webvowl:typeLabel').clean()[0]);
@@ -232,12 +232,12 @@ module.exports = function() {
       // add domain
       var domainID = getTextValueFromTtl(properties[p], 'webvowl:domain', store);
       // add datatype to "datatype" in the final json
-      graphJson.property.push({id: propertyId, type: propertyType});
+      graphJson.property.push({id: properties[p], type: propertyType});
       // add datatype to "datatypeAttribute" in the final json
       var propertyAttribute = {
-        id: propertyId,
+        id: properties[p],
         label: propertyLabelObject,
-        iri: properties[p],
+        iri: propertyIri,
         range: rangeID,
         domain: domainID,
       };
