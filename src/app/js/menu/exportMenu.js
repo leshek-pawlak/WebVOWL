@@ -324,16 +324,8 @@ module.exports = function (graph) {
 			.attr("download", exportFilename + ".json");
 	}
 
-	function getHash(url) {
-    if (typeof url === 'object') {
-      url = url._value;
-    }
-    return url.substring(url.indexOf('#') + 1);
-  }
-
 	function exportPositionToTtl() {
 		var prefixes = {
-			export: 'http://example.com/export#',
 			webvowl: 'http://gdsr.roche.com/mods/dft/1704/webvowl#',
 			xsd: 'http://www.w3.org/2001/XMLSchema#',
 		};
@@ -342,9 +334,8 @@ module.exports = function (graph) {
 		nodeElements.each(function (node, index) {
 			// if boxes view make sure that only visible and pinned nodes will be added to ttl file
 			if (node.pinned() && (graph.options().styleMenu().style === 'circle' || node.type().toLowerCase().indexOf('datatype') === -1 && !node.referenceClass)) {
-				var id = 'export:' + getHash(node.iri());
-				writer.addTriple(id, 'webvowl:coordinateX', '"' + parseFloat(node.x).toFixed(2).toString() + '"^^xsd:decimal');
-				writer.addTriple(id, 'webvowl:coordinateY', '"' + parseFloat(node.y).toFixed(2).toString() + '"^^xsd:decimal');
+				writer.addTriple(node.id(), 'webvowl:coordinateX', '"' + parseFloat(node.x).toFixed(2).toString() + '"^^xsd:decimal');
+				writer.addTriple(node.id(), 'webvowl:coordinateY', '"' + parseFloat(node.y).toFixed(2).toString() + '"^^xsd:decimal');
 			}
 		});
 		writer.end(function (error, result) {
