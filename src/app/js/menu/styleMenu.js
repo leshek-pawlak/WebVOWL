@@ -11,12 +11,12 @@ module.exports = function (graph) {
       minHeight = graph.options().umlBoxMinHeight(),
       minWidth = graph.options().umlBoxMinWidth();
 
-    styleMenu.style = graph.options().defaultGraphStyle();
     /**
      * Connects the website with graph styles.
      * @param choosedView save as style
      */
     styleMenu.setup = function () {
+      styleMenu.style = graph.options().defaultGraphStyle();
       allStyles = d3.selectAll('#styleRadios input');
 
       allStyles.each(function () {
