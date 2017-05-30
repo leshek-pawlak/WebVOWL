@@ -71,6 +71,29 @@ module.exports = (function () {
 		return rectangle;
 	};
 
+	/**
+	 * Appends a triangle class node with the passed attributes.
+	 * @param parent the parent element to which the rectangle will be appended
+	 * @param width
+	 * @param height
+	 * @param [cssClasses] an array of additional css classes
+	 * @param [tooltip]
+	 * @param [backgroundColor]
+	 * @returns {*}
+	 */
+	tools.appendTriangleClass = function (parent, width, height, cssClasses, tooltip, backgroundColor) {
+		var triangle = parent.append("path")
+			.classed("triangle", true)
+			.classed("class", true)
+			.attr("d", d3.svg.symbol().type('triangle-down').size(height * width));
+
+		addCssClasses(triangle, cssClasses);
+		addToolTip(triangle, tooltip);
+		addBackgroundColor(triangle, backgroundColor);
+
+		return triangle;
+	};
+
 	tools.drawPin = function(container, dx, dy, onClick) {
 		var pinR = 7;
 		var pinGroupElement = container
