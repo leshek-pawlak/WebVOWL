@@ -88,7 +88,7 @@ module.exports = function() {
         labelObject = {
           'IRI-based': labelFromJson,
           undefined: labelFromJson.replace(/([a-z])([A-Z])/g, '$1 $2'),
-        }
+        };
       }
       // NOTE type can be an attribute of class or 'owl:unionOf', but in xml file there are none exemples of used.
       result.class.push({
@@ -119,15 +119,15 @@ module.exports = function() {
       result.classAttribute.push(classAttribute);
     }
     // add datatype properties to result json.
-    for (var k = 0; k < datatypeProperties.length; k++) {
-      var idDatatype = 'datatype' + datatypeProperties[k]._hash._value;
-      var iriDatatypeLabel = datatypeProperties[k].skos_prefLabel || datatypeProperties[k].rdfs_label || datatypeProperties[k]._uri._value.substring(datatypeProperties[k]._uri._value.indexOf('#') + 1);
+    for (var z = 0; z < datatypeProperties.length; z++) {
+      var idDatatype = 'datatype' + datatypeProperties[z]._hash._value;
+      var iriDatatypeLabel = datatypeProperties[z].skos_prefLabel || datatypeProperties[z].rdfs_label || datatypeProperties[z]._uri._value.substring(datatypeProperties[z]._uri._value.indexOf('#') + 1);
       result.datatype.push({
         id: idDatatype,
         type: 'rdfs:Datatype',
       });
       result.property.push({
-        id: 'property' + datatypeProperties[k]._hash._value,
+        id: 'property' + datatypeProperties[z]._hash._value,
         type: 'owl:datatypeProperty',
       });
       result.datatypeAttribute.push({
@@ -135,7 +135,7 @@ module.exports = function() {
         label: {
           'IRI-based': iriDatatypeLabel,
         },
-        iri: datatypeProperties[k]._uri._value || datatypeProperties[k]._uri,
+        iri: datatypeProperties[z]._uri._value || datatypeProperties[z]._uri,
         // x: 0,
         // y: 0,
       });
@@ -313,16 +313,16 @@ module.exports = function() {
         result.metrics.individualCount += classes[k].instance.length;
         result.classAttribute.instances = classes[k].instance.length;
         var individuals = [];
-        for (var j = 0; j < classes[k].instance.length; ++j) {
+        for (var x = 0; x < classes[k].instance.length; ++x) {
 
-          var url = classes[k].instance[j]._uri._value;
+          var url = classes[k].instance[x]._uri._value;
           var hash = url.substring(url.indexOf('#') + 1);
-          var label = classes[k].instance_prefLabel ? classes[k].instance_prefLabel[j] : hash;
+          var label = classes[k].instance_prefLabel ? classes[k].instance_prefLabel[x] : hash;
           var iriLabel = classes[k].skos_prefLabel || classes[k].rdfs_label || classes[k]._uri._value.substring(classes[k]._uri._value.indexOf('#') + 1);
           // create undefined label from class url hash and IRI-based label
           var undefinedLabel = label.replace(iriLabel, '').replace(/([a-z])([A-Z])/g, '$1 $2');
           individuals.push({
-            iri: classes[k].instance[j]._uri._value,
+            iri: classes[k].instance[x]._uri._value,
             labels: {
               'IRI-based': label,
             },
@@ -353,7 +353,7 @@ module.exports = function() {
         propertyAttribute.range = findIdByUri(objectProperties[l].rdfs_range._uri);
       }
     }
-    console.log('5. create graphJson and fill it with information from the input json: ', result)
+    console.log('5. create graphJson and fill it with information from the input json: ', result);
     return JSON.stringify(result);
   }
 

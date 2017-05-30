@@ -194,7 +194,7 @@ module.exports = function (graph) {
 					} else if (mimeType === 'application/ttl') {
 						var ttlParser = ttl2Json();
 						ttlParser(request.responseText).then(function(data) {
-							jsonText = data
+							jsonText = data;
 							cachedConversions[relativePath] = jsonText;
 							loadOntologyFromText(jsonText, undefined, filename);
 							setLoadingStatus(loadingSuccessful, error ? error.response : undefined, errorInfo);
@@ -261,7 +261,7 @@ module.exports = function (graph) {
 					} else if (mimeType === 'application/ttl') {
 						var ttlParser = ttl2Json();
 						ttlParser(request.responseText).then(function(data) {
-							jsonText = data
+							jsonText = data;
 							cachedConversions[relativePath] = jsonText;
 							loadOntologyFromText(jsonText, undefined, filename);
 							setLoadingStatus(loadingSuccessful, error ? error.response : undefined, errorInfo);
