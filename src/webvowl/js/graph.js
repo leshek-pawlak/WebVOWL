@@ -277,21 +277,22 @@ module.exports = function (graphContainerSelector) {
 			if (label.property().element) {
 				// hide label
 				label.property().labelElement().classed('hidden', true);
-				var elementDom = d3.select('#' + label.property().element()).node();
-				if (elementDom && elementDom.parentNode.getAttribute('transform')) {
-					var matches = elementDom.parentNode.getAttribute('transform').match(/[\d|.|\+]+/g);
-					var xVal = parseFloat(matches[0]);
-					var yVal = parseFloat(matches[1]);
-					if (Math.sign(pathStart.x) !== Math.sign(xVal)) {
-						xVal *= -1;
-					}
-					if (Math.sign(pathStart.y) !== Math.sign(yVal)) {
-						yVal *= -1;
-					}
-					pathStart = {x: xVal, y: yVal};
-				}
-				// draw line without label
-				return curveFunction([pathStart, pathEnd]);
+			// 	var elementDom = d3.select('#' + label.property().element()).node();
+			// 	// change start path to a label. TODO find solution to positioning bug
+			// 	if (elementDom && elementDom.parentNode.getAttribute('transform')) {
+			// 		var matches = elementDom.parentNode.getAttribute('transform').match(/[\d|.|\+]+/g);
+			// 		var xVal = parseFloat(matches[0]);
+			// 		var yVal = parseFloat(matches[1]);
+			// 		if (Math.sign(pathStart.x) !== Math.sign(xVal)) {
+			// 			xVal *= -1;
+			// 		}
+			// 		if (Math.sign(pathStart.y) !== Math.sign(yVal)) {
+			// 			yVal *= -1;
+			// 		}
+			// 		pathStart = {x: xVal, y: yVal};
+			// 	}
+			// 	// draw line without label
+			// 	return curveFunction([pathStart, pathEnd]);
 			}
 
 			return curveFunction([pathStart, curvePoint, pathEnd]);
