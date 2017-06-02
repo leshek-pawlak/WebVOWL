@@ -11,7 +11,9 @@ module.exports = function (graph) {
       minHeight = graph.options().umlBoxMinHeight(),
       minWidth = graph.options().umlBoxMinWidth();
 
-    styleMenu.style = graph.options().defaultGraphStyle();
+    setTimeout(function() {
+      styleMenu.style = graph.options().defaultGraphStyle();
+    });
     /**
      * Connects the website with graph styles.
      * @param choosedView save as style
