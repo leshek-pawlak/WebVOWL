@@ -368,6 +368,9 @@ module.exports = function (graph) {
 						graph.options().pickAndPinModule().addPinnedElement(property);
 					}
 
+					if (element.element) {
+						property.element(element.element);
+					}
 
 					if (element.attributes) {
 						var deduplicatedAttributes = d3.set(element.attributes.concat(property.attributes()));

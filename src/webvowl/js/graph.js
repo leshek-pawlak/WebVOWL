@@ -270,9 +270,29 @@ module.exports = function (graphContainerSelector) {
 			if (l.isLoop()) {
 				return math.calculateLoopPath(l);
 			}
-			var curvePoint = l.label();
+			var label = l.label();
+			var curvePoint = label;
 			var pathStart = math.calculateIntersection(curvePoint, l.domain(), 1);
 			var pathEnd = math.calculateIntersection(curvePoint, l.range(), 1);
+			if (label.property().element) {
+				// hide label
+				label.property().labelElement().classed('hidden', true);
+				var elementDom = d3.select('#' + label.property().element()).node();
+				if (elementDom && elementDom.parentNode.getAttribute('transform')) {
+					var matches = elementDom.parentNode.getAttribute('transform').match(/[\d|.|\+]+/g);
+					var xVal = parseFloat(matches[0]);
+					var yVal = parseFloat(matches[1]);
+					if (Math.sign(pathStart.x) !== Math.sign(xVal)) {
+						xVal *= -1;
+					}
+					if (Math.sign(pathStart.y) !== Math.sign(yVal)) {
+						yVal *= -1;
+					}
+					pathStart = {x: xVal, y: yVal};
+				}
+				// draw line without label
+				return curveFunction([pathStart, pathEnd]);
+			}
 
 			return curveFunction([pathStart, curvePoint, pathEnd]);
 		});

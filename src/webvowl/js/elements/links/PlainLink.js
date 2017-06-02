@@ -76,7 +76,7 @@ PlainLink.prototype.draw = function (linkGroup) {
 
 	linkGroup.append("path")
 		.classed("link-path", true)
-		.classed(this.domain().cssClassOfNode(), true)
+		.classed(property.element ? property.element() : this.domain().cssClassOfNode(), true)
 		.classed(this.range().cssClassOfNode(), true)
 		.classed(property.linkType(), true);
 };
