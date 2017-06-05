@@ -55,7 +55,7 @@ module.exports = (function () {
 		};
 
 		this.setHoverHighlighting = function (enable) {
-			that.nodeElement().selectAll("path.triangle").classed("hovered", enable);
+			that.nodeElement().selectAll("path.hexagon").classed("hovered", enable);
 
 			var haloGroup=that.getHalos();
 			if (haloGroup){
@@ -72,13 +72,13 @@ module.exports = (function () {
 
 		this.toggleFocus = function () {
 			that.focused(!that.focused());
-			that.nodeElement().select("path.triangle").classed("focused", that.focused());
+			that.nodeElement().select("path.hexagon").classed("focused", that.focused());
 			graph.resetSearchHighlight();
 			graph.options().searchMenu().clearText();
 		};
 
 		/**
-		 * Draws the triangle node.
+		 * Draws the hexagon node.
 		 * @param parentElement the element to which this node will be appended
 		 * @param [additionalCssClasses] additional css classes
 		 */
@@ -91,7 +91,7 @@ module.exports = (function () {
 			if (additionalCssClasses instanceof Array) {
 				cssClasses = cssClasses.concat(additionalCssClasses);
 			}
-			drawTools.appendTriangleClass(parentElement, that.width(), that.height(), cssClasses, that.labelForCurrentLanguage(), that.backgroundColor());
+			drawTools.appendHexagonClass(parentElement, that.width(), that.height(), cssClasses, that.labelForCurrentLanguage(), that.backgroundColor());
 
 			textBlock = new CenteringTextElement(parentElement, that.backgroundColor());
 			textBlock.addText(that.labelForCurrentLanguage());

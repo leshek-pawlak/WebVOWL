@@ -72,7 +72,7 @@ module.exports = (function () {
 	};
 
 	/**
-	 * Appends a triangle class node with the passed attributes.
+	 * Appends a hexagon class node with the passed attributes.
 	 * @param parent the parent element to which the rectangle will be appended
 	 * @param width
 	 * @param height
@@ -81,18 +81,35 @@ module.exports = (function () {
 	 * @param [backgroundColor]
 	 * @returns {*}
 	 */
-	tools.appendTriangleClass = function (parent, width, height, cssClasses, tooltip, backgroundColor) {
-		var triangle = parent.append("path")
-			.classed("triangle", true)
+	tools.appendHexagonClass = function (parent, width, height, cssClasses, tooltip, backgroundColor) {
+		var h = (Math.sqrt(3)/2),
+    radius = width,
+    hexagonData = [
+      { "x": radius,   "y": 0},
+      { "x": radius/2,  "y": radius*h},
+      { "x": -radius/2,  "y": radius*h},
+      { "x": -radius,  "y": 0},
+      { "x": -radius/2,  "y": -radius*h},
+      { "x": radius/2, "y": -radius*h}
+    ];
+
+		var hexagon = parent.append("path")
+			.classed("hexagon", true)
 			.classed("class", true)
-			.attr("d", d3.svg.symbol().type('triangle-down').size(height * width));
+			.attr("d", drawHexagon(hexagonData));
 
-		addCssClasses(triangle, cssClasses);
-		addToolTip(triangle, tooltip);
-		addBackgroundColor(triangle, backgroundColor);
+		addCssClasses(hexagon, cssClasses);
+		addToolTip(hexagon, tooltip);
+		addBackgroundColor(hexagon, backgroundColor);
 
-		return triangle;
+		return hexagon;
 	};
+
+	var drawHexagon = d3.svg.line()
+		.x(function(d) { return d.x; })
+		.y(function(d) { return d.y; })
+		.interpolate("cardinal-closed")
+		.tension("0.2");
 
 	tools.drawPin = function(container, dx, dy, onClick) {
 		var pinR = 7;

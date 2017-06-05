@@ -2,7 +2,7 @@ var BaseProperty = require("../elements/properties/BaseProperty");
 var BaseNode = require("../elements/nodes/BaseNode");
 var DatatypeNode = require("../elements/nodes/DatatypeNode");
 var Thing = require("../elements/nodes/implementations/OwlThing");
-var Triangle = require("../elements/nodes/implementations/Triangle");
+var Hexagon = require("../elements/nodes/implementations/Hexagon");
 var ObjectProperty = require("../elements/properties/implementations/OwlObjectProperty");
 var DatatypeProperty = require("../elements/properties/implementations/OwlDatatypeProperty");
 var RdfsSubClassOf = require("../elements/properties/implementations/RdfsSubClassOf");
@@ -46,6 +46,6 @@ tools.isRdfsSubClassOf = function (property) {
 	return property instanceof RdfsSubClassOf;
 };
 
-tools.isTriangle = function (property) {
-	return property instanceof Triangle;
+tools.isHexagon = function (property) {
+	return property instanceof Hexagon;
 };

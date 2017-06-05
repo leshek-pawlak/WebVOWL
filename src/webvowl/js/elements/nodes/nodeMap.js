@@ -13,7 +13,7 @@ nodes.push(require("./implementations/RdfsClass"));
 nodes.push(require("./implementations/RdfsDatatype"));
 nodes.push(require("./implementations/RdfsLiteral"));
 nodes.push(require("./implementations/RdfsResource"));
-nodes.push(require("./implementations/Triangle"));
+nodes.push(require("./implementations/Hexagon"));
 
 var map = d3.map(nodes, function (Prototype) {
 	return new Prototype().type();
