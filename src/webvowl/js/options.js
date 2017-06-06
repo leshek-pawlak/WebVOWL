@@ -40,7 +40,7 @@ module.exports = function () {
 		cardinalityPlacement = "CLASS",
 		umlBoxMinHeight = 30,
 		umlBoxMinWidth = 100,
-		defaultGraphStyle = "rect",
+		graphStyle = "rect",
 		centerOnLoad = true,
 		centerOnFoundElement = true,
 		addIriCenterToUrl = true,
@@ -282,9 +282,9 @@ module.exports = function () {
 		return options;
 	};
 
-	options.defaultGraphStyle = function (p) {
-		if (!arguments.length) return defaultGraphStyle;
-		defaultGraphStyle = p;
+	options.graphStyle = function (p) {
+		if (!arguments.length) return graphStyle;
+		graphStyle = p;
 		return options;
 	};
 

@@ -5,18 +5,20 @@
  * @returns {{}}
  */
 module.exports = function (graph) {
-
     var styleMenu = {},
       allStyles,
       minHeight = graph.options().umlBoxMinHeight(),
       minWidth = graph.options().umlBoxMinWidth();
 
-    styleMenu.style = graph.options().defaultGraphStyle();
     /**
      * Connects the website with graph styles.
      * @param choosedView save as style
      */
     styleMenu.setup = function () {
+      // set only once value from options.json file. not from options.js.
+      if (!styleMenu.defaultGraphStyle) {
+        styleMenu.defaultGraphStyle = graph.options().graphStyle();
+      }
       allStyles = d3.selectAll('#styleRadios input');
 
       allStyles.each(function () {
@@ -24,7 +26,7 @@ module.exports = function (graph) {
         radio.on("click", function() { changeView(radio.attr('value')); });
       });
 
-      d3.select('#styleRadios input[value="'+ styleMenu.style +'"]').property('checked', true).on("click")();
+      d3.select('#styleRadios input[value="'+ graph.options().graphStyle() +'"]').property('checked', true).on("click")();
 
       if (d3.selectAll('circle')[0].length > 0) {
         prepareCircles();
@@ -54,8 +56,8 @@ module.exports = function (graph) {
     };
 
     function changeView(choosedView) {
-      if (choosedView === styleMenu.style) return;
-      styleMenu.style = choosedView;
+      if (choosedView === graph.options().graphStyle()) return;
+      graph.options().graphStyle(choosedView);
 
       allStyles.each(function () {
         var radio = d3.select(this);
@@ -68,14 +70,14 @@ module.exports = function (graph) {
     }
 
     function clear() {
-      changeView(graph.options().defaultGraphStyle());
+      changeView(styleMenu.defaultGraphStyle);
     }
 
     function render() {
       d3.selectAll('.elements-to-change').each(function () {
         var element = d3.select(this);
         var textElement = d3.select(getClosestTextElement(element));
-        if (styleMenu.style === 'rect') {
+        if (graph.options().graphStyle() === 'rect') {
           // change circle to rect
           element.property('outerHTML', element.property('outerHTML').replace(/circle/g, 'rect'));
           if (textElement.node()) {
