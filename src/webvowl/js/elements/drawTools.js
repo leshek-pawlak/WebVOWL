@@ -5,6 +5,13 @@ module.exports = (function () {
 
 	var tools = {};
 
+	// method to draw hexagon from the points (hexagonData).
+	var drawHexagon = d3.svg.line()
+		.x(function(d) { return d.x; })
+		.y(function(d) { return d.y; })
+		.interpolate("cardinal-closed")
+		.tension("0.2");
+
 	/**
 	 * Append a circular class node with the passed attributes.
 	 * @param parent the parent element to which the circle will be appended
@@ -81,18 +88,7 @@ module.exports = (function () {
 	 * @param [backgroundColor]
 	 * @returns {*}
 	 */
-	tools.appendHexagonClass = function (parent, width, height, cssClasses, tooltip, backgroundColor) {
-		var h = (Math.sqrt(3)/2),
-    radius = width,
-    hexagonData = [
-      { "x": radius,   "y": 0},
-      { "x": radius/2,  "y": radius*h},
-      { "x": -radius/2,  "y": radius*h},
-      { "x": -radius,  "y": 0},
-      { "x": -radius/2,  "y": -radius*h},
-      { "x": radius/2, "y": -radius*h}
-    ];
-
+	tools.appendHexagonClass = function (parent, radius, height, hexagonData, cssClasses, tooltip, backgroundColor) {
 		var hexagon = parent.append("path")
 			.classed("hexagon", true)
 			.classed("class", true)
@@ -104,12 +100,6 @@ module.exports = (function () {
 
 		return hexagon;
 	};
-
-	var drawHexagon = d3.svg.line()
-		.x(function(d) { return d.x; })
-		.y(function(d) { return d.y; })
-		.interpolate("cardinal-closed")
-		.tension("0.2");
 
 	tools.drawPin = function(container, dx, dy, onClick) {
 		var pinR = 7;

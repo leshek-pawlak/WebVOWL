@@ -8,16 +8,35 @@ module.exports = (function () {
 		BaseNode.apply(this, arguments);
 
 		var that = this,
-			width = 60,
-			height = width * Math.sqrt(3) / 2,
 			pinGroupElement,
 			haloGroupElement,
-			radius = width * Math.sqrt(3) / 3;
+			mostPopularCornerPoint = 0,
+			middleSidePoints = [],
+			radius = 40,
+			height = (Math.sqrt(3)/2),
+	    hexagonData = [];
 
+		function getMostPopularCornerPoint(cornerPoints) {
+			cornerPoints.sort();
+			var max=0,result,freq = 0;
+			for(var i=0; i < cornerPoints.length; i++){
+					if(cornerPoints[i]===cornerPoints[i+1]){
+							freq++;
+					}
+					else {
+							freq=0;
+					}
+					if(freq>max){
+							result = cornerPoints[i];
+							max = freq;
+					}
+			}
+			return result;
+		}
 		// Properties
-		this.width = function (p) {
-			if (!arguments.length) return width;
-			width = p;
+		this.radius = function (p) {
+			if (!arguments.length) return radius;
+			radius = p;
 			return this;
 		};
 
@@ -27,31 +46,66 @@ module.exports = (function () {
 			return this;
 		};
 
+		this.hexagonData = function (p) {
+			if (!arguments.length) return hexagonData;
+			hexagonData = p;
+			var cornerPoints = [];
+			for (var i = 0; i <= hexagonData.length; i++) {
+				var p = i - 1;
+				if (i < hexagonData.length) {
+					middleSidePoints[i] = Math.abs(hexagonData[i].y / hexagonData[i].x);
+				}
+				if (p > -1) {
+					if (middleSidePoints[i]) {
+						cornerPoints.push((middleSidePoints[p] + middleSidePoints[i]) / 3);
+					} else {
+						cornerPoints.push((middleSidePoints[p] + middleSidePoints[0]) / 3);
+					}
+				}
+				mostPopularCornerPoint = getMostPopularCornerPoint(cornerPoints);
+			}
+
+			return this;
+		};
+
 		this.getHalos = function () {
 			return haloGroupElement;
 		};
 
-		this.radius = function (p) {
-			if (!arguments.length) return radius;
-			radius = p;
-			return this;
-		};
-
-		// Functions
 		this.actualRadius = function () {
-			if (!graph.options().scaleNodesByIndividuals() || that.individuals().length <= 0) {
-				return that.radius();
-			} else {
-				// we could "listen" for radius and maxIndividualCount changes, but this is easier
-				var MULTIPLIER = 8,
-					additionalRadius = Math.log(that.individuals().length + 1) * MULTIPLIER + 5;
-
-				return that.radius() + additionalRadius;
-			}
+			return radius;
 		};
+
+		// set hexagonData
+		this.hexagonData([
+			{ "x": radius, "y": 0 },
+			{ "x": radius / 2,  "y": radius * height },
+			{ "x": -radius / 2,  "y": radius * height },
+			{ "x": -radius, "y": 0 },
+			{ "x": -radius / 2,  "y": -radius * height },
+			{ "x": radius / 2, "y": -radius * height }
+		]);
 
 		this.distanceToBorder = function (dx, dy) {
-			return that.actualRadius();
+			// maximum is sixth part of radius. It's always a top corner.
+			var m_link = Math.abs(dy / dx) > radius / 6 ? radius / 6 : Math.abs(dy / dx);
+
+			// here we have two special cases
+			if (m_link < mostPopularCornerPoint) {
+				// if we are on the left or right side of hexagon. We need to change only one part of axis.
+				var timesX = dx / radius,
+					rectY = dy / timesX;
+
+				return Math.sqrt(Math.pow(radius, 2) + Math.pow(rectY, 2)) + 2;
+			} else if (m_link < mostPopularCornerPoint * 3) {
+				// if we are between most popular corner, and middle of the side is part of linear function which we try to simulate.
+				var timesY = dy / radius,
+					rectX = dx / timesY;
+
+				return radius + Math.sqrt(Math.abs(rectX) - Math.abs(timesY)) - Math.pow(m_link, 2);
+			}
+
+			return radius + m_link;
 		};
 
 		this.setHoverHighlighting = function (enable) {
@@ -67,7 +121,7 @@ module.exports = (function () {
 		};
 
 		this.textWidth = function () {
-			return this.width();
+			return this.radius() * 2;
 		};
 
 		this.toggleFocus = function () {
@@ -91,7 +145,7 @@ module.exports = (function () {
 			if (additionalCssClasses instanceof Array) {
 				cssClasses = cssClasses.concat(additionalCssClasses);
 			}
-			drawTools.appendHexagonClass(parentElement, that.width(), that.height(), cssClasses, that.labelForCurrentLanguage(), that.backgroundColor());
+			drawTools.appendHexagonClass(parentElement, that.radius(), that.height(), that.hexagonData(), cssClasses, that.labelForCurrentLanguage(), that.backgroundColor());
 
 			textBlock = new CenteringTextElement(parentElement, that.backgroundColor());
 			textBlock.addText(that.labelForCurrentLanguage());
@@ -109,7 +163,7 @@ module.exports = (function () {
 		this.drawPin = function () {
 			that.pinned(true);
 
-			var dx = 0.25 * width,
+			var dx = 0.25 * radius,
 				dy = -0.5 * height;
 
 			pinGroupElement = drawTools.drawPin(that.nodeElement(), dx, dy, this.removePin);
@@ -135,7 +189,7 @@ module.exports = (function () {
 			that.halo(true);
 
 			var offset = 15;
-			haloGroupElement = drawTools.drawRectHalo(that, this.width(), this.height(), offset);
+			haloGroupElement = drawTools.drawRectHalo(that, this.radius(), this.height(), offset);
 
 		};
 	};
