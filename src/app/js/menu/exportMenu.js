@@ -325,31 +325,45 @@ module.exports = function (graph) {
 	}
 
 	function exportPositionToTtl() {
-    var prefixes = {
-      export: 'http://example.com/export#',
-      webvowl: 'http://gdsr.roche.com/mods/dft/1704/webvowl#',
-      xsd: 'http://www.w3.org/2001/XMLSchema#',
-    };
-    var writer = N3.Writer({ prefixes: prefixes });
+    var exportPrefixWasUsed = false;
 		var nodeElements = graph.graphNodeElements();  // get visible nodes
+    var writer = N3.Writer();
+    var triples = [];
     var propElements = graph.graphLabelElements(); // get visible labels
     nodeElements.each(function (node, index) {
 			// if boxes view make sure that only visible and pinned nodes will be added to ttl file
 			if (node.pinned() && (graph.options().graphStyle() === 'circles' || node.type().toLowerCase().indexOf('datatype') === -1 && !node.referenceClass)) {
-        var nodeIri = node.id().indexOf('http://') > -1 ? node.id() : 'export:' + node.id();
-        writer.addTriple(nodeIri, 'webvowl:coordinateX', '"' + parseFloat(node.x).toFixed(2).toString() + '"^^xsd:decimal');
-				writer.addTriple(nodeIri, 'webvowl:coordinateY', '"' + parseFloat(node.y).toFixed(2).toString() + '"^^xsd:decimal');
+        var nodeIri = node.id();
+        if (node.id().indexOf('http://') === -1) {
+          exportPrefixWasUsed = true;
+          nodeIri = 'export:' + nodeIri;
+        }
+        triples.push({subject: nodeIri, predicate: 'webvowl:coordinateX', object: '"' + parseFloat(node.x).toFixed(2).toString() + '"^^xsd:decimal'});
+				triples.push({subject: nodeIri, predicate: 'webvowl:coordinateY', object: '"' + parseFloat(node.y).toFixed(2).toString() + '"^^xsd:decimal'});
 			}
 		});
     for (var p = 0; p < propElements.length; p++) {
 			var correspondingProp = propElements[p].property();
       // for pinned labels add also coordinates
       if (correspondingProp.pinned()) {
-        var propIri = correspondingProp.id().indexOf('http://') > -1 ? correspondingProp.id() : 'export:' + correspondingProp.id();
-        writer.addTriple(propIri, 'webvowl:coordinateX', '"' + parseFloat(propElements[p].x).toFixed(2).toString() + '"^^xsd:decimal');
-				writer.addTriple(propIri, 'webvowl:coordinateY', '"' + parseFloat(propElements[p].y).toFixed(2).toString() + '"^^xsd:decimal');
+        var propIri = correspondingProp.id();
+        if (correspondingProp.id().indexOf('http://') === -1) {
+          exportPrefixWasUsed = true;
+          propIri = 'export:' + propIri;
+        }
+        triples.push({subject: propIri, predicate: 'webvowl:coordinateX', object: '"' + parseFloat(propElements[p].x).toFixed(2).toString() + '"^^xsd:decimal'});
+				triples.push({subject: propIri, predicate: 'webvowl:coordinateY', object: '"' + parseFloat(propElements[p].y).toFixed(2).toString() + '"^^xsd:decimal'});
       }
 		}
+    var prefixes = {
+      webvowl: 'http://gdsr.roche.com/mods/dft/1704/webvowl#',
+      xsd: 'http://www.w3.org/2001/XMLSchema#',
+    };
+    if (exportPrefixWasUsed) {
+      prefixes.export = 'http://example.com/export#';
+    }
+    writer.addPrefixes(prefixes);
+    writer.addTriples(triples);
 		writer.end(function (error, result) {
 			var content = "data:text/ttl," + result;
 			var encodedUri = encodeURI(content);
