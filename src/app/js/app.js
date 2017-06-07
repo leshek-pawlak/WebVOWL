@@ -152,6 +152,8 @@ module.exports = function () {
 				var ontologyName = languageTools.textInLanguage(ontologyNames);
 
 				if (ontologyName) {
+					// add version to the filename
+					ontologyName += ' - ' + data.header.version;
 					filename = ontologyName;
 				} else {
 					filename = alternativeFilename;
