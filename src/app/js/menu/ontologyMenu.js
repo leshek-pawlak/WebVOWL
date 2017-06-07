@@ -1,4 +1,3 @@
-var xml2Json = require("../parsing/xml2Json");
 var ttl2Json = require("../parsing/ttl2Json");
 var unescape = require("lodash/unescape");
 var d3promise = require("d3.promise");
@@ -132,12 +131,7 @@ module.exports = function (graph) {
 			promise.then(function() {
 				loadOntologyFromUri(pathWithoutExtentsion + ".json", hashParameter, 'application/json');
 			}, function(error) {
-				var xmlPromise = d3promise.xml(pathWithoutExtentsion + ".xml");
-				xmlPromise.then(function() {
-					loadOntologyFromUri(pathWithoutExtentsion + ".xml", hashParameter, 'application/xml');
-				}, function(error) {
-					loadOntologyFromUri(pathWithoutExtentsion + ".ttl", hashParameter, 'application/ttl');
-				});
+				loadOntologyFromUri(pathWithoutExtentsion + ".ttl", hashParameter, 'application/ttl');
 			});
 
 			ontologyOptions.each(function () {
@@ -161,9 +155,8 @@ module.exports = function (graph) {
 
 		// check if requested url is a json;
 		var isJSON=requestedURL.toLowerCase().endsWith(".json");
-		var isXML=requestedURL.toLowerCase().endsWith(".xml");
 		var isTTL=requestedURL.toLowerCase().endsWith(".ttl");
-		if (!isJSON && !isXML && !isTTL){
+		if (!isJSON && !isTTL){
 			ontologyMenu.notValidJsonURL();
 			graph.clearGraphData();
 			return;
@@ -174,7 +167,7 @@ module.exports = function (graph) {
 			setLoadingStatus(true);
 		} else {
 			displayLoadingIndicators();
-			// requestToFile if returns 404 try with xml type
+			// requestToFile if returns 404 try with ttl type
 			d3.xhr(relativePath, mimeType, function (error, request) {
 				var loadingSuccessful = !error;
 				var errorInfo;
@@ -188,10 +181,7 @@ module.exports = function (graph) {
 
 				var jsonText;
 				if (loadingSuccessful) {
-					if (mimeType === 'application/xml') {
-						var xmlParser = xml2Json();
-						jsonText = xmlParser(request.responseText);
-					} else if (mimeType === 'application/ttl') {
+					if (mimeType === 'application/ttl') {
 						var ttlParser = ttl2Json();
 						ttlParser(request.responseText).then(function(data) {
 							jsonText = data;
@@ -241,7 +231,7 @@ module.exports = function (graph) {
 			setLoadingStatus(true);
 		} else {
 			displayLoadingIndicators();
-			// requestToFile if returns 404 try with xml type
+			// requestToFile if returns 404 try with ttl type
 			d3.xhr(relativePath, mimeType, function (error, request) {
 				var loadingSuccessful = !error;
 				var errorInfo;
@@ -251,14 +241,9 @@ module.exports = function (graph) {
 				 	return;
 				 }
 
-
-
 				var jsonText;
 				if (loadingSuccessful) {
-					if (mimeType === 'application/xml') {
-						var xmlParser = xml2Json();
-						jsonText = xmlParser(request.responseText);
-					} else if (mimeType === 'application/ttl') {
+					if (mimeType === 'application/ttl') {
 						var ttlParser = ttl2Json();
 						ttlParser(request.responseText).then(function(data) {
 							jsonText = data;
