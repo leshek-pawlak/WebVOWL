@@ -335,7 +335,7 @@ module.exports = function (graph) {
     var propElements = graph.graphLabelElements(); // get visible labels
     nodeElements.each(function (node, index) {
 			// if boxes view make sure that only visible and pinned nodes will be added to ttl file
-			if (node.pinned() && (graph.options().graphStyle() === 'circle' || node.type().toLowerCase().indexOf('datatype') === -1 && !node.referenceClass)) {
+			if (node.pinned() && (graph.options().graphStyle() === 'circles' || node.type().toLowerCase().indexOf('datatype') === -1 && !node.referenceClass)) {
         var nodeIri = node.id().indexOf('http://') > -1 ? node.id() : 'export:' + node.id();
         writer.addTriple(nodeIri, 'webvowl:coordinateX', '"' + parseFloat(node.x).toFixed(2).toString() + '"^^xsd:decimal');
 				writer.addTriple(nodeIri, 'webvowl:coordinateY', '"' + parseFloat(node.y).toFixed(2).toString() + '"^^xsd:decimal');

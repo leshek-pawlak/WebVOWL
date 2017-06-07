@@ -64,7 +64,7 @@ module.exports = function (graph) {
 		var stringList = [];
 
 		var i;
-		if (graph.options().graphStyle() === 'rect') {
+		if (graph.options().graphStyle() === 'boxes') {
 			for (i = 0; i < labelDictionary.length; i++) {
 				var isHidden = true;
 				if (labelDictionary[i].labelElement) {

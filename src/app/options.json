@@ -12,7 +12,7 @@
   "labelMaxTextLineLength": 55,
   "umlBoxMinHeight": 30,
   "umlBoxMinWidth": 100,
-  "graphStyle": "rect",
+  "graphStyle": "boxes",
   "centerOnLoad": true,
   "centerOnFoundElement": true,
   "addIriCenterToUrl": true,

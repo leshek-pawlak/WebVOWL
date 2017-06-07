@@ -77,7 +77,7 @@ module.exports = function (graph) {
       d3.selectAll('.elements-to-change').each(function () {
         var element = d3.select(this);
         var textElement = d3.select(getClosestTextElement(element));
-        if (graph.options().graphStyle() === 'rect') {
+        if (graph.options().graphStyle() === 'boxes') {
           // change circle to rect
           element.property('outerHTML', element.property('outerHTML').replace(/circle/g, 'rect'));
           if (textElement.node()) {
