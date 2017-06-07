@@ -17,12 +17,8 @@ module.exports = function() {
   // export function
   function parseTtl(ttl) {
     return new Promise(function (resolve, reject) {
-      var path = window.location.href,
-        index = path.indexOf('#');
-      if (index > 0) {
-        path = path.substring(0, index);
-      }
-      d3.xhr(path + 'data/webvowl.ttl', 'application/ttl', function (error, request) {
+      var pathToWebvowlTtl = location.origin + location.pathname + 'data/webvowl.ttl';
+      d3.xhr(pathToWebvowlTtl, 'application/ttl', function (error, request) {
         if (!error) {
           resolve(createStructure(ttl, request.responseText));
         } else {
