@@ -997,8 +997,7 @@ module.exports = function (graphContainerSelector) {
 			return;
 		}
 		if (!circle.attr('height')) {
-			var tmpHeight = text.node().getBoundingClientRect().height > umlTextHeight ? text.node().getBoundingClientRect().height + umlSecondLineExtraFactor : umlTextHeight;
-			tmpHeight /= zoomFactor;
+			var tmpHeight = (text.node().getBoundingClientRect().height / zoomFactor) + umlSecondLineExtraFactor;
 			var newHeight = tmpHeight > options.umlBoxMinHeight() ? tmpHeight : options.umlBoxMinHeight();
 			newHeight += umlSpaceBetweenProperties;
 			if (isEmbededInsideContainer) {
@@ -1012,7 +1011,7 @@ module.exports = function (graphContainerSelector) {
 			domainElement.height(newHeight);
 		}
 		if (!circle.attr('width')) {
-			var tmpWidth = (text.node().getBoundingClientRect().width + umlTextHeight) / zoomFactor;
+			var tmpWidth = (text.node().getBoundingClientRect().width / zoomFactor) + umlTextHeight;
 			var newWidth = tmpWidth > options.umlBoxMinWidth() ? tmpWidth : options.umlBoxMinWidth();
 			circle.attr('width', newWidth);
 			if (whiteCircle) {
