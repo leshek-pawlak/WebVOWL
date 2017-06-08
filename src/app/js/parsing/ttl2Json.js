@@ -1,16 +1,5 @@
 /* jshint -W117 */
 module.exports = function() {
-  // remove undefined values from array
-  Array.prototype.clean = function(deleteValue) {
-    for (var i = 0; i < this.length; i++) {
-      if (this[i] === deleteValue) {
-        this.splice(i, 1);
-        i--;
-      }
-    }
-    return this;
-  };
-
   // import
   var N3 = require('n3');
 
