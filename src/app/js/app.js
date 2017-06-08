@@ -11,6 +11,7 @@ module.exports = function () {
   };
 
 	var app = {},
+		N3 = require('n3'),
 		graph = webvowl.graph(),
 		options = graph.graphOptions(),
 		languageTools = webvowl.util.languageTools(),
@@ -53,9 +54,92 @@ module.exports = function () {
 			});
 	};
 
-	app.overrideOptions = function(overridingOptions) {
+	function overrideOptions(overridingOptions) {
 		options.rewriteFrom(overridingOptions);
 	};
+
+	function getValue(uri, prefixes) {
+    if (!uri) { return null; }
+    var util = N3.Util;
+    var result = uri;
+    if (util.isLiteral(uri)) {
+      result = util.getLiteralValue(uri);
+			var tryParse = parseFloat(result, 10);
+			if (!isNaN(tryParse)) {
+				result = tryParse;
+			} else if (result === 'true') {
+				result = true;
+			} else if (result === 'false') {
+				result = false;
+			}
+    } else if (prefixes) {
+      Object.keys(prefixes).map(function(prefixKey) {
+        var iriToReplace = prefixes[prefixKey];
+        var index = uri.indexOf(iriToReplace);
+        if (index > -1) {
+					// remove prefixes from the values
+          result = uri.replace(iriToReplace, '');
+        }
+      });
+    }
+
+    return result;
+  }
+
+	function getOptionsFromTtl(ttl, dictionaryTtl) {
+		var parser = N3.Parser(),
+		parsed = parser.parse(ttl),
+		store = N3.Store(parsed, {prefixes: parser._prefixes}),
+		dictionaryParser = N3.Parser(),
+		dictionaryParsed = dictionaryParser.parse(dictionaryTtl),
+		dictionaryStore = N3.Store(dictionaryParsed, {prefixes: dictionaryParser._prefixes}),
+		result = {};
+		// console.log('dictionaryStore.getObjects(): ', dictionaryStore.getObjects(), 'dictionaryStore.getPredicates(): ', dictionaryStore.getPredicates(), 'dictionaryStore.getSubjects(): ', dictionaryStore.getSubjects());
+	  // console.log('store.getObjects(): ', store.getObjects(), 'store.getPredicates(): ', store.getPredicates(), 'store.getSubjects(): ', store.getSubjects());
+
+		// get subject for options.
+		var optionSubject = store.getSubjects('rdf:type', 'webvowl:OptionSet').clean()[0];
+		// get all predicates for options.
+		var labels = store.getPredicates(optionSubject).clean();
+    for (var i = 0; i < labels.length; i++) {
+			// change predicate into human-readable object key name.
+			var key = getValue(labels[i], store._prefixes);
+			// get valid value from object for specified subject and predicate.
+      var value = getValue(store.getObjects(optionSubject, labels[i]).clean()[0]);
+			if (typeof value === 'string' && value.indexOf('http') > -1) {
+				// if the value is an url that means we need to get value from a webvowl.ttl file.
+				value = getValue(dictionaryStore.getObjects(value, 'webvowl:typeLabel').clean()[0], dictionaryStore._prefixes);
+			}
+			// if the value is not null
+			if (value) {
+				result[key] = value;
+			}
+    }
+
+		return result;
+	}
+
+	app.loadOptionsFile = function() {
+    var pathToWebvowlTtl = location.origin + location.pathname + 'data/webvowl.ttl';
+    d3.xhr(pathToWebvowlTtl, 'application/ttl', function (error, request) {
+      if (!error) {
+				var dictionaryTtl = request.responseText;
+				var pathToOptionsTtl = location.origin + location.pathname + 'options.ttl';
+				d3.xhr(pathToOptionsTtl, 'application/ttl', function (error, request) {
+					if (!error) {
+						var options = getOptionsFromTtl(request.responseText, dictionaryTtl);
+						overrideOptions(options);
+					} else {
+		        console.error(error);
+		      }
+					// start application
+					app.initialize();
+				});
+      } else {
+        console.error(error);
+      }
+    });
+	}
 
 	app.initialize = function () {
 

@@ -1,0 +1,36 @@
+# baseURI: http://gdsr.roche.com/mods/dft/1704/webvowl-options
+# imports: http://gdsr.roche.com/mods/dft/1704/webvowl
+
+@prefix : <http://gdsr.roche.com/mods/dft/1704/webvowl-options#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix webvowl: <http://gdsr.roche.com/mods/dft/1704/webvowl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://gdsr.roche.com/mods/dft/1704/webvowl-options>
+  rdf:type owl:Ontology ;
+  owl:imports <http://gdsr.roche.com/mods/dft/1704/webvowl> ;
+  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+.
+:OptionSet1
+  rdf:type webvowl:OptionSet ;
+  webvowl:addIndividualsToDictionary "true"^^xsd:boolean ;
+  webvowl:addIriCenterToUrl "true"^^xsd:boolean ;
+  webvowl:cardinalityPlacement webvowl:CardinalityPlacementCLASS ;
+  webvowl:cardinalityVisible "true"^^xsd:boolean ;
+  webvowl:centerOnFoundElement "true"^^xsd:boolean ;
+  webvowl:centerOnLoad "true"^^xsd:boolean ;
+  webvowl:classDistance 200 ;
+  webvowl:datatypeDistance 120 ;
+  webvowl:datatypeFilterEnabled "false"^^xsd:boolean ;
+  webvowl:forceFullLabels "true"^^xsd:boolean ;
+  webvowl:graphStyle webvowl:CardinalityPlacementBoxes ;
+  webvowl:labelMaxTextLineLength 55 ;
+  webvowl:maxMagnification "4"^^xsd:float ;
+  webvowl:minMagnification "0.1"^^xsd:float ;
+  webvowl:objectPropertyFilterEnabled "false"^^xsd:boolean ;
+  webvowl:paused "false"^^xsd:boolean ;
+  webvowl:umlBoxMinHeight 30 ;
+  webvowl:umlBoxMinWidth 100 ;
+.

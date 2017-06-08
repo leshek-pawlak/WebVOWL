@@ -204,17 +204,7 @@
 <script src="js/webvowl.app.js"></script>
 <script>
 	(function () {
-		var app = webvowl.app();
-
-		var oReq = new XMLHttpRequest();
-		oReq.open('get', 'options.json', true);
-		oReq.onload = function reqListener () {
-			var options = JSON.parse(this.responseText);
-			app.overrideOptions(options);
-		};
-		oReq.send();
-
-		window.onload = app.initialize;
+		window.onload = webvowl.app().loadOptionsFile;
 	})();
 </script>
 </body>
