@@ -6,7 +6,7 @@ module.exports = function() {
   // export function
   function parseTtl(ttl) {
     return new Promise(function (resolve, reject) {
-      var pathToWebvowlTtl = location.origin + location.pathname + 'data/webvowl.ttl';
+      var pathToWebvowlTtl = location.origin + location.pathname + 'webvowl.ttl';
       d3.xhr(pathToWebvowlTtl, 'application/ttl', function (error, request) {
         if (!error) {
           resolve(createStructure(ttl, request.responseText));

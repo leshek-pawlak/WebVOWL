@@ -120,7 +120,7 @@ module.exports = function () {
 	}
 
 	app.loadOptionsFile = function() {
-    var pathToWebvowlTtl = location.origin + location.pathname + 'data/webvowl.ttl';
+    var pathToWebvowlTtl = location.origin + location.pathname + 'webvowl.ttl';
     d3.xhr(pathToWebvowlTtl, 'application/ttl', function (error, request) {
       if (!error) {
 				var dictionaryTtl = request.responseText;
