@@ -12,8 +12,8 @@ module.exports = (function () {
 			haloGroupElement,
 			mostPopularCornerPoint = 0,
 			middleSidePoints = [],
-			radius = 40,
-			height = (Math.sqrt(3)/2),
+			radius = 15,
+			height = Math.sqrt(3) / 2,
 	    hexagonData = [];
 
 		function getMostPopularCornerPoint(cornerPoints) {
@@ -87,23 +87,10 @@ module.exports = (function () {
 		]);
 
 		this.distanceToBorder = function (dx, dy) {
+			var abs = Math.abs(dy / dx);
+			var partOfRadius = radius / 6;
 			// maximum is sixth part of radius. It's always a top corner.
-			var m_link = Math.abs(dy / dx) > radius / 6 ? radius / 6 : Math.abs(dy / dx);
-
-			// here we have two special cases
-			if (m_link < mostPopularCornerPoint) {
-				// if we are on the left or right side of hexagon. We need to change only one part of axis.
-				var timesX = dx / radius,
-					rectY = dy / timesX;
-
-				return Math.sqrt(Math.pow(radius, 2) + Math.pow(rectY, 2)) + 2;
-			} else if (m_link < mostPopularCornerPoint * 3) {
-				// if we are between most popular corner, and middle of the side is part of linear function which we try to simulate.
-				var timesY = dy / radius,
-					rectX = dx / timesY;
-
-				return radius + Math.sqrt(Math.abs(rectX) - Math.abs(timesY)) - Math.pow(m_link, 2);
-			}
+			var m_link = abs > partOfRadius ? partOfRadius : abs;
 
 			return radius + m_link;
 		};
