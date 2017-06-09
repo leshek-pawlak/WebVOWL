@@ -115,7 +115,7 @@ module.exports = function (graph) {
         var textElement = getClosestTextElement(circle);
         circle.classed("elements-to-change", true);
         if (!circle.attr('height')) {
-          var newHeight = textElement ? textElement.getBoundingClientRect().height + 8 : 26;
+          var newHeight = textElement ? (textElement.getBoundingClientRect().height / graph.scaleFactor()) + 8 : 26;
           circle.attr('height', newHeight > 40 ? newHeight : 40);
         }
         if (!circle.attr('width')) {
