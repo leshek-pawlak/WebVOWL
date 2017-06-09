@@ -90,7 +90,7 @@ module.exports = (function () {
 		this.toggleFocus = function () {
 			that.focused(!that.focused());
 			d3.selectAll('.focused').classed('focused', false);
-			that.nodeElement().select(graph.options().graphStyle()).classed("focused", that.focused());
+			that.nodeElement().select(graph.options().graphStyle() === 'boxes' ? 'rect' : 'circle').classed("focused", that.focused());
 			graph.resetSearchHighlight();
 			graph.options().searchMenu().clearText();
 		};
