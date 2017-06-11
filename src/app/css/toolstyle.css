@@ -676,6 +676,35 @@ a#pause-button:not(.paused)::before {
 		background-color: #24323e;
 	}
 }
+#propFilter {
+	padding: 5px;
+	.selectContainer, .labelContainer {
+		width: 100%;
+		select, p {
+			float: left;
+			margin: 0;
+			&:nth-child(2n) {
+				float: right;
+			}
+		}
+		&::after {
+			content: '';
+			display: block;
+			clear: both;
+		}
+	}
+	select {
+		background: #34495e;
+		border: 1px solid #34495E;
+		color: #ecf0f1;
+		option {
+			background-color: #24323e;
+		}
+	}
+	> div {
+		margin-bottom: 5px;
+	}
+}
 .converter-form:not(:first-child) {
 	margin-top: 5px;
 }
@@ -834,4 +863,19 @@ a#pause-button:not(.paused)::before {
 	-moz-animation-timing-function: linear;
 	-o-animation-timing-function: linear;
 	animation-timing-function: linear;
+}
+
+#activePropFilters .activeFilter {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	padding: 4px 0;
+	margin: 4px 0;
+	border-top: 1px solid #34495e;
+	a {
+		cursor: pointer;
+		&:hover {
+			color: red;
+		}
+	}
 }

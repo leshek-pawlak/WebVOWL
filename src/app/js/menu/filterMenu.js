@@ -8,8 +8,11 @@ module.exports = function (graph) {
 
 	var filterMenu = {},
 		checkboxData = [],
+		selectedPropFilter = { 'name': null, 'value': null },
 		menuElement = d3.select("#filterOption a"),
 		nodeDegreeContainer = d3.select("#nodeDegreeFilteringOption"),
+		nameSelector = d3.select('#namePropFilter'),
+		valueSelector = d3.select('#valuePropFilter'),
 		graphDegreeLevel,
 		degreeSlider;
 
@@ -49,8 +52,53 @@ module.exports = function (graph) {
 
 		addNodeDegreeFilter(nodeDegreeFilter, nodeDegreeContainer);
 
+		addRuleFilter('#propFilter');
 	};
 
+	function addToActiveFilters() {
+		// add filter to the list of active filters
+		var newActiveFilter = d3.select('#activePropFilters');
+		var container = newActiveFilter.append('div').classed('activeFilter', true).attr('id', 'filter_' + Date.now());
+		container.append('span').classed('name', true).text(selectedPropFilter.name);
+		container.append('span').classed('value', true).text(selectedPropFilter.value);
+		container.append('a').text('X').on('click', function() {
+			// remove cliked node from DOM
+			newActiveFilter.select('#' + this.parentNode.id).remove();
+		});
+		// reset select values
+		selectedPropFilter = { 'name': null, 'value': null };
+		nameSelector.property('value', '');
+		valueSelector.property('value', '');
+	}
+
+	function addRuleFilter(selector) {
+		var container = d3.select(selector),
+			properties = [null, 'domain', 'range'],
+			values = [null, 'class999', 'class222'];
+
+		setDataToSelectors(nameSelector, properties);
+		setDataToSelectors(valueSelector, values);
+	}
+
+	function setDataToSelectors(element, data) {
+		element.selectAll("option").remove();
+		element.selectAll("option")
+		.data(data)
+		.enter().append("option")
+		.attr("value", function (d) {
+			return d;
+		})
+		.text(function (d) {
+			return d;
+		});
+		element.on("change", function () {
+			var selectedOption = this.getElementsByTagName('option')[this.selectedIndex];
+			selectedPropFilter[this.id.replace('PropFilter', '')] = selectedOption.value;
+			if (selectedPropFilter.name && selectedPropFilter.value) {
+				addToActiveFilters();
+			}
+		});
+	}
 
 	function addFilterItem(filter, identifier, pluralNameOfFilteredItems, selector) {
 		var filterContainer,
@@ -163,7 +211,7 @@ module.exports = function (graph) {
 			graph.update();
 		}
 	}
-	
+
 	function setSliderValue(slider, value) {
 		slider.property("value", value).on("input")();
 	}
@@ -183,7 +231,7 @@ module.exports = function (graph) {
 				checkbox.on("click")();
 			}
 		});
-		
+
 		setSliderValue(degreeSlider, 0);
 		degreeSlider.on("change")();
 	};
