@@ -72,6 +72,16 @@ webvowl:Description
   rdf:type owl:Class ;
   rdfs:label "Description"^^xsd:string ;
 .
+webvowl:FilterDimension
+  rdf:type owl:Class ;
+  rdfs:comment "Each Visualization can have defined several Filter Dimensions. The Filter Dimension defines all possible values that are valid in this Dimension and that can be filtered for Model Elements annotated with values of this dimension."^^xsd:string ;
+  rdfs:label "Filter Dimension"^^xsd:string ;
+.
+webvowl:FilterDimensionValue
+  rdf:type owl:Class ;
+  rdfs:comment "A value that is valid in a Dimension and that can be filtered for Model Elements annotated with it."^^xsd:string ;
+  rdfs:label "Filter Dimension Value"^^xsd:string ;
+.
 webvowl:FocalOntology
   rdf:type owl:Class ;
   spin:rule [
@@ -271,6 +281,10 @@ webvowl:Language
   rdf:type owl:Class ;
   rdfs:label "Language"^^xsd:string ;
 .
+webvowl:ModelVersion
+  rdf:type owl:Class ;
+  rdfs:label "Model Version"^^xsd:string ;
+.
 webvowl:OptionSet
   rdf:type owl:Class ;
   rdfs:comment "The option set collects a number of options that can define the default settings when the application is started."^^xsd:string ;
@@ -285,10 +299,9 @@ webvowl:PropertyType
   rdf:type owl:Class ;
   rdfs:label "Property Type"^^xsd:string ;
 .
-webvowl:ReferencedHeader
+webvowl:Rule
   rdf:type owl:Class ;
-  rdfs:label "Referenced Header"^^xsd:string ;
-  rdfs:subClassOf webvowl:Header ;
+  rdfs:label "Rule"^^xsd:string ;
 .
 webvowl:Title
   rdf:type owl:Class ;
@@ -314,8 +327,20 @@ webvowl:addIriCenterToUrl
 .
 webvowl:annotation
   rdf:type owl:ObjectProperty ;
-  rdfs:domain webvowl:Class ;
-  rdfs:range webvowl:Annotation ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          webvowl:Rule
+        ) ;
+    ] ;
+  rdfs:range [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Annotation
+          webvowl:Definition
+        ) ;
+    ] ;
 .
 webvowl:author
   rdf:type owl:DatatypeProperty ;
@@ -439,6 +464,20 @@ webvowl:definedLanguage
   rdfs:label "Defined Language"^^xsd:string ;
   rdfs:range webvowl:Language ;
 .
+webvowl:dimensionName
+  rdf:type owl:AnnotationProperty ;
+  rdfs:comment "The Name of the Dimension that is shown in the User Interface in the filter panel." ;
+  rdfs:domain webvowl:FilterDimension ;
+  rdfs:label "Dimension Name" ;
+  rdfs:range xsd:string ;
+  rdfs:subPropertyOf rdfs:label ;
+.
+webvowl:dimensionValueLabel
+  rdf:type owl:AnnotationProperty ;
+  rdfs:domain webvowl:FilterDimensionValue ;
+  rdfs:label "Dimension Value Label"^^xsd:string ;
+  rdfs:subPropertyOf rdfs:label ;
+.
 webvowl:domain
   rdf:type owl:ObjectProperty ;
   rdfs:domain webvowl:Class ;
@@ -457,6 +496,16 @@ webvowl:graphStyle
   rdfs:domain webvowl:OptionSet ;
   rdfs:label "graphStyle" ;
   rdfs:range webvowl:GraphStyle ;
+.
+webvowl:hasDimensionValue
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:FilterDimension ;
+  rdfs:range webvowl:FilterDimensionValue ;
+.
+webvowl:hasFilterDimension
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Header ;
+  rdfs:range webvowl:FilterDimension ;
 .
 webvowl:hasIndividual
   rdf:type owl:ObjectProperty ;
@@ -479,7 +528,6 @@ webvowl:iri
   rdfs:domain webvowl:Datatype ;
   rdfs:domain webvowl:Header ;
   rdfs:domain webvowl:Property ;
-  rdfs:domain webvowl:ReferencedHeader ;
   rdfs:label "IRI"^^xsd:string ;
   rdfs:range xsd:anyURI ;
 .
@@ -503,10 +551,16 @@ webvowl:isReferenceClass
 .
 webvowl:label
   rdf:type owl:ObjectProperty ;
-  rdfs:domain webvowl:Class ;
-  rdfs:domain webvowl:Datatype ;
-  rdfs:domain webvowl:Individual ;
-  rdfs:domain webvowl:Property ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          webvowl:Datatype
+          webvowl:Individual
+          webvowl:Property
+          webvowl:Rule
+        ) ;
+    ] ;
   rdfs:range webvowl:Label ;
 .
 webvowl:labelMaxTextLineLength
@@ -521,6 +575,12 @@ webvowl:languageLabel
   rdfs:domain webvowl:Language ;
   rdfs:label "Language Label"^^xsd:string ;
   rdfs:subPropertyOf rdfs:label ;
+.
+webvowl:link
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:ModelVersion ;
+  rdfs:label "Link"^^xsd:string ;
+  rdfs:range xsd:string ;
 .
 webvowl:maxCardinality
   rdf:type owl:DatatypeProperty ;
@@ -558,7 +618,7 @@ webvowl:objectPropertyFilterEnabled
 webvowl:otherVersion
   rdf:type owl:ObjectProperty ;
   rdfs:domain webvowl:Header ;
-  rdfs:range webvowl:ReferencedHeader ;
+  rdfs:range webvowl:ModelVersion ;
 .
 webvowl:paused
   rdf:type owl:DatatypeProperty ;
@@ -589,6 +649,37 @@ webvowl:range
   rdf:type owl:ObjectProperty ;
   rdfs:domain webvowl:Class ;
   rdfs:range webvowl:Class ;
+.
+webvowl:ruleFilterEnabled
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "If we want to load the application with rule filter enabled we should set it to true. Application will load a little bit faster, when the graph has many elements. The default value is FALSE ." ;
+  rdfs:domain webvowl:OptionSet ;
+  rdfs:label "ruleFilterEnabled" ;
+  rdfs:range xsd:boolean ;
+.
+webvowl:ruleInput
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Rule ;
+  rdfs:label "Rule Input"^^xsd:string ;
+  rdfs:range webvowl:Property ;
+.
+webvowl:ruleOutput
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Rule ;
+  rdfs:label "Rule Output"^^xsd:string ;
+  rdfs:range webvowl:Property ;
+.
+webvowl:tag
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          webvowl:Property
+          webvowl:Datatype
+        ) ;
+    ] ;
+  rdfs:range webvowl:FilterDimensionValue ;
 .
 webvowl:typeLabel
   rdf:type owl:AnnotationProperty ;
@@ -622,8 +713,13 @@ webvowl:undef
 .
 webvowl:version
   rdf:type owl:DatatypeProperty ;
-  rdfs:domain webvowl:Header ;
-  rdfs:domain webvowl:ReferencedHeader ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Header
+          webvowl:ModelVersion
+        ) ;
+    ] ;
   rdfs:label "Version"^^xsd:string ;
   rdfs:range xsd:string ;
 .
