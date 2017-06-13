@@ -192,7 +192,7 @@ module.exports = function (graph) {
 					}
 				}
 				// add current and every later version
-				if (currentVersionIndex) {
+				if (currentVersionIndex > -1) {
 					select.append('option')
 						.attr('value', sortedVersions[i].url)
 						.attr('selected', currentVersionIndex === i ? 'selected' : null)
