@@ -158,9 +158,23 @@ module.exports = function() {
       iri: header,
       title: title,
       version: version,
+      versions: [{
+        url: location.href,
+        version: version,
+      }],
       author: [author],
       description: description,
     };
+    // add versions to json
+    var otherVersions = getTextValue(store.getObjects(header, 'webvowl:otherVersion').clean());
+    if (otherVersions.length > 0) {
+      for (var ov = 0; ov < otherVersions.length; ++ov) {
+        graphJson.header.versions.push({
+          url: getTextValue(store.getObjects(otherVersions[ov], 'webvowl:link').clean()[0]),
+          version: getTextValue(store.getObjects(otherVersions[ov], 'webvowl:version').clean()[0])
+        });
+      }
+    }
     // add rules to json
     var rules = store.getSubjects('rdf:type', 'webvowl:Rule').clean();
     for (var r = 0; r < rules.length; r++) {
