@@ -201,7 +201,7 @@ module.exports = function() {
         addRuleProperty('property' + ri + Date.now(), outputIri, ruleId, outputIri);
       } else {
         var domainOutputIri = getTextValueFromTtl(store.getObjects(outputIri, 'webvowl:domain').clean()[0], 'webvowl:iri', store);
-        addRuleProperty('property' + ri + Date.now(), outputIri, domainOutputIri, ruleId);
+        addRuleProperty('property' + ri + Date.now(), outputIri, ruleId, domainOutputIri);
       }
       // create role attribute object.
       var ruleAttribute = {
