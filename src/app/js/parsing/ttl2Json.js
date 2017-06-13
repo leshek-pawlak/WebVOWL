@@ -63,7 +63,43 @@ module.exports = function() {
     return annotations;
   }
 
+  function getTextValue(uri, prefixes, toReplace) {
+    if (!uri) { return null; }
+    var util = N3.Util;
+    var result = uri;
+    if (util.isLiteral(uri)) {
+      result = util.getLiteralValue(uri);
+    } else if (prefixes) {
+      Object.keys(prefixes).map(function(prefixKey) {
+        var iriToReplace = prefixes[prefixKey];
+        var index = uri.indexOf(iriToReplace);
+        if (index > -1) {
+          if (typeof toReplace === 'undefined') { toReplace = prefixKey; }
+          result = uri.replace(iriToReplace, toReplace);
+        }
+      });
+    }
+
+    return result;
+  }
+
   function createStructure(ttl, dictionaryTtl) {
+    // add rule function is specifed here, because we need access to graphJson.
+    function addRuleProperty(id, element, domain, range) {
+      ++graphJson.metrics.objectPropertyCount;
+      ++graphJson.metrics.propertyCount;
+      graphJson.propertyAttribute.push({
+        id: id, // new id for this property. unique number
+        element: element, // iri of output/input
+        domain: domain, // this iri of rule || iri of input class.
+        range: range // iri of output class || this iri of rule
+      });
+      graphJson.property.push({
+        id: id,
+        type: 'relations'
+      });
+    }
+
     var graphJson = {
         _comment: "Created with TTL2JSON",
         metrics: {
@@ -125,9 +161,55 @@ module.exports = function() {
       author: [author],
       description: description,
     };
+    // add rules to json
+    var rules = store.getSubjects('rdf:type', 'webvowl:Rule').clean();
+    for (var r = 0; r < rules.length; r++) {
+      var ruleId = rules[r];
+      // add label
+      var ruleLabelObject = getLabels(rules[r], languageLabels, store);
+      // get inputs and add property to create arrows between rule and inputs
+      var ruleInputs = store.getObjects(rules[r], 'webvowl:ruleInput').clean();
+      for (var ri = 0; ri < ruleInputs.length; ri++) {
+        var inputIri = getTextValueFromTtl(ruleInputs[ri], 'webvowl:iri', store);
+        var inputType = getTextValue(store.getObjects(ruleInputs[ri], 'rdf:type').clean()[0], store._prefixes, '');
+        if (inputType === 'Class') {
+          addRuleProperty('property' + ri + Date.now(), inputIri, inputIri, ruleId);
+        } else {
+          var domainInputIri = getTextValueFromTtl(store.getObjects(inputIri, 'webvowl:domain').clean()[0], 'webvowl:iri', store);
+          addRuleProperty('property' + ri + Date.now(), inputIri, domainInputIri, ruleId);
+        }
+      }
+      // get output and add property to create arrow between rule and output
+      var ruleOutput = getTextValueFromTtl(rules[r], 'webvowl:ruleOutput', store);
+      var outputIri = getTextValueFromTtl(ruleOutput, 'webvowl:iri', store);
+      var outputType = getTextValue(store.getObjects(ruleOutput, 'rdf:type').clean()[0], store._prefixes, '');
+      if (outputType === 'Class') {
+        addRuleProperty('property' + ri + Date.now(), outputIri, ruleId, outputIri);
+      } else {
+        var domainOutputIri = getTextValueFromTtl(store.getObjects(outputIri, 'webvowl:domain').clean()[0], 'webvowl:iri', store);
+        addRuleProperty('property' + ri + Date.now(), outputIri, domainOutputIri, ruleId);
+      }
+      // create role attribute object.
+      var ruleAttribute = {
+        id: ruleId,
+        label: ruleLabelObject,
+        input: ruleInputs,
+        output: ruleOutput
+      };
+      // get annotations
+      var ruleAnnotations = getAnnotations(rules[r], languageLabels, store, dictionaryStore);
+      if (Object.keys(ruleAnnotations).length > 0) {
+        ruleAttribute.annotations = ruleAnnotations;
+      }
+      // add rule to "class" in the final json
+      graphJson.class.push({id: ruleId, type: 'rule'});
+      // add rule to "classAttribute" in the final json
+      graphJson.classAttribute.push(ruleAttribute);
+    }
     // add classes to json
     var classes = store.getSubjects('rdf:type', 'webvowl:Class').clean();
-    graphJson.metrics.classCount = classes.length;
+    var classCount = classes.length + rules.length;
+    graphJson.metrics.classCount += classCount;
     for (var i = 0; i < classes.length; i++) {
       // add label
       var classLabelObject = getLabels(classes[i], languageLabels, store);
@@ -176,8 +258,10 @@ module.exports = function() {
     }
     // it's time to add datatypes
     var datatypes = store.getSubjects('rdf:type', 'webvowl:Datatype').clean();
-    graphJson.metrics.datatypePropertyCount = graphJson.metrics.datatypeCount = datatypes.length;
-    graphJson.metrics.nodeCount = classes.length + datatypes.length;
+    var nodeCount = classes.length + datatypes.length;
+    graphJson.metrics.datatypePropertyCount += datatypes.length;
+    graphJson.metrics.datatypeCount += datatypes.length;
+    graphJson.metrics.nodeCount += nodeCount;
     for (var d = 0; d < datatypes.length; d++) {
       // get iri
       var datatypeIri = getTextValueFromTtl(datatypes[d], 'webvowl:iri', store);
@@ -207,8 +291,9 @@ module.exports = function() {
     }
     // at the end add properties
     var properties = store.getSubjects('rdf:type', 'webvowl:Property').clean();
-    graphJson.metrics.objectPropertyCount = properties.length;
-    graphJson.metrics.propertyCount = properties.length + datatypes.length;
+    var propertyCount = properties.length + datatypes.length;
+    graphJson.metrics.objectPropertyCount += properties.length;
+    graphJson.metrics.propertyCount += propertyCount;
     for (var p = 0; p < properties.length; p++) {
       // get iri
       var propertyIri = getTextValueFromTtl(properties[p], 'webvowl:iri', store);
@@ -255,25 +340,6 @@ module.exports = function() {
     // console.log("graphJson", graphJson);
     // parsing JSON to graph valid JSON
     return JSON.stringify(graphJson);
-  }
-
-  function getTextValue(uri, prefixes) {
-    if (!uri) { return null; }
-    var util = N3.Util;
-    var result = uri;
-    if (util.isLiteral(uri)) {
-      result = util.getLiteralValue(uri);
-    } else if (prefixes) {
-      Object.keys(prefixes).map(function(prefixKey) {
-        var iriToReplace = prefixes[prefixKey];
-        var index = uri.indexOf(iriToReplace);
-        if (index > -1) {
-          result = uri.replace(iriToReplace, prefixKey);
-        }
-      });
-    }
-
-    return result;
   }
 
   return parseTtl;
