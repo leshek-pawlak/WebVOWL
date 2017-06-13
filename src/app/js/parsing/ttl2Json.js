@@ -221,6 +221,11 @@ module.exports = function() {
       // get classTypes
       var classTypeIRI = store.getObjects(classes[i], 'webvowl:classType').clean()[0];
       var classType = getTextValue(dictionaryStore.getObjects(classTypeIRI, 'webvowl:typeLabel').clean()[0]);
+      // if it's null it's unionOf.
+      if (!classType) {
+        // NOTE it should be defined in the webvowl.ttl file
+        classType = 'owl:unionOf';
+      }
       // get individuals
       var individuals = [];
       var instances = store.getObjects(classes[i], 'webvowl:hasIndividual').clean();
@@ -245,6 +250,15 @@ module.exports = function() {
       }
       if (classCoordinateY) {
         classAttribute.y = classCoordinateY;
+      }
+      // get part of unions
+      if (classType === 'owl:unionOf') {
+        var partOfUnion = [];
+        var partOfUnionIRIs = store.getObjects(classIri, 'webvowl:partOfUnion').clean();
+        for (var pu = 0; pu < partOfUnionIRIs.length; pu++) {
+          partOfUnion.push(getTextValueFromTtl(partOfUnionIRIs[pu], 'webvowl:iri', store));
+        }
+        classAttribute.union = partOfUnion;
       }
       // get annotations
       var classAnnotations = getAnnotations(classes[i], languageLabels, store, dictionaryStore);
