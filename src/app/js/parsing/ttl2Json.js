@@ -5,9 +5,9 @@ module.exports = function() {
 
   // export function
   function parseTtl(ttl) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       var pathToWebvowlTtl = location.origin + location.pathname + 'webvowl.ttl';
-      d3.xhr(pathToWebvowlTtl, 'application/ttl', function (error, request) {
+      d3.xhr(pathToWebvowlTtl, 'application/ttl', function(error, request) {
         if (!error) {
           resolve(createStructure(ttl, request.responseText));
         } else {
@@ -17,89 +17,7 @@ module.exports = function() {
     });
   }
 
-  function getLabels(iri, languageLabels, store) {
-    var labelObject = {};
-    var labels = store.getObjects(iri, 'webvowl:label').clean();
-    for (var i = 0; i < labels.length; i++) {
-      var text = getTextValue(store.getObjects(labels[i], 'webvowl:content').clean()[0]);
-      var language = store.getObjects(labels[i], 'webvowl:contentLanguage').clean()[0];
-      labelObject[languageLabels[language]] = text;
-    }
-
-    return labelObject;
-  }
-
-  function getTextForLanguage(iri, languageLabels, store) {
-    var textObject = {};
-    var text = getTextValue(store.getObjects(iri, 'webvowl:content').clean()[0]);
-    var language = store.getObjects(iri, 'webvowl:contentLanguage').clean()[0];
-    textObject[languageLabels[language]] = text;
-
-    return textObject;
-  }
-
-  function getTextValueFromTtl(subject, predicate, store) {
-    return getTextValue(store.getObjects(subject, predicate).clean()[0], store._prefixes);
-  }
-
-  function getAnnotations(iri, languageLabels, store, dictionaryStore) {
-    var annotations = {};
-    var annotationIRI = store.getObjects(iri, 'webvowl:annotation').clean();
-    for (var j = 0; j < annotationIRI.length; j++) {
-      var annotation = getTextForLanguage(annotationIRI[j], languageLabels, store);
-      var lang = Object.keys(annotation)[0];
-      var typeIRI = store.getObjects(annotationIRI[j], 'rdf:type').clean()[0];
-      var identifier = getTextValue(dictionaryStore.getObjects(typeIRI, 'rdfs:label').clean()[0]);
-      annotations[identifier] = [
-        {
-          identifier: identifier,
-          language: lang,
-          value: annotation[lang],
-          type: 'label',
-        }
-      ];
-    }
-
-    return annotations;
-  }
-
-  function getTextValue(uri, prefixes, toReplace) {
-    if (!uri) { return null; }
-    var util = N3.Util;
-    var result = uri;
-    if (util.isLiteral(uri)) {
-      result = util.getLiteralValue(uri);
-    } else if (prefixes) {
-      Object.keys(prefixes).map(function(prefixKey) {
-        var iriToReplace = prefixes[prefixKey];
-        var index = uri.indexOf(iriToReplace);
-        if (index > -1) {
-          if (typeof toReplace === 'undefined') { toReplace = prefixKey; }
-          result = uri.replace(iriToReplace, toReplace);
-        }
-      });
-    }
-
-    return result;
-  }
-
   function createStructure(ttl, dictionaryTtl) {
-    // add rule function is specifed here, because we need access to graphJson.
-    function addRuleProperty(id, element, domain, range) {
-      ++graphJson.metrics.objectPropertyCount;
-      ++graphJson.metrics.propertyCount;
-      graphJson.propertyAttribute.push({
-        id: id, // new id for this property. unique number
-        element: element, // iri of output/input
-        domain: domain, // this iri of rule || iri of input class.
-        range: range // iri of output class || this iri of rule
-      });
-      graphJson.property.push({
-        id: id,
-        type: 'relations'
-      });
-    }
-
     var graphJson = {
         _comment: "Created with TTL2JSON",
         metrics: {
@@ -110,7 +28,7 @@ module.exports = function() {
           propertyCount: 0,
           nodeCount: 0,
           axiomCount: 0,
-          individualCount: 0
+          individualCount: 0,
         },
         namespace: [],
         class: [],
@@ -118,22 +36,99 @@ module.exports = function() {
         datatype: [],
         datatypeAttribute: [],
         property: [],
-        propertyAttribute: []
+        propertyAttribute: [],
       },
       parser = N3.Parser(),
-      parsed = parser.parse(ttl),
-      store = N3.Store(parsed, {prefixes: parser._prefixes}),
-      dictionaryParser = N3.Parser(),
-      dictionaryParsed = dictionaryParser.parse(dictionaryTtl),
-      dictionaryStore = N3.Store(dictionaryParsed, {prefixes: dictionaryParser._prefixes});
+      parsed = parser.parse(ttl + dictionaryTtl),
+      store = N3.Store(parsed, {prefixes: parser._prefixes});
 
-    // console.log('dictionaryStore.getObjects(): ', dictionaryStore.getObjects(), 'dictionaryStore.getPredicates(): ', dictionaryStore.getPredicates(), 'dictionaryStore.getSubjects(): ', dictionaryStore.getSubjects());
+    // add rule function is specifed here, because we need access to graphJson.
+    function addRuleProperty(id, element, domain, range) {
+      ++graphJson.metrics.objectPropertyCount;
+      ++graphJson.metrics.propertyCount;
+      graphJson.propertyAttribute.push({id: id, // new id for this property. unique number
+        element: element, // iri of output/input
+        domain: domain, // this iri of rule || iri of input class.
+        range: range,
+      }); // iri of output class || this iri of rule
+      graphJson.property.push({id: id, type: 'relations',});
+    }
+
+    function getLabels(iri, languageLabels) {
+      var labelObject = {};
+      var labels = store.getObjects(iri, 'webvowl:label').clean();
+      for (var i = 0; i < labels.length; i++) {
+        var text = getTextValueFromTtl(labels[i], 'webvowl:content');
+        var language = store.getObjects(labels[i], 'webvowl:contentLanguage').clean()[0];
+        labelObject[languageLabels[language]] = text;
+      }
+
+      return labelObject;
+    }
+
+    function getTextForLanguage(iri, languageLabels) {
+      var textObject = {};
+      var text = getTextValue(store.getObjects(iri, 'webvowl:content').clean()[0]);
+      var language = store.getObjects(iri, 'webvowl:contentLanguage').clean()[0];
+      textObject[languageLabels[language]] = text;
+
+      return textObject;
+    }
+
+    function getTextValueFromTtl(subject, predicate) {
+      return getTextValue(store.getObjects(subject, predicate).clean()[0]);
+    }
+
+    function getAnnotations(iri, languageLabels) {
+      var annotations = {};
+      var annotationIRI = store.getObjects(iri, 'webvowl:annotation').clean();
+      for (var j = 0; j < annotationIRI.length; j++) {
+        var annotation = getTextForLanguage(annotationIRI[j], languageLabels);
+        var lang = Object.keys(annotation)[0];
+        var typeIRI = store.getObjects(annotationIRI[j], 'rdf:type').clean()[0];
+        var identifier = getTextValue(store.getObjects(typeIRI, 'rdfs:label').clean()[0]);
+        annotations[identifier] = [
+          {
+            identifier: identifier,
+            language: lang,
+            value: annotation[lang],
+            type: 'label'
+          }
+        ];
+      }
+
+      return annotations;
+    }
+
+    function getTextValue(uri, toReplace) {
+      if (!uri) {
+        return null;
+      }
+      var util = N3.Util;
+      var result = uri;
+      if (util.isLiteral(uri)) {
+        result = util.getLiteralValue(uri);
+      } else {
+        Object.keys(store._prefixes).map(function(prefixKey) {
+          var iriToReplace = store._prefixes[prefixKey];
+          var index = uri.indexOf(iriToReplace);
+          if (index > -1) {
+            if (typeof toReplace === 'undefined') {
+              toReplace = prefixKey;
+            }
+            result = uri.replace(iriToReplace, toReplace);
+          }
+        });
+      }
+
+      return result;
+    }
     // console.log('store.getObjects(): ', store.getObjects(), 'store.getPredicates(): ', store.getPredicates(), 'store.getSubjects(): ', store.getSubjects());
     // get language labels
     var languageLabels = {};
-    var languagesIri = dictionaryStore.getSubjects('webvowl:languageLabel').clean();
+    var languagesIri = store.getSubjects('webvowl:languageLabel').clean();
     for (var l = 0; l < languagesIri.length; l++) {
-      var label = getTextValue(dictionaryStore.getObjects(languagesIri[l], 'webvowl:languageLabel').clean()[0]);
+      var label = getTextValue(store.getObjects(languagesIri[l], 'webvowl:languageLabel').clean()[0]);
       languageLabels[languagesIri[l]] = label;
     }
     // add header to json
@@ -143,10 +138,10 @@ module.exports = function() {
     var author = getTextValue(store.getObjects(header, 'webvowl:author').clean()[0]);
     // get description from header
     var descriptionIRI = getTextValue(store.getObjects(header, 'webvowl:headerDescription').clean()[0]);
-    var description = getTextForLanguage(descriptionIRI, languageLabels, store);
+    var description = getTextForLanguage(descriptionIRI, languageLabels);
     // get title from header
     var titleIRI = getTextValue(store.getObjects(header, 'webvowl:headerTitle').clean()[0]);
-    var title = getTextForLanguage(titleIRI, languageLabels, store);
+    var title = getTextForLanguage(titleIRI, languageLabels);
     // add languages to header
     var headerLanguages = store.getObjects(header, 'webvowl:definedLanguage').clean();
     var lang = [];
@@ -158,12 +153,14 @@ module.exports = function() {
       iri: header,
       title: title,
       version: version,
-      versions: [{
-        url: location.href,
-        version: version,
-      }],
+      versions: [
+        {
+          url: location.href,
+          version: version
+        }
+      ],
       author: [author],
-      description: description,
+      description: description
     };
     // add versions to json
     var otherVersions = getTextValue(store.getObjects(header, 'webvowl:otherVersion').clean());
@@ -171,7 +168,7 @@ module.exports = function() {
       for (var ov = 0; ov < otherVersions.length; ++ov) {
         graphJson.header.versions.push({
           url: getTextValue(store.getObjects(otherVersions[ov], 'webvowl:link').clean()[0]),
-          version: getTextValue(store.getObjects(otherVersions[ov], 'webvowl:version').clean()[0])
+          version: getTextValue(store.getObjects(otherVersions[ov], 'webvowl:version').clean()[0]),
         });
       }
     }
@@ -180,27 +177,27 @@ module.exports = function() {
     for (var r = 0; r < rules.length; r++) {
       var ruleId = rules[r];
       // add label
-      var ruleLabelObject = getLabels(rules[r], languageLabels, store);
+      var ruleLabelObject = getLabels(rules[r], languageLabels);
       // get inputs and add property to create arrows between rule and inputs
       var ruleInputs = store.getObjects(rules[r], 'webvowl:ruleInput').clean();
       for (var ri = 0; ri < ruleInputs.length; ri++) {
-        var inputIri = getTextValueFromTtl(ruleInputs[ri], 'webvowl:iri', store);
-        var inputType = getTextValue(store.getObjects(ruleInputs[ri], 'rdf:type').clean()[0], store._prefixes, '');
+        var inputIri = getTextValueFromTtl(ruleInputs[ri], 'webvowl:iri');
+        var inputType = getTextValue(store.getObjects(ruleInputs[ri], 'rdf:type').clean()[0], '');
         if (inputType === 'Class') {
           addRuleProperty('property' + ri + Date.now(), inputIri, inputIri, ruleId);
         } else {
-          var domainInputIri = getTextValueFromTtl(store.getObjects(inputIri, 'webvowl:domain').clean()[0], 'webvowl:iri', store);
+          var domainInputIri = getTextValueFromTtl(store.getObjects(inputIri, 'webvowl:domain').clean()[0], 'webvowl:iri');
           addRuleProperty('property' + ri + Date.now(), inputIri, domainInputIri, ruleId);
         }
       }
       // get output and add property to create arrow between rule and output
-      var ruleOutput = getTextValueFromTtl(rules[r], 'webvowl:ruleOutput', store);
-      var outputIri = getTextValueFromTtl(ruleOutput, 'webvowl:iri', store);
-      var outputType = getTextValue(store.getObjects(ruleOutput, 'rdf:type').clean()[0], store._prefixes, '');
+      var ruleOutput = getTextValueFromTtl(rules[r], 'webvowl:ruleOutput');
+      var outputIri = getTextValueFromTtl(ruleOutput, 'webvowl:iri');
+      var outputType = getTextValue(store.getObjects(ruleOutput, 'rdf:type').clean()[0], '');
       if (outputType === 'Class') {
         addRuleProperty('property' + ri + Date.now(), outputIri, ruleId, outputIri);
       } else {
-        var domainOutputIri = getTextValueFromTtl(store.getObjects(outputIri, 'webvowl:domain').clean()[0], 'webvowl:iri', store);
+        var domainOutputIri = getTextValueFromTtl(store.getObjects(outputIri, 'webvowl:domain').clean()[0], 'webvowl:iri');
         addRuleProperty('property' + ri + Date.now(), outputIri, ruleId, domainOutputIri);
       }
       // create role attribute object.
@@ -208,15 +205,15 @@ module.exports = function() {
         id: ruleId,
         label: ruleLabelObject,
         input: ruleInputs,
-        output: ruleOutput
+        output: ruleOutput,
       };
       // get annotations
-      var ruleAnnotations = getAnnotations(rules[r], languageLabels, store, dictionaryStore);
+      var ruleAnnotations = getAnnotations(rules[r], languageLabels);
       if (Object.keys(ruleAnnotations).length > 0) {
         ruleAttribute.annotations = ruleAnnotations;
       }
       // add rule to "class" in the final json
-      graphJson.class.push({id: ruleId, type: 'rule'});
+      graphJson.class.push({id: ruleId, type: 'rule',});
       // add rule to "classAttribute" in the final json
       graphJson.classAttribute.push(ruleAttribute);
     }
@@ -226,25 +223,22 @@ module.exports = function() {
     graphJson.metrics.classCount += classCount;
     for (var i = 0; i < classes.length; i++) {
       // add label
-      var classLabelObject = getLabels(classes[i], languageLabels, store);
+      var classLabelObject = getLabels(classes[i], languageLabels);
       // get iri
-      var classIri = getTextValueFromTtl(classes[i], 'webvowl:iri', store);
+      var classIri = getTextValueFromTtl(classes[i], 'webvowl:iri');
       // get coordinates
       var classCoordinateX = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateX').clean()[0]);
       var classCoordinateY = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateY').clean()[0]);
       // get classTypes
       var classTypeIRI = store.getObjects(classes[i], 'webvowl:classType').clean()[0];
-      var classType = getTextValue(dictionaryStore.getObjects(classTypeIRI, 'webvowl:typeLabel').clean()[0]);
+      var classType = getTextValue(store.getObjects(classTypeIRI, 'webvowl:typeLabel').clean()[0]);
       // get individuals
       var individuals = [];
       var instances = store.getObjects(classes[i], 'webvowl:hasIndividual').clean();
       for (var j = 0; j < instances.length; j++) {
         ++graphJson.metrics.individualCount;
-        var individualLabels = getLabels(instances[j], languageLabels, store);
-        individuals.push({
-          iri: instances[j],
-          labels: individualLabels,
-        });
+        var individualLabels = getLabels(instances[j], languageLabels);
+        individuals.push({iri: instances[j], labels: individualLabels});
       }
       // prepare object to put to classAttribute
       var classAttribute = {
@@ -252,7 +246,7 @@ module.exports = function() {
         label: classLabelObject,
         iri: classIri,
         instances: instances.length,
-        individuals: individuals
+        individuals: individuals,
       };
       if (classCoordinateX) {
         classAttribute.x = classCoordinateX;
@@ -265,17 +259,17 @@ module.exports = function() {
         var partOfUnion = [];
         var partOfUnionIRIs = store.getObjects(classIri, 'webvowl:partOfUnion').clean();
         for (var pu = 0; pu < partOfUnionIRIs.length; pu++) {
-          partOfUnion.push(getTextValueFromTtl(partOfUnionIRIs[pu], 'webvowl:iri', store));
+          partOfUnion.push(getTextValueFromTtl(partOfUnionIRIs[pu], 'webvowl:iri'));
         }
         classAttribute.union = partOfUnion;
       }
       // get annotations
-      var classAnnotations = getAnnotations(classes[i], languageLabels, store, dictionaryStore);
+      var classAnnotations = getAnnotations(classes[i], languageLabels);
       if (Object.keys(classAnnotations).length > 0) {
         classAttribute.annotations = classAnnotations;
       }
       // add class to "class" in the final json
-      graphJson.class.push({id: classes[i], type: classType});
+      graphJson.class.push({id: classes[i], type: classType,});
       // add class to "classAttribute" in the final json
       graphJson.classAttribute.push(classAttribute);
     }
@@ -287,19 +281,19 @@ module.exports = function() {
     graphJson.metrics.nodeCount += nodeCount;
     for (var d = 0; d < datatypes.length; d++) {
       // get iri
-      var datatypeIri = getTextValueFromTtl(datatypes[d], 'webvowl:iri', store);
+      var datatypeIri = getTextValueFromTtl(datatypes[d], 'webvowl:iri');
       // get type from datatype
       var datatypeTypeIRI = store.getObjects(datatypes[d], 'webvowl:datatypeType').clean()[0];
-      var datatypeType = getTextValue(dictionaryStore.getObjects(datatypeTypeIRI, 'webvowl:typeLabel').clean()[0]);
+      var datatypeType = getTextValue(store.getObjects(datatypeTypeIRI, 'webvowl:typeLabel').clean()[0]);
       // add label
-      var datatypeLabelObject = getLabels(datatypes[d], languageLabels, store);
+      var datatypeLabelObject = getLabels(datatypes[d], languageLabels);
       // get coordinates
       var datatypeCoordinateX = getTextValue(store.getObjects(datatypes[d], 'webvowl:coordinateX').clean()[0]);
       var datatypeCoordinateY = getTextValue(store.getObjects(datatypes[d], 'webvowl:coordinateY').clean()[0]);
       var datatypeAttribute = {
         id: datatypes[d],
         label: datatypeLabelObject,
-        iri: datatypeIri,
+        iri: datatypeIri
       };
       if (datatypeCoordinateX) {
         datatypeAttribute.x = datatypeCoordinateX;
@@ -308,7 +302,7 @@ module.exports = function() {
         datatypeAttribute.y = datatypeCoordinateY;
       }
       // add datatype to "datatype" in the final json
-      graphJson.datatype.push({id: datatypes[d], type: datatypeType});
+      graphJson.datatype.push({id: datatypes[d], type: datatypeType,});
       // add datatype to "datatypeAttribute" in the final json
       graphJson.datatypeAttribute.push(datatypeAttribute);
     }
@@ -319,41 +313,41 @@ module.exports = function() {
     graphJson.metrics.propertyCount += propertyCount;
     for (var p = 0; p < properties.length; p++) {
       // get iri
-      var propertyIri = getTextValueFromTtl(properties[p], 'webvowl:iri', store);
+      var propertyIri = getTextValueFromTtl(properties[p], 'webvowl:iri');
       // get type from datatype
       var propertyTypeIRI = store.getObjects(properties[p], 'webvowl:propertyType').clean()[0];
-      var propertyType = getTextValue(dictionaryStore.getObjects(propertyTypeIRI, 'webvowl:typeLabel').clean()[0]);
+      var propertyType = getTextValue(store.getObjects(propertyTypeIRI, 'webvowl:typeLabel').clean()[0]);
       // add label
-      var propertyLabelObject = getLabels(properties[p], languageLabels, store);
+      var propertyLabelObject = getLabels(properties[p], languageLabels);
       // add range
-      var rangeID = getTextValueFromTtl(properties[p], 'webvowl:range', store);
+      var rangeID = getTextValueFromTtl(properties[p], 'webvowl:range');
       // add domain
-      var domainID = getTextValueFromTtl(properties[p], 'webvowl:domain', store);
+      var domainID = getTextValueFromTtl(properties[p], 'webvowl:domain');
       // add datatype to "datatype" in the final json
-      graphJson.property.push({id: properties[p], type: propertyType});
+      graphJson.property.push({id: properties[p], type: propertyType,});
       // add datatype to "datatypeAttribute" in the final json
       var propertyAttribute = {
         id: properties[p],
         label: propertyLabelObject,
         iri: propertyIri,
         range: rangeID,
-        domain: domainID,
+        domain: domainID
       };
       // add optional props (cardinality)
-      var cardinality = getTextValueFromTtl(properties[p], 'webvowl:cardinality', store);
+      var cardinality = getTextValueFromTtl(properties[p], 'webvowl:cardinality');
       if (cardinality) {
         propertyAttribute.cardinality = cardinality;
       }
-      var maxCardinality = getTextValueFromTtl(properties[p], 'webvowl:maxCardinality', store);
+      var maxCardinality = getTextValueFromTtl(properties[p], 'webvowl:maxCardinality');
       if (maxCardinality) {
         propertyAttribute.maxCardinality = maxCardinality;
       }
-      var minCardinality = getTextValueFromTtl(properties[p], 'webvowl:minCardinality', store);
+      var minCardinality = getTextValueFromTtl(properties[p], 'webvowl:minCardinality');
       if (minCardinality) {
         propertyAttribute.minCardinality = minCardinality;
       }
       // get annotations
-      var propertyAnnotations = getAnnotations(properties[p], languageLabels, store, dictionaryStore);
+      var propertyAnnotations = getAnnotations(properties[p], languageLabels);
       if (Object.keys(propertyAnnotations).length > 0) {
         propertyAttribute.annotations = propertyAnnotations;
       }
@@ -368,16 +362,16 @@ module.exports = function() {
         var possibleValues = [];
         var dimensionValues = store.getObjects(filterDimensions[fd], 'webvowl:hasDimensionValue').clean();
         for (var dv = 0; dv < dimensionValues.length; dv++) {
-          possibleValues.push(getTextValueFromTtl(dimensionValues[dv], 'webvowl:dimensionValueLabel', store));
+          possibleValues.push(getTextValueFromTtl(dimensionValues[dv], 'webvowl:dimensionValueLabel'));
         }
         groupedFilterDimensions.push({
-          name: getTextValueFromTtl(filterDimensions[fd], 'webvowl:dimensionName', store),
-          values: possibleValues
+          name: getTextValueFromTtl(filterDimensions[fd], 'webvowl:dimensionName'),
+          values: possibleValues,
         });
       }
       graphJson.filterDimensions = groupedFilterDimensions;
     }
-    
+
     // console.log("graphJson", graphJson);
     // parsing JSON to graph valid JSON
     return JSON.stringify(graphJson);
