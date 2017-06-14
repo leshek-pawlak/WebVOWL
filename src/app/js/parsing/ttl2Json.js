@@ -257,7 +257,7 @@ module.exports = function() {
       // get part of unions
       if (classType === 'owl:unionOf') {
         var partOfUnion = [];
-        var partOfUnionIRIs = store.getObjects(classIri, 'webvowl:partOfUnion').clean();
+        var partOfUnionIRIs = store.getObjects(classes[i], 'webvowl:partOfUnion').clean();
         for (var pu = 0; pu < partOfUnionIRIs.length; pu++) {
           partOfUnion.push(getTextValueFromTtl(partOfUnionIRIs[pu], 'webvowl:iri'));
         }
