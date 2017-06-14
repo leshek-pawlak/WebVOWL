@@ -365,6 +365,24 @@ module.exports = function() {
       graphJson.propertyAttribute.push(propertyAttribute);
     }
 
+    // NOTE here are parsed filters
+    var filterDimensions = store.getSubjects('rdf:type', 'webvowl:FilterDimension').clean();
+    if (filterDimensions.length > 0) {
+      var groupedFilterDimensions = [];
+      for (var fd = 0; fd < filterDimensions.length; ++fd) {
+        var possibleValues = [];
+        var dimensionValues = store.getObjects(filterDimensions[fd], 'webvowl:hasDimensionValue').clean();
+        for (var dv = 0; dv < dimensionValues.length; dv++) {
+          possibleValues.push(getTextValueFromTtl(dimensionValues[dv], 'webvowl:dimensionValueLabel', store));
+        }
+        groupedFilterDimensions.push({
+          name: getTextValueFromTtl(filterDimensions[fd], 'webvowl:dimensionName', store),
+          values: possibleValues
+        });
+      }
+      graphJson.filterDimensions = groupedFilterDimensions;
+    }
+    
     // console.log("graphJson", graphJson);
     // parsing JSON to graph valid JSON
     return JSON.stringify(graphJson);
