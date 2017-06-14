@@ -480,7 +480,7 @@ webvowl:dimensionValueLabel
 .
 webvowl:domain
   rdf:type owl:ObjectProperty ;
-  rdfs:domain webvowl:Class ;
+  rdfs:domain webvowl:Property ;
   rdfs:range webvowl:Class ;
 .
 webvowl:forceFullLabels
@@ -620,6 +620,11 @@ webvowl:otherVersion
   rdfs:domain webvowl:Header ;
   rdfs:range webvowl:ModelVersion ;
 .
+webvowl:partOfUnion
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain webvowl:Class ;
+  rdfs:range webvowl:Class ;
+.
 webvowl:paused
   rdf:type owl:DatatypeProperty ;
   rdfs:comment "It lets define us if the graph should start paused or resumed. More efficient for the application is to start paused. The default value is FALSE ." ;
@@ -647,7 +652,7 @@ webvowl:propertyTypeSubclassOf
 .
 webvowl:range
   rdf:type owl:ObjectProperty ;
-  rdfs:domain webvowl:Class ;
+  rdfs:domain webvowl:Property ;
   rdfs:range webvowl:Class ;
 .
 webvowl:ruleFilterEnabled
@@ -692,6 +697,10 @@ webvowl:typeLabel
 webvowl:typeOwlClass
   rdf:type webvowl:Type ;
   webvowl:typeLabel "owl:class"^^xsd:string ;
+.
+webvowl:typeOwlUnionOf
+  rdf:type webvowl:Type ;
+  webvowl:typeLabel "owl:unionOf"^^xsd:string ;
 .
 webvowl:umlBoxMinHeight
   rdf:type owl:DatatypeProperty ;
@@ -966,6 +975,7 @@ owl:Class
               ] ;
           ]
         ) ;
+      rdfs:comment "Create owl:Class in WebVOWL"^^xsd:string ;
     ] ;
   spin:rule [
       rdf:type sp:Construct ;
@@ -1168,6 +1178,7 @@ owl:Class
               ] ;
           ]
         ) ;
+      rdfs:comment "Create Individuals for owl:Class (s)"^^xsd:string ;
     ] ;
 .
 owl:DatatypeProperty
@@ -1283,37 +1294,9 @@ owl:DatatypeProperty
           ]
           [
             sp:object [
-                sp:varName "domain"^^xsd:string ;
-              ] ;
-            sp:predicate webvowl:domain ;
-            sp:subject spin:_this ;
-          ]
-          [
-            sp:object [
                 sp:varName "rangeDatatypeObjectIri"^^xsd:string ;
               ] ;
             sp:predicate webvowl:range ;
-            sp:subject spin:_this ;
-          ]
-          [
-            sp:object [
-                sp:varName "minCard"^^xsd:string ;
-              ] ;
-            sp:predicate webvowl:minCardinality ;
-            sp:subject spin:_this ;
-          ]
-          [
-            sp:object [
-                sp:varName "maxCard"^^xsd:string ;
-              ] ;
-            sp:predicate webvowl:maxCardinality ;
-            sp:subject spin:_this ;
-          ]
-          [
-            sp:object [
-                sp:varName "card"^^xsd:string ;
-              ] ;
-            sp:predicate webvowl:cardinality ;
             sp:subject spin:_this ;
           ]
           [
@@ -1544,6 +1527,467 @@ owl:DatatypeProperty
                 ]
               ) ;
           ]
+        ) ;
+      rdfs:comment "Create Labels and Description of Object Properties and Range Datatypes"^^xsd:string ;
+    ] ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:domain ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "cl"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:partOfUnion ;
+            sp:subject [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:Class ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:typeOwlUnionOf ;
+            sp:predicate webvowl:classType ;
+            sp:subject [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "minCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:minCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "maxCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:maxCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "card"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:cardinality ;
+            sp:subject spin:_this ;
+          ]
+        ) ;
+      sp:where (
+          [
+            rdf:type sp:SubQuery ;
+            sp:query [
+                rdf:type sp:Select ;
+                sp:groupBy (
+                    spin:_this
+                    [
+                      sp:varName "dom"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:orderBy (
+                    [
+                      sp:varName "clName"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:resultVariables (
+                    spin:_this
+                    [
+                      sp:varName "dom"^^xsd:string ;
+                    ]
+                    [
+                      sp:expression [
+                          rdf:type sp:iri ;
+                          sp:arg1 [
+                              rdf:type sp:replace ;
+                              sp:arg1 [
+                                  rdf:type sp:str ;
+                                  sp:arg1 spin:_this ;
+                                ] ;
+                              sp:arg2 [
+                                  rdf:type afn:localname ;
+                                  sp:arg1 spin:_this ;
+                                ] ;
+                              sp:arg3 [
+                                  rdf:type sp:concat ;
+                                  sp:arg1 "UnionClass" ;
+                                  sp:arg2 [
+                                      rdf:type xsd:string ;
+                                      sp:arg1 [
+                                          rdf:type sp:GroupConcat ;
+                                          sp:expression [
+                                              sp:varName "clName"^^xsd:string ;
+                                            ] ;
+                                          sp:separator ""^^xsd:string ;
+                                        ] ;
+                                    ] ;
+                                ] ;
+                            ] ;
+                        ] ;
+                      sp:varName "anoClass"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:where (
+                    [
+                      sp:object owl:DatatypeProperty ;
+                      sp:predicate rdf:type ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      sp:object webvowl:FocalOntology ;
+                      sp:predicate rdf:type ;
+                      sp:subject [
+                          sp:varName "fo"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Filter ;
+                      sp:expression [
+                          rdf:type sp:contains ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 [
+                              rdf:type xsd:string ;
+                              sp:arg1 [
+                                  sp:varName "fo"^^xsd:string ;
+                                ] ;
+                            ] ;
+                        ] ;
+                    ]
+                    [
+                      sp:object [
+                          sp:varName "dom"^^xsd:string ;
+                        ] ;
+                      sp:predicate rdfs:domain ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      rdf:type sp:TriplePath ;
+                      sp:object [
+                          sp:varName "cl"^^xsd:string ;
+                        ] ;
+                      sp:path [
+                          rdf:type sp:SeqPath ;
+                          sp:path1 [
+                              rdf:type sp:SeqPath ;
+                              sp:path1 owl:unionOf ;
+                              sp:path2 [
+                                  rdf:type sp:ModPath ;
+                                  sp:modMax -2 ;
+                                  sp:modMin 0 ;
+                                  sp:subPath rdf:rest ;
+                                ] ;
+                            ] ;
+                          sp:path2 rdf:first ;
+                        ] ;
+                      sp:subject [
+                          sp:varName "dom"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Bind ;
+                      sp:expression [
+                          rdf:type afn:localname ;
+                          sp:arg1 [
+                              sp:varName "cl"^^xsd:string ;
+                            ] ;
+                        ] ;
+                      sp:variable [
+                          sp:varName "clName"^^xsd:string ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+          [
+            rdf:type sp:SubQuery ;
+            sp:query [
+                rdf:type sp:Select ;
+                sp:resultVariables (
+                    spin:_this
+                    [
+                      sp:varName "dom"^^xsd:string ;
+                    ]
+                    [
+                      sp:varName "cl"^^xsd:string ;
+                    ]
+                    [
+                      sp:varName "minCard"^^xsd:string ;
+                    ]
+                    [
+                      sp:varName "maxCard"^^xsd:string ;
+                    ]
+                    [
+                      sp:varName "card"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:where (
+                    [
+                      sp:object owl:DatatypeProperty ;
+                      sp:predicate rdf:type ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      sp:object webvowl:FocalOntology ;
+                      sp:predicate rdf:type ;
+                      sp:subject [
+                          sp:varName "fo"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Filter ;
+                      sp:expression [
+                          rdf:type sp:contains ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 [
+                              rdf:type xsd:string ;
+                              sp:arg1 [
+                                  sp:varName "fo"^^xsd:string ;
+                                ] ;
+                            ] ;
+                        ] ;
+                    ]
+                    [
+                      sp:object [
+                          sp:varName "dom"^^xsd:string ;
+                        ] ;
+                      sp:predicate rdfs:domain ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      rdf:type sp:TriplePath ;
+                      sp:object [
+                          sp:varName "cl"^^xsd:string ;
+                        ] ;
+                      sp:path [
+                          rdf:type sp:SeqPath ;
+                          sp:path1 [
+                              rdf:type sp:SeqPath ;
+                              sp:path1 owl:unionOf ;
+                              sp:path2 [
+                                  rdf:type sp:ModPath ;
+                                  sp:modMax -2 ;
+                                  sp:modMin 0 ;
+                                  sp:subPath rdf:rest ;
+                                ] ;
+                            ] ;
+                          sp:path2 rdf:first ;
+                        ] ;
+                      sp:subject [
+                          sp:varName "dom"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Optional ;
+                      sp:elements (
+                          [
+                            sp:object [
+                                sp:varName "?0"^^xsd:string ;
+                              ] ;
+                            sp:predicate rdfs:subClassOf ;
+                            sp:subject [
+                                sp:varName "cl"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object owl:Restriction ;
+                            sp:predicate rdf:type ;
+                            sp:subject [
+                                sp:varName "?0"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object spin:_this ;
+                            sp:predicate owl:onProperty ;
+                            sp:subject [
+                                sp:varName "?0"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object [
+                                sp:varName "minCard"^^xsd:string ;
+                              ] ;
+                            sp:predicate owl:minCardinality ;
+                            sp:subject [
+                                sp:varName "?0"^^xsd:string ;
+                              ] ;
+                          ]
+                        ) ;
+                    ]
+                    [
+                      rdf:type sp:Optional ;
+                      sp:elements (
+                          [
+                            sp:object [
+                                sp:varName "?1"^^xsd:string ;
+                              ] ;
+                            sp:predicate rdfs:subClassOf ;
+                            sp:subject [
+                                sp:varName "cl"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object owl:Restriction ;
+                            sp:predicate rdf:type ;
+                            sp:subject [
+                                sp:varName "?1"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object spin:_this ;
+                            sp:predicate owl:onProperty ;
+                            sp:subject [
+                                sp:varName "?1"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object [
+                                sp:varName "maxCard"^^xsd:string ;
+                              ] ;
+                            sp:predicate owl:maxCardinality ;
+                            sp:subject [
+                                sp:varName "?1"^^xsd:string ;
+                              ] ;
+                          ]
+                        ) ;
+                    ]
+                    [
+                      rdf:type sp:Optional ;
+                      sp:elements (
+                          [
+                            sp:object [
+                                sp:varName "?2"^^xsd:string ;
+                              ] ;
+                            sp:predicate rdfs:subClassOf ;
+                            sp:subject [
+                                sp:varName "cl"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object owl:Restriction ;
+                            sp:predicate rdf:type ;
+                            sp:subject [
+                                sp:varName "?2"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object spin:_this ;
+                            sp:predicate owl:onProperty ;
+                            sp:subject [
+                                sp:varName "?2"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object [
+                                sp:varName "card"^^xsd:string ;
+                              ] ;
+                            sp:predicate owl:cardinality ;
+                            sp:subject [
+                                sp:varName "?2"^^xsd:string ;
+                              ] ;
+                          ]
+                        ) ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "If Domain is a Union, create anonymous Domain Class and connection to Classes and Cardinalities"^^xsd:string ;
+    ] ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "domain"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:domain ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "minCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:minCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "maxCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:maxCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "card"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:cardinality ;
+            sp:subject spin:_this ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object owl:DatatypeProperty ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:FocalOntology ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "fo"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:contains ;
+                sp:arg1 [
+                    rdf:type xsd:string ;
+                    sp:arg1 spin:_this ;
+                  ] ;
+                sp:arg2 [
+                    rdf:type xsd:string ;
+                    sp:arg1 [
+                        sp:varName "fo"^^xsd:string ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+          [
+            rdf:type sp:NotExists ;
+            sp:elements (
+                [
+                  rdf:type sp:TriplePath ;
+                  sp:object [
+                      sp:varName "un"^^xsd:string ;
+                    ] ;
+                  sp:path [
+                      rdf:type sp:SeqPath ;
+                      sp:path1 rdfs:domain ;
+                      sp:path2 owl:unionOf ;
+                    ] ;
+                  sp:subject spin:_this ;
+                ]
+              ) ;
+          ]
           [
             rdf:type sp:Optional ;
             sp:elements (
@@ -1668,6 +2112,7 @@ owl:DatatypeProperty
               ) ;
           ]
         ) ;
+      rdfs:comment "If Domain is NOT a UNION, Create Domain connection and Cardinality"^^xsd:string ;
     ] ;
 .
 owl:ObjectProperty
@@ -1783,37 +2228,9 @@ owl:ObjectProperty
           ]
           [
             sp:object [
-                sp:varName "domain"^^xsd:string ;
-              ] ;
-            sp:predicate webvowl:domain ;
-            sp:subject spin:_this ;
-          ]
-          [
-            sp:object [
                 sp:varName "range"^^xsd:string ;
               ] ;
             sp:predicate webvowl:range ;
-            sp:subject spin:_this ;
-          ]
-          [
-            sp:object [
-                sp:varName "minCard"^^xsd:string ;
-              ] ;
-            sp:predicate webvowl:minCardinality ;
-            sp:subject spin:_this ;
-          ]
-          [
-            sp:object [
-                sp:varName "maxCard"^^xsd:string ;
-              ] ;
-            sp:predicate webvowl:maxCardinality ;
-            sp:subject spin:_this ;
-          ]
-          [
-            sp:object [
-                sp:varName "card"^^xsd:string ;
-              ] ;
-            sp:predicate webvowl:cardinality ;
             sp:subject spin:_this ;
           ]
         ) ;
@@ -1950,6 +2367,706 @@ owl:ObjectProperty
                 ]
               ) ;
           ]
+        ) ;
+      rdfs:comment "Create Labels and Description of Object Properties"^^xsd:string ;
+    ] ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:domain ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "cl"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:partOfUnion ;
+            sp:subject [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:Class ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:typeOwlUnionOf ;
+            sp:predicate webvowl:classType ;
+            sp:subject [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "minCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:minCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "maxCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:maxCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "card"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:cardinality ;
+            sp:subject spin:_this ;
+          ]
+        ) ;
+      sp:where (
+          [
+            rdf:type sp:SubQuery ;
+            sp:query [
+                rdf:type sp:Select ;
+                sp:groupBy (
+                    spin:_this
+                    [
+                      sp:varName "dom"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:orderBy (
+                    [
+                      sp:varName "clName"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:resultVariables (
+                    spin:_this
+                    [
+                      sp:varName "dom"^^xsd:string ;
+                    ]
+                    [
+                      sp:expression [
+                          rdf:type sp:iri ;
+                          sp:arg1 [
+                              rdf:type sp:replace ;
+                              sp:arg1 [
+                                  rdf:type sp:str ;
+                                  sp:arg1 spin:_this ;
+                                ] ;
+                              sp:arg2 [
+                                  rdf:type afn:localname ;
+                                  sp:arg1 spin:_this ;
+                                ] ;
+                              sp:arg3 [
+                                  rdf:type sp:concat ;
+                                  sp:arg1 "UnionClass" ;
+                                  sp:arg2 [
+                                      rdf:type xsd:string ;
+                                      sp:arg1 [
+                                          rdf:type sp:GroupConcat ;
+                                          sp:expression [
+                                              sp:varName "clName"^^xsd:string ;
+                                            ] ;
+                                          sp:separator ""^^xsd:string ;
+                                        ] ;
+                                    ] ;
+                                ] ;
+                            ] ;
+                        ] ;
+                      sp:varName "anoClass"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:where (
+                    [
+                      sp:object owl:ObjectProperty ;
+                      sp:predicate rdf:type ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      sp:object webvowl:FocalOntology ;
+                      sp:predicate rdf:type ;
+                      sp:subject [
+                          sp:varName "fo"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Filter ;
+                      sp:expression [
+                          rdf:type sp:contains ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 [
+                              rdf:type xsd:string ;
+                              sp:arg1 [
+                                  sp:varName "fo"^^xsd:string ;
+                                ] ;
+                            ] ;
+                        ] ;
+                    ]
+                    [
+                      sp:object [
+                          sp:varName "dom"^^xsd:string ;
+                        ] ;
+                      sp:predicate rdfs:domain ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      rdf:type sp:TriplePath ;
+                      sp:object [
+                          sp:varName "cl"^^xsd:string ;
+                        ] ;
+                      sp:path [
+                          rdf:type sp:SeqPath ;
+                          sp:path1 [
+                              rdf:type sp:SeqPath ;
+                              sp:path1 owl:unionOf ;
+                              sp:path2 [
+                                  rdf:type sp:ModPath ;
+                                  sp:modMax -2 ;
+                                  sp:modMin 0 ;
+                                  sp:subPath rdf:rest ;
+                                ] ;
+                            ] ;
+                          sp:path2 rdf:first ;
+                        ] ;
+                      sp:subject [
+                          sp:varName "dom"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Bind ;
+                      sp:expression [
+                          rdf:type afn:localname ;
+                          sp:arg1 [
+                              sp:varName "cl"^^xsd:string ;
+                            ] ;
+                        ] ;
+                      sp:variable [
+                          sp:varName "clName"^^xsd:string ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+          [
+            rdf:type sp:SubQuery ;
+            sp:query [
+                rdf:type sp:Select ;
+                sp:resultVariables (
+                    spin:_this
+                    [
+                      sp:varName "dom"^^xsd:string ;
+                    ]
+                    [
+                      sp:varName "cl"^^xsd:string ;
+                    ]
+                    [
+                      sp:varName "minCard"^^xsd:string ;
+                    ]
+                    [
+                      sp:varName "maxCard"^^xsd:string ;
+                    ]
+                    [
+                      sp:varName "card"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:where (
+                    [
+                      sp:object owl:ObjectProperty ;
+                      sp:predicate rdf:type ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      sp:object webvowl:FocalOntology ;
+                      sp:predicate rdf:type ;
+                      sp:subject [
+                          sp:varName "fo"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Filter ;
+                      sp:expression [
+                          rdf:type sp:contains ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 [
+                              rdf:type xsd:string ;
+                              sp:arg1 [
+                                  sp:varName "fo"^^xsd:string ;
+                                ] ;
+                            ] ;
+                        ] ;
+                    ]
+                    [
+                      sp:object [
+                          sp:varName "dom"^^xsd:string ;
+                        ] ;
+                      sp:predicate rdfs:domain ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      rdf:type sp:TriplePath ;
+                      sp:object [
+                          sp:varName "cl"^^xsd:string ;
+                        ] ;
+                      sp:path [
+                          rdf:type sp:SeqPath ;
+                          sp:path1 [
+                              rdf:type sp:SeqPath ;
+                              sp:path1 owl:unionOf ;
+                              sp:path2 [
+                                  rdf:type sp:ModPath ;
+                                  sp:modMax -2 ;
+                                  sp:modMin 0 ;
+                                  sp:subPath rdf:rest ;
+                                ] ;
+                            ] ;
+                          sp:path2 rdf:first ;
+                        ] ;
+                      sp:subject [
+                          sp:varName "dom"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Optional ;
+                      sp:elements (
+                          [
+                            sp:object [
+                                sp:varName "?0"^^xsd:string ;
+                              ] ;
+                            sp:predicate rdfs:subClassOf ;
+                            sp:subject [
+                                sp:varName "cl"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object owl:Restriction ;
+                            sp:predicate rdf:type ;
+                            sp:subject [
+                                sp:varName "?0"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object spin:_this ;
+                            sp:predicate owl:onProperty ;
+                            sp:subject [
+                                sp:varName "?0"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object [
+                                sp:varName "minCard"^^xsd:string ;
+                              ] ;
+                            sp:predicate owl:minCardinality ;
+                            sp:subject [
+                                sp:varName "?0"^^xsd:string ;
+                              ] ;
+                          ]
+                        ) ;
+                    ]
+                    [
+                      rdf:type sp:Optional ;
+                      sp:elements (
+                          [
+                            sp:object [
+                                sp:varName "?1"^^xsd:string ;
+                              ] ;
+                            sp:predicate rdfs:subClassOf ;
+                            sp:subject [
+                                sp:varName "cl"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object owl:Restriction ;
+                            sp:predicate rdf:type ;
+                            sp:subject [
+                                sp:varName "?1"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object spin:_this ;
+                            sp:predicate owl:onProperty ;
+                            sp:subject [
+                                sp:varName "?1"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object [
+                                sp:varName "maxCard"^^xsd:string ;
+                              ] ;
+                            sp:predicate owl:maxCardinality ;
+                            sp:subject [
+                                sp:varName "?1"^^xsd:string ;
+                              ] ;
+                          ]
+                        ) ;
+                    ]
+                    [
+                      rdf:type sp:Optional ;
+                      sp:elements (
+                          [
+                            sp:object [
+                                sp:varName "?2"^^xsd:string ;
+                              ] ;
+                            sp:predicate rdfs:subClassOf ;
+                            sp:subject [
+                                sp:varName "cl"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object owl:Restriction ;
+                            sp:predicate rdf:type ;
+                            sp:subject [
+                                sp:varName "?2"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object spin:_this ;
+                            sp:predicate owl:onProperty ;
+                            sp:subject [
+                                sp:varName "?2"^^xsd:string ;
+                              ] ;
+                          ]
+                          [
+                            sp:object [
+                                sp:varName "card"^^xsd:string ;
+                              ] ;
+                            sp:predicate owl:cardinality ;
+                            sp:subject [
+                                sp:varName "?2"^^xsd:string ;
+                              ] ;
+                          ]
+                        ) ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "If Domain is a Union, create anonymous Domain Class and connection to Classes and Cardinalities"^^xsd:string ;
+    ] ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:range ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "cl"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:partOfUnion ;
+            sp:subject [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:Class ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:typeOwlUnionOf ;
+            sp:predicate webvowl:classType ;
+            sp:subject [
+                sp:varName "anoClass"^^xsd:string ;
+              ] ;
+          ]
+        ) ;
+      sp:where (
+          [
+            rdf:type sp:SubQuery ;
+            sp:query [
+                rdf:type sp:Select ;
+                sp:groupBy (
+                    spin:_this
+                    [
+                      sp:varName "range"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:orderBy (
+                    [
+                      sp:varName "clName"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:resultVariables (
+                    spin:_this
+                    [
+                      sp:varName "range"^^xsd:string ;
+                    ]
+                    [
+                      sp:expression [
+                          rdf:type sp:iri ;
+                          sp:arg1 [
+                              rdf:type sp:replace ;
+                              sp:arg1 [
+                                  rdf:type sp:str ;
+                                  sp:arg1 spin:_this ;
+                                ] ;
+                              sp:arg2 [
+                                  rdf:type afn:localname ;
+                                  sp:arg1 spin:_this ;
+                                ] ;
+                              sp:arg3 [
+                                  rdf:type sp:concat ;
+                                  sp:arg1 "UnionClass" ;
+                                  sp:arg2 [
+                                      rdf:type xsd:string ;
+                                      sp:arg1 [
+                                          rdf:type sp:GroupConcat ;
+                                          sp:expression [
+                                              sp:varName "clName"^^xsd:string ;
+                                            ] ;
+                                          sp:separator ""^^xsd:string ;
+                                        ] ;
+                                    ] ;
+                                ] ;
+                            ] ;
+                        ] ;
+                      sp:varName "anoClass"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:where (
+                    [
+                      sp:object owl:ObjectProperty ;
+                      sp:predicate rdf:type ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      sp:object webvowl:FocalOntology ;
+                      sp:predicate rdf:type ;
+                      sp:subject [
+                          sp:varName "fo"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Filter ;
+                      sp:expression [
+                          rdf:type sp:contains ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 [
+                              rdf:type xsd:string ;
+                              sp:arg1 [
+                                  sp:varName "fo"^^xsd:string ;
+                                ] ;
+                            ] ;
+                        ] ;
+                    ]
+                    [
+                      sp:object [
+                          sp:varName "range"^^xsd:string ;
+                        ] ;
+                      sp:predicate rdfs:range ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      rdf:type sp:TriplePath ;
+                      sp:object [
+                          sp:varName "cl"^^xsd:string ;
+                        ] ;
+                      sp:path [
+                          rdf:type sp:SeqPath ;
+                          sp:path1 [
+                              rdf:type sp:SeqPath ;
+                              sp:path1 owl:unionOf ;
+                              sp:path2 [
+                                  rdf:type sp:ModPath ;
+                                  sp:modMax -2 ;
+                                  sp:modMin 0 ;
+                                  sp:subPath rdf:rest ;
+                                ] ;
+                            ] ;
+                          sp:path2 rdf:first ;
+                        ] ;
+                      sp:subject [
+                          sp:varName "range"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Bind ;
+                      sp:expression [
+                          rdf:type afn:localname ;
+                          sp:arg1 [
+                              sp:varName "cl"^^xsd:string ;
+                            ] ;
+                        ] ;
+                      sp:variable [
+                          sp:varName "clName"^^xsd:string ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+          [
+            rdf:type sp:SubQuery ;
+            sp:query [
+                rdf:type sp:Select ;
+                sp:resultVariables (
+                    spin:_this
+                    [
+                      sp:varName "range"^^xsd:string ;
+                    ]
+                    [
+                      sp:varName "cl"^^xsd:string ;
+                    ]
+                  ) ;
+                sp:where (
+                    [
+                      sp:object owl:ObjectProperty ;
+                      sp:predicate rdf:type ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      sp:object webvowl:FocalOntology ;
+                      sp:predicate rdf:type ;
+                      sp:subject [
+                          sp:varName "fo"^^xsd:string ;
+                        ] ;
+                    ]
+                    [
+                      rdf:type sp:Filter ;
+                      sp:expression [
+                          rdf:type sp:contains ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 [
+                              rdf:type xsd:string ;
+                              sp:arg1 [
+                                  sp:varName "fo"^^xsd:string ;
+                                ] ;
+                            ] ;
+                        ] ;
+                    ]
+                    [
+                      sp:object [
+                          sp:varName "range"^^xsd:string ;
+                        ] ;
+                      sp:predicate rdfs:range ;
+                      sp:subject spin:_this ;
+                    ]
+                    [
+                      rdf:type sp:TriplePath ;
+                      sp:object [
+                          sp:varName "cl"^^xsd:string ;
+                        ] ;
+                      sp:path [
+                          rdf:type sp:SeqPath ;
+                          sp:path1 [
+                              rdf:type sp:SeqPath ;
+                              sp:path1 owl:unionOf ;
+                              sp:path2 [
+                                  rdf:type sp:ModPath ;
+                                  sp:modMax -2 ;
+                                  sp:modMin 0 ;
+                                  sp:subPath rdf:rest ;
+                                ] ;
+                            ] ;
+                          sp:path2 rdf:first ;
+                        ] ;
+                      sp:subject [
+                          sp:varName "range"^^xsd:string ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "If Range is a Union, create anonymous Range Class and connection to Classes and Cardinalities"^^xsd:string ;
+    ] ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "domain"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:domain ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "minCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:minCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "maxCard"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:maxCardinality ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "card"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:cardinality ;
+            sp:subject spin:_this ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object owl:ObjectProperty ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:FocalOntology ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "fo"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:contains ;
+                sp:arg1 [
+                    rdf:type xsd:string ;
+                    sp:arg1 spin:_this ;
+                  ] ;
+                sp:arg2 [
+                    rdf:type xsd:string ;
+                    sp:arg1 [
+                        sp:varName "fo"^^xsd:string ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+          [
+            rdf:type sp:NotExists ;
+            sp:elements (
+                [
+                  rdf:type sp:TriplePath ;
+                  sp:object [
+                      sp:varName "un"^^xsd:string ;
+                    ] ;
+                  sp:path [
+                      rdf:type sp:SeqPath ;
+                      sp:path1 rdfs:domain ;
+                      sp:path2 owl:unionOf ;
+                    ] ;
+                  sp:subject spin:_this ;
+                ]
+              ) ;
+          ]
           [
             rdf:type sp:Optional ;
             sp:elements (
@@ -2074,5 +3191,73 @@ owl:ObjectProperty
               ) ;
           ]
         ) ;
+      rdfs:comment "If Domain is NOT a UNION, Create Domain connection and Cardinality"^^xsd:string ;
+    ] ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "range"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:range ;
+            sp:subject spin:_this ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object owl:ObjectProperty ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:FocalOntology ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "fo"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:contains ;
+                sp:arg1 [
+                    rdf:type xsd:string ;
+                    sp:arg1 spin:_this ;
+                  ] ;
+                sp:arg2 [
+                    rdf:type xsd:string ;
+                    sp:arg1 [
+                        sp:varName "fo"^^xsd:string ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+          [
+            rdf:type sp:NotExists ;
+            sp:elements (
+                [
+                  rdf:type sp:TriplePath ;
+                  sp:object [
+                      sp:varName "un"^^xsd:string ;
+                    ] ;
+                  sp:path [
+                      rdf:type sp:SeqPath ;
+                      sp:path1 rdfs:range ;
+                      sp:path2 owl:unionOf ;
+                    ] ;
+                  sp:subject spin:_this ;
+                ]
+              ) ;
+          ]
+          [
+            sp:object [
+                sp:varName "range"^^xsd:string ;
+              ] ;
+            sp:predicate rdfs:range ;
+            sp:subject spin:_this ;
+          ]
+        ) ;
+      rdfs:comment "If Range is NOT a Union, Create Range connection"^^xsd:string ;
     ] ;
 .
