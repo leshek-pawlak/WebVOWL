@@ -20,7 +20,8 @@ module.exports = {
 	},
 	module: {
 		loaders: [
-			{test: /\.css$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader!postcss-loader")}
+			{ test: /\.css$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader!postcss-loader") },
+			{ test: /\.svg$/, include: [/choices\.js/], loader: 'url-loader' }
 		]
 	},
 	plugins: [

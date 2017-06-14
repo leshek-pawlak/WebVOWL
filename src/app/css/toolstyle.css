@@ -1,8 +1,12 @@
-@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+/*----------------------------------------------
+        Choices.js styles
+----------------------------------------------*/
+@import '../../../node_modules/choices.js/assets/styles/css/choices.min.css';
+
 /*----------------------------------------------
         WebVOWL page
 ----------------------------------------------*/
-
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
 
 #locateSearchResult:focus{
 	ouline: none;
@@ -309,7 +313,7 @@ ul#optionsMenu > li:hover .aboutMenu {
 .aboutMenu, .export {
 	min-width: 150px;
 }
-.gravity, .filter {
+.gravity {
 	min-width: 180px;
 }
 .module {
@@ -678,29 +682,6 @@ a#pause-button:not(.paused)::before {
 }
 #propFilter {
 	padding: 5px;
-	.selectContainer, .labelContainer {
-		width: 100%;
-		select, p {
-			float: left;
-			margin: 0;
-			&:nth-child(2n) {
-				float: right;
-			}
-		}
-		&::after {
-			content: '';
-			display: block;
-			clear: both;
-		}
-	}
-	select {
-		background: #34495e;
-		border: 1px solid #34495E;
-		color: #ecf0f1;
-		option {
-			background-color: #24323e;
-		}
-	}
 	> div {
 		margin-bottom: 5px;
 	}
@@ -865,17 +846,14 @@ a#pause-button:not(.paused)::before {
 	animation-timing-function: linear;
 }
 
-#activePropFilters .activeFilter {
-	display: flex;
-	flex-wrap: nowrap;
-	justify-content: space-between;
-	padding: 4px 0;
-	margin: 4px 0;
-	border-top: 1px solid #34495e;
-	a {
-		cursor: pointer;
-		&:hover {
-			color: red;
-		}
+/* overwrite choices.js styles */
+.selectContainer {
+	width: 300px;
+}
+.choices {
+	font-size: 12px;
+	width: 282px;
+	.choices__inner {
+		font-size: 12px;
 	}
 }

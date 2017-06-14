@@ -6,16 +6,23 @@
  */
 module.exports = function (graph) {
 
-	var filterMenu = {},
+	var Choices = require('choices.js/assets/scripts/dist/choices.js'),
+		filterMenu = {},
 		checkboxData = [],
 		selectedPropFilter = { 'name': null, 'value': null },
 		menuElement = d3.select("#filterOption a"),
 		nodeDegreeContainer = d3.select("#nodeDegreeFilteringOption"),
-		nameSelector = d3.select('#namePropFilter'),
-		valueSelector = d3.select('#valuePropFilter'),
+		nameSelector = initChoices('#namePropFilter', 'Prop names '),
+		valueSelector = initChoices('#valuePropFilter', 'Prop values '),
 		graphDegreeLevel,
 		degreeSlider;
 
+	function initChoices(selector, placeholder) {
+		return new Choices(selector, {
+	    removeItemButton: true,
+			placeholderValue: placeholder
+	  });
+	}
 
 	/** some getter function  **/
 	filterMenu.getCheckBoxContainer = function () {
@@ -72,32 +79,44 @@ module.exports = function (graph) {
 	}
 
 	function addRuleFilter(selector) {
-		var container = d3.select(selector),
-			properties = [null, 'domain', 'range'],
-			values = [null, 'class999', 'class222'];
+		var properties = [],
+			values = [];
 
-		setDataToSelectors(nameSelector, properties);
-		setDataToSelectors(valueSelector, values);
+		// wait for the data in graph.options
+		setTimeout(function() {
+			var filterDimensions = graph.options().data().filterDimensions;
+			for (var fd = 0; fd < filterDimensions.length; fd++) {
+				properties.push({ value: filterDimensions[fd].name, label: filterDimensions[fd].name });
+				for (var fdv = 0; fdv < filterDimensions[fd].values.length; fdv++) {
+					values.push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
+				}
+			}
+
+			setDataToSelectors(nameSelector, properties);
+			setDataToSelectors(valueSelector, values);
+		}, 1000);
 	}
 
 	function setDataToSelectors(element, data) {
-		element.selectAll("option").remove();
-		element.selectAll("option")
-		.data(data)
-		.enter().append("option")
-		.attr("value", function (d) {
-			return d;
-		})
-		.text(function (d) {
-			return d;
-		});
-		element.on("change", function () {
-			var selectedOption = this.getElementsByTagName('option')[this.selectedIndex];
-			selectedPropFilter[this.id.replace('PropFilter', '')] = selectedOption.value;
-			if (selectedPropFilter.name && selectedPropFilter.value) {
-				addToActiveFilters();
-			}
-		});
+		console.log(element, data);
+		element.setChoices(data, 'value', 'label', true);
+		// element.selectAll("option").remove();
+		// element.selectAll("option")
+		// .data(data)
+		// .enter().append("option")
+		// .attr("value", function (d) {
+		// 	return d;
+		// })
+		// .text(function (d) {
+		// 	return d;
+		// });
+		// element.on("change", function () {
+		// 	var selectedOption = this.getElementsByTagName('option')[this.selectedIndex];
+		// 	selectedPropFilter[this.id.replace('PropFilter', '')] = selectedOption.value;
+		// 	if (selectedPropFilter.name && selectedPropFilter.value) {
+		// 		addToActiveFilters();
+		// 	}
+		// });
 	}
 
 	function addFilterItem(filter, identifier, pluralNameOfFilteredItems, selector) {
