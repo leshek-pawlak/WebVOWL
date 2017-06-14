@@ -88,37 +88,30 @@ module.exports = function (graph) {
 			if (filterDimensions) {
 				for (var fd = 0; fd < filterDimensions.length; fd++) {
 					properties.push({ value: filterDimensions[fd].name, label: filterDimensions[fd].name });
+					values.push({
+						id: fd,
+						label: filterDimensions[fd].name,
+						disabled: true,
+						choices: []
+					});
 					for (var fdv = 0; fdv < filterDimensions[fd].values.length; fdv++) {
-						values.push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
+						values[values.length - 1].choices.push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
 					}
 				}
 			}
-
-			setDataToSelectors(nameSelector, properties);
-			setDataToSelectors(valueSelector, values);
+			// console.log('values', values);
+			nameSelector.setChoices(properties, 'value', 'label', false);
+			nameSelector.passedElement.addEventListener('addItem', function(element) {
+				// console.log('change', element);
+				// selectedPropFilter[this.id.replace('PropFilter', '')] = value;
+				// if (selectedPropFilter.name && selectedPropFilter.value) {
+				// 	addToActiveFilters();
+				// }
+				// valueSelector.enable();
+			});
+			valueSelector.setChoices(values, 'value', 'label', false);
+			// valueSelector.disable();
 		}, 1000);
-	}
-
-	function setDataToSelectors(element, data) {
-		console.log(element, data);
-		element.setChoices(data, 'value', 'label', true);
-		// element.selectAll("option").remove();
-		// element.selectAll("option")
-		// .data(data)
-		// .enter().append("option")
-		// .attr("value", function (d) {
-		// 	return d;
-		// })
-		// .text(function (d) {
-		// 	return d;
-		// });
-		// element.on("change", function () {
-		// 	var selectedOption = this.getElementsByTagName('option')[this.selectedIndex];
-		// 	selectedPropFilter[this.id.replace('PropFilter', '')] = selectedOption.value;
-		// 	if (selectedPropFilter.name && selectedPropFilter.value) {
-		// 		addToActiveFilters();
-		// 	}
-		// });
 	}
 
 	function addFilterItem(filter, identifier, pluralNameOfFilteredItems, selector) {
