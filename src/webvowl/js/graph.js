@@ -1016,11 +1016,7 @@ module.exports = function (graphContainerSelector) {
 		var domainElement = link.domain();
 		var container = domainElement.nodeElement();
 		var whiteCircle = getWhiteCircleSybling(container);
-		// concatenate the label
-		var label = '(no label)';
-		if (link.label().property().label()) {
-			label = link.label().property().label()[language];
-		}
+		var label = link.label().property().labelForCurrentLanguage();
 		var text = link.range().labelForCurrentLanguage();
 		if (options.cardinalityVisible() && link.label().property().generateCardinalityText()) {
 			text += ' [' + link.label().property().generateCardinalityText() + ']';
