@@ -85,10 +85,12 @@ module.exports = function (graph) {
 		// wait for the data in graph.options
 		setTimeout(function() {
 			var filterDimensions = graph.options().data().filterDimensions;
-			for (var fd = 0; fd < filterDimensions.length; fd++) {
-				properties.push({ value: filterDimensions[fd].name, label: filterDimensions[fd].name });
-				for (var fdv = 0; fdv < filterDimensions[fd].values.length; fdv++) {
-					values.push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
+			if (filterDimensions) {
+				for (var fd = 0; fd < filterDimensions.length; fd++) {
+					properties.push({ value: filterDimensions[fd].name, label: filterDimensions[fd].name });
+					for (var fdv = 0; fdv < filterDimensions[fd].values.length; fdv++) {
+						values.push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
+					}
 				}
 			}
 
