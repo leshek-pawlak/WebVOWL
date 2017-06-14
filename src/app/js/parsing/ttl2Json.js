@@ -235,11 +235,6 @@ module.exports = function() {
       // get classTypes
       var classTypeIRI = store.getObjects(classes[i], 'webvowl:classType').clean()[0];
       var classType = getTextValue(dictionaryStore.getObjects(classTypeIRI, 'webvowl:typeLabel').clean()[0]);
-      // if it's null it's unionOf.
-      if (!classType) {
-        // NOTE it should be defined in the webvowl.ttl file
-        classType = 'owl:unionOf';
-      }
       // get individuals
       var individuals = [];
       var instances = store.getObjects(classes[i], 'webvowl:hasIndividual').clean();
