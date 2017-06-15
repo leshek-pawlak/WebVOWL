@@ -226,9 +226,6 @@ module.exports = function() {
       var classLabelObject = getLabels(classes[i], languageLabels);
       // get iri
       var classIri = getTextValueFromTtl(classes[i], 'webvowl:iri');
-      // get coordinates
-      var classCoordinateX = parseFloat(getTextValue(store.getObjects(classes[i], 'webvowl:coordinateX').clean()[0]), 10);
-      var classCoordinateY = parseFloat(getTextValue(store.getObjects(classes[i], 'webvowl:coordinateY').clean()[0]), 10);
       // get classTypes
       var classTypeIRI = store.getObjects(classes[i], 'webvowl:classType').clean()[0];
       var classType = getTextValue(store.getObjects(classTypeIRI, 'webvowl:typeLabel').clean()[0]);
@@ -248,11 +245,31 @@ module.exports = function() {
         instances: instances.length,
         individuals: individuals,
       };
+      // get coordinates
+      var classCoordinateX = parseFloat(getTextValue(store.getObjects(classes[i], 'webvowl:coordinateX').clean()[0]), 10);
+      var classCoordinateY = parseFloat(getTextValue(store.getObjects(classes[i], 'webvowl:coordinateY').clean()[0]), 10);
       if (classCoordinateX) {
         classAttribute.x = classCoordinateX;
       }
       if (classCoordinateY) {
         classAttribute.y = classCoordinateY;
+      }
+      if (classCoordinateY) {
+        classAttribute.y = classCoordinateY;
+      }
+      // get tags
+      var classTags = store.getObjects(classes[i], 'webvowl:tag').clean();
+      if (classTags.length > 0) {
+        var tags = [];
+        for (var ct = 0; ct < classTags.length; ct++) {
+          tags.push(getTextValueFromTtl(classTags[ct], 'webvowl:dimensionValueLabel'));
+        }
+        classAttribute.tags = tags;
+      }
+      // get backgroundColor
+      var backgroundColor = getTextValueFromTtl(classes[i], 'webvowl:backgroundColor');
+      if (backgroundColor) {
+        classAttribute.backgroundColor = backgroundColor;
       }
       // get referenceClass
       var classReference = getTextValueFromTtl(classes[i], 'webvowl:isReferenceClass');
