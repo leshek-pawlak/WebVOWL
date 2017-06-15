@@ -29,6 +29,7 @@
   webvowl:labelMaxTextLineLength 55 ;
   webvowl:maxMagnification "4"^^xsd:float ;
   webvowl:minMagnification "0.1"^^xsd:float ;
+  webvowl:nodeCountLimitForAutoEnabling 10000 ;
   webvowl:objectPropertyFilterEnabled "false"^^xsd:boolean ;
   webvowl:paused "false"^^xsd:boolean ;
   webvowl:umlBoxMinHeight 30 ;

@@ -17,10 +17,11 @@
 
 <http://gdsr.roche.com/mods/dft/1704/webvowl>
   rdf:type owl:Ontology ;
+  webvowl:author "Felix Schwagereit"^^xsd:string ;
+  rdfs:comment "This ontology defines a subset of the vocabulary for describing visualization packages for WebVOWL 1.0rc . It also defines rules (in SPIN format) for transforming any OWL/RDFS Ontology into this visualization format. The rules cover only a commonly used subset of OWL/RDFS and only a subset of WebVOWL visualization elements."^^xsd:string ;
   owl:imports <http://spinrdf.org/spl> ;
   owl:imports <http://topbraid.org/spin/spinmapl> ;
   owl:imports <http://www.w3.org/2004/02/skos/core> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
 .
 webvowl:Annotation
   rdf:type owl:Class ;
@@ -49,6 +50,36 @@ webvowl:CardinalityPlacementPROPERTY
 .
 webvowl:Class
   rdf:type owl:Class ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object "true"^^xsd:boolean ;
+            sp:predicate webvowl:isReferenceClass ;
+            sp:subject spin:_this ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object webvowl:Class ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:NotExists ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "v"^^xsd:string ;
+                    ] ;
+                  sp:predicate webvowl:isBusinessEntity ;
+                  sp:subject spin:_this ;
+                ]
+              ) ;
+          ]
+        ) ;
+      rdfs:comment "Annotate all non Business Entites as Reference Class"^^xsd:string ;
+    ] ;
   rdfs:label "Class"^^xsd:string ;
 .
 webvowl:Construct_1
@@ -397,40 +428,69 @@ webvowl:classType
 .
 webvowl:color
   rdf:type owl:DatatypeProperty ;
-  rdfs:domain webvowl:Class ;
-  rdfs:domain owl:Class ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          owl:Class
+        ) ;
+    ] ;
   rdfs:label "Color"^^xsd:string ;
   rdfs:range xsd:string ;
 .
 webvowl:content
   rdf:type owl:DatatypeProperty ;
-  rdfs:domain webvowl:Annotation ;
-  rdfs:domain webvowl:Description ;
-  rdfs:domain webvowl:Label ;
-  rdfs:domain webvowl:Title ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Annotation
+          webvowl:Description
+          webvowl:Label
+          webvowl:Title
+        ) ;
+    ] ;
   rdfs:label "Content"^^xsd:string ;
   rdfs:range xsd:string ;
 .
 webvowl:contentLanguage
   rdf:type owl:ObjectProperty ;
-  rdfs:domain webvowl:Annotation ;
-  rdfs:domain webvowl:Description ;
-  rdfs:domain webvowl:Label ;
-  rdfs:domain webvowl:Title ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Annotation
+          webvowl:Description
+          webvowl:Label
+          webvowl:Title
+        ) ;
+    ] ;
   rdfs:label "Content Language"^^xsd:string ;
   rdfs:range webvowl:Language ;
 .
 webvowl:coordinateX
   rdf:type owl:DatatypeProperty ;
-  rdfs:domain webvowl:Class ;
-  rdfs:domain owl:Class ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          owl:Class
+          webvowl:Datatype
+          webvowl:Property
+        ) ;
+    ] ;
   rdfs:label "Coordinate X"^^xsd:string ;
   rdfs:range xsd:decimal ;
 .
 webvowl:coordinateY
   rdf:type owl:DatatypeProperty ;
-  rdfs:domain webvowl:Class ;
-  rdfs:domain owl:Class ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          owl:Class
+          webvowl:Datatype
+          webvowl:Property
+        ) ;
+    ] ;
   rdfs:label "Coordinate Y"^^xsd:string ;
   rdfs:range xsd:decimal ;
 .
@@ -524,10 +584,15 @@ webvowl:headerTitle
 .
 webvowl:iri
   rdf:type owl:DatatypeProperty ;
-  rdfs:domain webvowl:Class ;
-  rdfs:domain webvowl:Datatype ;
-  rdfs:domain webvowl:Header ;
-  rdfs:domain webvowl:Property ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          webvowl:Datatype
+          webvowl:Header
+          webvowl:Property
+        ) ;
+    ] ;
   rdfs:label "IRI"^^xsd:string ;
   rdfs:range xsd:anyURI ;
 .
@@ -535,17 +600,40 @@ webvowl:iri-based
   rdf:type webvowl:Language ;
   webvowl:languageLabel "IRI-based"^^xsd:string ;
 .
+webvowl:isBusinessEntity
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "If a class is also a Business Entity, i.e. of Business relevance it usually is not a Reference Class."^^xsd:string ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          owl:Class
+        ) ;
+    ] ;
+  rdfs:label "Is Business Entity"^^xsd:string ;
+  rdfs:range xsd:boolean ;
+.
 webvowl:isExternal
   rdf:type owl:DatatypeProperty ;
-  rdfs:domain webvowl:Class ;
-  rdfs:domain owl:Class ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          owl:Class
+        ) ;
+    ] ;
   rdfs:label "Is External Element"^^xsd:string ;
   rdfs:range xsd:boolean ;
 .
 webvowl:isReferenceClass
   rdf:type owl:DatatypeProperty ;
-  rdfs:domain webvowl:Class ;
-  rdfs:domain owl:Class ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          owl:Class
+        ) ;
+    ] ;
   rdfs:label "Is Reference Class"^^xsd:string ;
   rdfs:range xsd:boolean ;
 .
@@ -607,6 +695,13 @@ webvowl:minMagnification
   rdfs:domain webvowl:OptionSet ;
   rdfs:label "minMagnification" ;
   rdfs:range xsd:float ;
+.
+webvowl:nodeCountLimitForAutoEnabling
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "It defines the threshhold of nodes in the model that trigger automated collapsing of nodes when the number of nodes is above (or equal) the threshold."^^xsd:string ;
+  rdfs:domain webvowl:OptionSet ;
+  rdfs:label "nodeCountLimitForAutoEnabling"^^xsd:string ;
+  rdfs:range xsd:integer ;
 .
 webvowl:objectPropertyFilterEnabled
   rdf:type owl:DatatypeProperty ;
@@ -1179,6 +1274,156 @@ owl:Class
           ]
         ) ;
       rdfs:comment "Create Individuals for owl:Class (s)"^^xsd:string ;
+    ] ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object webvowl:Property ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "propIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:propertyTypeSubclassOf ;
+            sp:predicate webvowl:propertyType ;
+            sp:subject [
+                sp:varName "propIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate webvowl:domain ;
+            sp:subject [
+                sp:varName "propIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "superclass"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:range ;
+            sp:subject [
+                sp:varName "propIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:genericSubClassIRILabel ;
+            sp:predicate webvowl:label ;
+            sp:subject [
+                sp:varName "propIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:Label ;
+            sp:predicate rdf:type ;
+            sp:subject webvowl:genericSubClassIRILabel ;
+          ]
+          [
+            sp:object webvowl:iri-based ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject webvowl:genericSubClassIRILabel ;
+          ]
+          [
+            sp:object "Subclass Of"^^xsd:string ;
+            sp:predicate webvowl:content ;
+            sp:subject webvowl:genericSubClassIRILabel ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object owl:Class ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type afn:localname ;
+                sp:arg1 spin:_this ;
+              ] ;
+            sp:variable [
+                sp:varName "localname"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:FocalOntology ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "fo"^^xsd:string ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:contains ;
+                sp:arg1 [
+                    rdf:type xsd:string ;
+                    sp:arg1 spin:_this ;
+                  ] ;
+                sp:arg2 [
+                    rdf:type xsd:string ;
+                    sp:arg1 [
+                        sp:varName "fo"^^xsd:string ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "superclass"^^xsd:string ;
+              ] ;
+            sp:predicate rdfs:subClassOf ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:NotExists ;
+            sp:elements (
+                [
+                  sp:object owl:Restriction ;
+                  sp:predicate rdf:type ;
+                  sp:subject [
+                      sp:varName "superclass"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:ne ;
+                sp:arg1 [
+                    sp:varName "superclass"^^xsd:string ;
+                  ] ;
+                sp:arg2 owl:Thing ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type sp:iri ;
+                sp:arg1 [
+                    rdf:type sp:concat ;
+                    sp:arg1 [
+                        rdf:type xsd:string ;
+                        sp:arg1 spin:_this ;
+                      ] ;
+                    sp:arg2 [
+                        rdf:type afn:localname ;
+                        sp:arg1 [
+                            sp:varName "superclass"^^xsd:string ;
+                          ] ;
+                      ] ;
+                    sp:arg3 "SuperclassProp" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "propIri"^^xsd:string ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "Create subClass Property for Class"^^xsd:string ;
     ] ;
 .
 owl:DatatypeProperty
@@ -2225,13 +2470,6 @@ owl:ObjectProperty
             sp:subject [
                 sp:varName "definitionIri"^^xsd:string ;
               ] ;
-          ]
-          [
-            sp:object [
-                sp:varName "range"^^xsd:string ;
-              ] ;
-            sp:predicate webvowl:range ;
-            sp:subject spin:_this ;
           ]
         ) ;
       sp:where (
