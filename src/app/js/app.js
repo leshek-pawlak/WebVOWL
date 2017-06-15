@@ -173,7 +173,7 @@ module.exports = function () {
 		modeMenu.setup(pickAndPin, nodeScalingSwitch, compactNotationSwitch, colorExternalsSwitch);
 		pauseMenu.setup();
 		styleMenu.setup();
-		sidebar.setup();
+		sidebar.setup(tagFilter);
 		ontologyMenu.setup(loadOntologyFromText);
 		resetMenu.setup([gravityMenu, filterMenu, modeMenu, focuser, selectionDetailDisplayer, pauseMenu, segmentsMenu, styleMenu]);
 		searchMenu.setup();

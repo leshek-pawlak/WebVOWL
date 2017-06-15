@@ -15,6 +15,7 @@ module.exports = function (graph) {
 		selectedProperties = [],
 		properties = [],
 		values = {},
+		filter,
 	// Required for reloading when the language changes
 		ontologyInfo,
 		lastSelectedElement;
@@ -76,9 +77,19 @@ module.exports = function (graph) {
 				selectedProperties.splice(index, 1);
 				// if we delete nameSelector we should remove all selected values in second selector
 				for (var ns = 0; ns < values[element.detail.value].length; ns++) {
+					filter.addTag(values[element.detail.value][ns].value);
 					valueSelector.removeItemsByValue(values[element.detail.value][ns].value);
 				}
 				manageValueSelector();
+				graph.update();
+			});
+			valueSelector.passedElement.addEventListener('addItem', function(element) {
+				filter.removeTag(element.detail.value);
+				graph.update();
+			});
+			valueSelector.passedElement.addEventListener('removeItem', function(element) {
+				filter.addTag(element.detail.value);
+				graph.update();
 			});
 			valueSelector.disable();
 			// set all values selected on the beginning
@@ -91,8 +102,10 @@ module.exports = function (graph) {
 	/**
 	 * Setup the menu bar.
 	 */
-	sidebar.setup = function () {
+	sidebar.setup = function (tagFilter) {
+		filter = tagFilter;
 		setupCollapsing();
+		addDimensionsFilter('#dimensionsFilter');
 	};
 
 	function setupCollapsing() {
@@ -127,8 +140,6 @@ module.exports = function (graph) {
 				selectedTrigger.classed("accordion-trigger-active", true);
 			}
 		});
-
-		addDimensionsFilter('#dimensionsFilter');
 	}
 
 	sidebar.clearOntologyInformation= function(){
