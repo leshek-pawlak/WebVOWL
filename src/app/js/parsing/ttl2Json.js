@@ -254,6 +254,11 @@ module.exports = function() {
       if (classCoordinateY) {
         classAttribute.y = classCoordinateY;
       }
+      // get referenceClass
+      var classReference = getTextValueFromTtl(classes[i], 'webvowl:isReferenceClass');
+      if (classReference) {
+        classAttribute.referenceClass = classReference;
+      }
       // get part of unions
       if (classType === 'owl:unionOf') {
         var partOfUnion = [];
