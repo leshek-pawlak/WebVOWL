@@ -424,6 +424,7 @@ module.exports = function (graphContainerSelector) {
 	};
 
 	graph.load = function () {
+		var sidebar=graph.options().sidebar();
 		force.stop();
 		loadGraphData();
 		refreshGraphData();
@@ -443,6 +444,13 @@ module.exports = function (graphContainerSelector) {
 				// we have to wait to load sidebar
 				centerOnElementFromUrl();
 			});
+		}
+		if (graph.options().data()) {
+			sidebar.resetDimensions();
+		} else {
+			setTimeout(function() {
+				sidebar.resetDimensions();
+			}, 1000);
 		}
 	};
 

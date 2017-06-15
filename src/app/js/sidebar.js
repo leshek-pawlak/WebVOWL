@@ -10,11 +10,11 @@ module.exports = function (graph) {
 		languageTools = webvowl.util.languageTools(),
 		elementTools = webvowl.util.elementTools(),
 	// Dimensions filter
-		nameSelector = initChoices('#nameDimensionFilter', 'Dimension names '),
-		valueSelector = initChoices('#valueDimensionFilter', 'Dimension values '),
-		selectedProperties = [],
-		properties = [],
-		values = {},
+		nameSelector,
+		valueSelector,
+		selectedProperties,
+		properties,
+		values,
 		filter,
 	// Required for reloading when the language changes
 		ontologyInfo,
@@ -55,18 +55,39 @@ module.exports = function (graph) {
 	}
 
 	function addDimensionsFilter(selector) {
-		// wait for the data in graph.options
-		setTimeout(function() {
-			var filterDimensions = graph.options().data().filterDimensions;
-			if (filterDimensions) {
-				for (var fd = 0; fd < filterDimensions.length; fd++) {
-					properties.push({ value: filterDimensions[fd].name, label: filterDimensions[fd].name });
-					values[filterDimensions[fd].name] = [];
-					for (var fdv = 0; fdv < filterDimensions[fd].values.length; fdv++) {
-						values[filterDimensions[fd].name].push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
-					}
+		selectedProperties = [];
+		properties = [];
+		values = {};
+		var filterDimensions = graph.options().data().filterDimensions;
+		if (filterDimensions) {
+			for (var fd = 0; fd < filterDimensions.length; fd++) {
+				properties.push({ value: filterDimensions[fd].name, label: filterDimensions[fd].name });
+				values[filterDimensions[fd].name] = [];
+				for (var fdv = 0; fdv < filterDimensions[fd].values.length; fdv++) {
+					values[filterDimensions[fd].name].push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
 				}
 			}
+		}
+		valueSelector.disable();
+		// set all values selected on the beginning
+		nameSelector.setValue(properties);
+		valueSelector.setChoices([], 'value', 'label', true);
+		valueSelector.setValue(getPossibleValues([]));
+	}
+
+	/**
+	 * Setup the menu bar.
+	 */
+	sidebar.setup = function (tagFilter) {
+		filter = tagFilter;
+		setupCollapsing();
+	};
+
+	sidebar.resetDimensions = function() {
+		if (nameSelector) {
+			nameSelector.clearStore();
+		} else {
+			nameSelector = initChoices('#nameDimensionFilter', 'Dimension names ');
 			nameSelector.passedElement.addEventListener('addItem', function(element) {
 				selectedProperties.push(element.detail.value);
 				manageValueSelector();
@@ -83,6 +104,11 @@ module.exports = function (graph) {
 				manageValueSelector();
 				graph.update();
 			});
+		}
+		if (valueSelector) {
+			valueSelector.clearStore();
+		} else {
+			valueSelector = initChoices('#valueDimensionFilter', 'Dimension values ');
 			valueSelector.passedElement.addEventListener('addItem', function(element) {
 				filter.removeTag(element.detail.value);
 				graph.update();
@@ -91,22 +117,9 @@ module.exports = function (graph) {
 				filter.addTag(element.detail.value);
 				graph.update();
 			});
-			valueSelector.disable();
-			// set all values selected on the beginning
-			nameSelector.setValue(properties);
-			valueSelector.setChoices([], 'value', 'label', true);
-			valueSelector.setValue(getPossibleValues([]));
-		}, 1000);
-	}
-
-	/**
-	 * Setup the menu bar.
-	 */
-	sidebar.setup = function (tagFilter) {
-		filter = tagFilter;
-		setupCollapsing();
+		}
 		addDimensionsFilter('#dimensionsFilter');
-	};
+	}
 
 	function setupCollapsing() {
 		// adapted version of this example: http://www.normansblog.de/simple-jquery-accordion/
