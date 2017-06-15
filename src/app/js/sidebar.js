@@ -26,9 +26,7 @@ module.exports = function (graph) {
 	  });
 	}
 
-	function manageValueSelector() {
-		// get already selected values
-		var selected = valueSelector.getValue(true);
+	function getPossibleValues(selected) {
 		// add to value selector values from selectedProperties
 		var valueSelectorChoices = [];
 		for (var sp = 0; sp < selectedProperties.length; sp++) {
@@ -38,6 +36,14 @@ module.exports = function (graph) {
 				}
 			}
 		}
+
+		return valueSelectorChoices;
+	}
+
+	function manageValueSelector() {
+		// get already selected values
+		var selected = valueSelector.getValue(true);
+		var valueSelectorChoices = getPossibleValues(selected);
 		valueSelector.setChoices(valueSelectorChoices, 'value', 'label', true);
 		// if selector is empty just disable it.
 		if (valueSelectorChoices.length > 0 || selected.length > 0) {
@@ -60,7 +66,6 @@ module.exports = function (graph) {
 					}
 				}
 			}
-			nameSelector.setChoices(properties, 'value', 'label', false);
 			nameSelector.passedElement.addEventListener('addItem', function(element) {
 				selectedProperties.push(element.detail.value);
 				manageValueSelector();
@@ -76,6 +81,10 @@ module.exports = function (graph) {
 				manageValueSelector();
 			});
 			valueSelector.disable();
+			// set all values selected on the beginning
+			nameSelector.setValue(properties);
+			valueSelector.setChoices([], 'value', 'label', true);
+			valueSelector.setValue(getPossibleValues([]));
 		}, 1000);
 	}
 
