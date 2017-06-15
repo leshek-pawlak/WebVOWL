@@ -27,16 +27,20 @@ module.exports = function (graph) {
 	}
 
 	function manageValueSelector() {
+		// get already selected values
+		var selected = valueSelector.getValue(true);
 		// add to value selector values from selectedProperties
 		var valueSelectorChoices = [];
 		for (var sp = 0; sp < selectedProperties.length; sp++) {
 			for (var spv = 0; spv < values[selectedProperties[sp]].length; spv++) {
-				valueSelectorChoices.push(values[selectedProperties[sp]][spv]);
+				if (selected.indexOf(values[selectedProperties[sp]][spv].value) === -1) {
+					valueSelectorChoices.push(values[selectedProperties[sp]][spv]);
+				}
 			}
 		}
 		valueSelector.setChoices(valueSelectorChoices, 'value', 'label', true);
 		// if selector is empty just disable it.
-		if (valueSelectorChoices.length > 0) {
+		if (valueSelectorChoices.length > 0 || selected.length > 0) {
 			valueSelector.enable();
 		} else {
 			valueSelector.disable();

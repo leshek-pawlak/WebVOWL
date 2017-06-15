@@ -66,13 +66,13 @@ module.exports = function (graph) {
 		var i;
 		if (graph.options().graphStyle() === 'boxes') {
 			for (i = 0; i < labelDictionary.length; i++) {
-				var isHidden = true;
+				var rectElement, isHidden = true;
 				if (labelDictionary[i].labelElement) {
 					// check if link range element has property referenceClass on true
 					isHidden = labelDictionary[i].range().referenceClass || labelDictionary[i].range().type().indexOf('Datatype') > -1;
 					// if the range element has referenceClass add its label, but id take from parent class
 					if (isHidden) {
-						var rectElement = labelDictionary[i].domain().nodeElement().select('g[id="' + labelDictionary[i].range().id() + '"] rect');
+						rectElement = labelDictionary[i].domain().nodeElement().select('g[id="' + labelDictionary[i].range().id() + '"] rect');
 						addLabelsForAllLanguages(labelDictionary[i], labelDictionary[i].domain().id(), idList, stringList, rectElement);
 						addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].domain().id(), idList, stringList, rectElement);
 					}
@@ -81,7 +81,7 @@ module.exports = function (graph) {
 					isHidden = labelDictionary[i].nodeElement().classed('hidden');
 					// if the node is referenceClass - add label with id of parent class if it's not a referenceClass too.
 					if (isHidden && !labelDictionary[i].links()[0].domain().referenceClass) {
-						var rectElement = labelDictionary[i].links()[0].domain().nodeElement().select('g[id="' + labelDictionary[i].links()[0].range().id() + '"] rect');
+						rectElement = labelDictionary[i].links()[0].domain().nodeElement().select('g[id="' + labelDictionary[i].links()[0].range().id() + '"] rect');
 						addLabelsForAllLanguages(labelDictionary[i], labelDictionary[i].links()[0].domain().id(), idList, stringList, rectElement);
 						addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].links()[0].domain().id(), idList, stringList, rectElement);
 					}
@@ -90,7 +90,7 @@ module.exports = function (graph) {
 				if (!isHidden) {
 					var element = labelDictionary[i].nodeElement ? labelDictionary[i].nodeElement() : labelDictionary[i].labelElement();
 					if (element) {
-						var rectElement = element.select('g[id="' + labelDictionary[i].id() + '"] rect');
+						rectElement = element.select('g[id="' + labelDictionary[i].id() + '"] rect');
 						addLabelsForAllLanguages(labelDictionary[i], labelDictionary[i].id(), idList, stringList, rectElement);
 						addIndividualsToDictionary(labelDictionary[i], labelDictionary[i].id(), idList, stringList, rectElement);
 					}
