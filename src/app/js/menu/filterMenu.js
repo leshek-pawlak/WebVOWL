@@ -6,25 +6,12 @@
  */
 module.exports = function (graph) {
 
-	var Choices = require('choices.js/assets/scripts/dist/choices.js'),
-		filterMenu = {},
+	var filterMenu = {},
 		checkboxData = [],
-		selectedProperties = [],
 		menuElement = d3.select("#filterOption a"),
 		nodeDegreeContainer = d3.select("#nodeDegreeFilteringOption"),
-		nameSelector = initChoices('#namePropFilter', 'Prop names '),
-		valueSelector = initChoices('#valuePropFilter', 'Prop values '),
 		graphDegreeLevel,
-		degreeSlider,
-		properties = [],
-		values = {};
-
-	function initChoices(selector, placeholder) {
-		return new Choices(selector, {
-	    removeItemButton: true,
-			placeholderValue: placeholder
-	  });
-	}
+		degreeSlider;
 
 	/** some getter function  **/
 	filterMenu.getCheckBoxContainer = function () {
@@ -60,58 +47,7 @@ module.exports = function (graph) {
 		addFilterItem(setOperatorFilter, "setoperator", "Set operators", "#setOperatorFilteringOption");
 
 		addNodeDegreeFilter(nodeDegreeFilter, nodeDegreeContainer);
-
-		addRuleFilter('#propFilter');
 	};
-
-	function manageValueSelector() {
-		// add to value selector values from selectedProperties
-		var valueSelectorChoices = [];
-		for (var sp = 0; sp < selectedProperties.length; sp++) {
-			for (var spv = 0; spv < values[selectedProperties[sp]].length; spv++) {
-				valueSelectorChoices.push(values[selectedProperties[sp]][spv]);
-			}
-		}
-		valueSelector.setChoices(valueSelectorChoices, 'value', 'label', true);
-		// if selector is empty just disable it.
-		if (valueSelectorChoices.length > 0) {
-			valueSelector.enable();
-		} else {
-			valueSelector.disable();
-		}
-	}
-
-	function addRuleFilter(selector) {
-		// wait for the data in graph.options
-		setTimeout(function() {
-			var filterDimensions = graph.options().data().filterDimensions;
-			if (filterDimensions) {
-				for (var fd = 0; fd < filterDimensions.length; fd++) {
-					properties.push({ value: filterDimensions[fd].name, label: filterDimensions[fd].name });
-					values[filterDimensions[fd].name] = [];
-					for (var fdv = 0; fdv < filterDimensions[fd].values.length; fdv++) {
-						values[filterDimensions[fd].name].push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
-					}
-				}
-			}
-			nameSelector.setChoices(properties, 'value', 'label', false);
-			nameSelector.passedElement.addEventListener('addItem', function(element) {
-				selectedProperties.push(element.detail.value);
-				manageValueSelector();
-			});
-			nameSelector.passedElement.addEventListener('removeItem', function(element) {
-				// remove it from selectedProperties
-				var index = selectedProperties.indexOf(element.detail.value);
-				selectedProperties.splice(index, 1);
-				// if we delete nameSelector we should remove all selected values in second selector
-				for (var ns = 0; ns < values[element.detail.value].length; ns++) {
-					valueSelector.removeItemsByValue(values[element.detail.value][ns].value);
-				}
-				manageValueSelector();
-			});
-			valueSelector.disable();
-		}, 1000);
-	}
 
 	function addFilterItem(filter, identifier, pluralNameOfFilteredItems, selector) {
 		var filterContainer,

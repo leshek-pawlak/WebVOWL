@@ -98,6 +98,15 @@
 					<p><span>Select an element in the visualization.</span></p>
 				</div>
 			</div>
+			<h3 class="accordion-trigger" id="dimensions-filter-trigger">Filter by dimensions</h3>
+			<div class="accordion-container" id="dimensions-filter">
+				<div class="dimensionsFilter" id="dimensionsFilter">
+					<div class="selectContainer">
+						<select multiple id="nameDimensionFilter"></select>
+						<select multiple id="valueDimensionFilter"></select>
+					</div>
+				</div>
+			</div>
 		</section>
 	</aside>
 	<nav id="optionsArea">
@@ -133,15 +142,6 @@
 				<ul class="toolTipMenu filter">
 					<li class="toggleOption" id="datatypeFilteringOption"></li>
 					<li class="toggleOption" id="objectPropertyFilteringOption"></li>
-					<li class="propFilter" id="propFilter">
-						<div>
-							<p>Filter by properties</p>
-							<div class="selectContainer">
-								<select multiple id="namePropFilter"></select>
-								<select multiple id="valuePropFilter"></select>
-							</div>
-						</div>
-					</li>
 					<li class="toggleOption" id="subclassFilteringOption"></li>
 					<li class="toggleOption" id="disjointFilteringOption"></li>
 					<li class="toggleOption" id="setOperatorFilteringOption"></li>

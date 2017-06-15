@@ -5,13 +5,75 @@
  */
 module.exports = function (graph) {
 
-	var sidebar = {},
+	var Choices = require('choices.js/assets/scripts/dist/choices.js'),
+		sidebar = {},
 		languageTools = webvowl.util.languageTools(),
 		elementTools = webvowl.util.elementTools(),
+	// Dimensions filter
+		nameSelector = initChoices('#nameDimensionFilter', 'Dimension names '),
+		valueSelector = initChoices('#valueDimensionFilter', 'Dimension values '),
+		selectedProperties = [],
+		properties = [],
+		values = {},
 	// Required for reloading when the language changes
 		ontologyInfo,
 		lastSelectedElement;
 
+	function initChoices(selector, placeholder) {
+		return new Choices(selector, {
+	    removeItemButton: true,
+			placeholderValue: placeholder
+	  });
+	}
+
+	function manageValueSelector() {
+		// add to value selector values from selectedProperties
+		var valueSelectorChoices = [];
+		for (var sp = 0; sp < selectedProperties.length; sp++) {
+			for (var spv = 0; spv < values[selectedProperties[sp]].length; spv++) {
+				valueSelectorChoices.push(values[selectedProperties[sp]][spv]);
+			}
+		}
+		valueSelector.setChoices(valueSelectorChoices, 'value', 'label', true);
+		// if selector is empty just disable it.
+		if (valueSelectorChoices.length > 0) {
+			valueSelector.enable();
+		} else {
+			valueSelector.disable();
+		}
+	}
+
+	function addDimensionsFilter(selector) {
+		// wait for the data in graph.options
+		setTimeout(function() {
+			var filterDimensions = graph.options().data().filterDimensions;
+			if (filterDimensions) {
+				for (var fd = 0; fd < filterDimensions.length; fd++) {
+					properties.push({ value: filterDimensions[fd].name, label: filterDimensions[fd].name });
+					values[filterDimensions[fd].name] = [];
+					for (var fdv = 0; fdv < filterDimensions[fd].values.length; fdv++) {
+						values[filterDimensions[fd].name].push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
+					}
+				}
+			}
+			nameSelector.setChoices(properties, 'value', 'label', false);
+			nameSelector.passedElement.addEventListener('addItem', function(element) {
+				selectedProperties.push(element.detail.value);
+				manageValueSelector();
+			});
+			nameSelector.passedElement.addEventListener('removeItem', function(element) {
+				// remove it from selectedProperties
+				var index = selectedProperties.indexOf(element.detail.value);
+				selectedProperties.splice(index, 1);
+				// if we delete nameSelector we should remove all selected values in second selector
+				for (var ns = 0; ns < values[element.detail.value].length; ns++) {
+					valueSelector.removeItemsByValue(values[element.detail.value][ns].value);
+				}
+				manageValueSelector();
+			});
+			valueSelector.disable();
+		}, 1000);
+	}
 
 	/**
 	 * Setup the menu bar.
@@ -52,6 +114,8 @@ module.exports = function (graph) {
 				selectedTrigger.classed("accordion-trigger-active", true);
 			}
 		});
+
+		addDimensionsFilter('#dimensionsFilter');
 	}
 
 	sidebar.clearOntologyInformation= function(){
