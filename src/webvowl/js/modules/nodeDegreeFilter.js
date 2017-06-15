@@ -13,7 +13,7 @@ module.exports = function (menu) {
 		degreeGetter,
 		degreeSetter;
 
-	var NODE_COUNT_LIMIT_FOR_AUTO_ENABLING = 50;
+	var NODE_COUNT_LIMIT_FOR_AUTO_ENABLING = 100;
 
 
 	filter.initialize = function (nodes, properties) {
