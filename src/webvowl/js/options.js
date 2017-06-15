@@ -44,7 +44,8 @@ module.exports = function () {
 		centerOnLoad = true,
 		centerOnFoundElement = true,
 		addIriCenterToUrl = true,
-		addIndividualsToDictionary = true;
+		addIndividualsToDictionary = true,
+		nodeCountLimitForAutoEnabling = 50;
 
 	options.sidebar= function(s){
 		if (!arguments.length) return sidebar;
@@ -309,6 +310,12 @@ module.exports = function () {
 	options.addIndividualsToDictionary = function (p) {
 		if (!arguments.length) return addIndividualsToDictionary;
 		addIndividualsToDictionary = p;
+		return options;
+	};
+
+	options.nodeCountLimitForAutoEnabling = function (p) {
+		if (!arguments.length) return nodeCountLimitForAutoEnabling;
+		nodeCountLimitForAutoEnabling = p;
 		return options;
 	};
 

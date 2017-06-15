@@ -1,7 +1,7 @@
 var elementTools = require("../util/elementTools")();
 var filterTools = require("../util/filterTools")();
 
-module.exports = function (menu) {
+module.exports = function (menu, graph) {
 
 	var filter = {},
 		nodes,
@@ -12,9 +12,6 @@ module.exports = function (menu) {
 		maxDegreeSetter,
 		degreeGetter,
 		degreeSetter;
-
-	var NODE_COUNT_LIMIT_FOR_AUTO_ENABLING = 100;
-
 
 	filter.initialize = function (nodes, properties) {
 		var maxLinkCount = findMaxLinkCount(nodes);
@@ -36,7 +33,7 @@ module.exports = function (menu) {
 		for (var degree = 0; degree < maxDegree; degree++) {
 			var filteredData = filterByNodeDegree(nodes, properties, degree);
 
-			if (filteredData.nodes.length <= NODE_COUNT_LIMIT_FOR_AUTO_ENABLING) {
+			if (filteredData.nodes.length <= graph.options().nodeCountLimitForAutoEnabling()) {
 				return degree;
 			}
 		}
