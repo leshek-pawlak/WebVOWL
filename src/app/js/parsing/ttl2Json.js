@@ -227,8 +227,8 @@ module.exports = function() {
       // get iri
       var classIri = getTextValueFromTtl(classes[i], 'webvowl:iri');
       // get coordinates
-      var classCoordinateX = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateX').clean()[0]);
-      var classCoordinateY = getTextValue(store.getObjects(classes[i], 'webvowl:coordinateY').clean()[0]);
+      var classCoordinateX = parseFloat(getTextValue(store.getObjects(classes[i], 'webvowl:coordinateX').clean()[0]), 10);
+      var classCoordinateY = parseFloat(getTextValue(store.getObjects(classes[i], 'webvowl:coordinateY').clean()[0]), 10);
       // get classTypes
       var classTypeIRI = store.getObjects(classes[i], 'webvowl:classType').clean()[0];
       var classType = getTextValue(store.getObjects(classTypeIRI, 'webvowl:typeLabel').clean()[0]);
@@ -288,8 +288,8 @@ module.exports = function() {
       // add label
       var datatypeLabelObject = getLabels(datatypes[d], languageLabels);
       // get coordinates
-      var datatypeCoordinateX = getTextValue(store.getObjects(datatypes[d], 'webvowl:coordinateX').clean()[0]);
-      var datatypeCoordinateY = getTextValue(store.getObjects(datatypes[d], 'webvowl:coordinateY').clean()[0]);
+      var datatypeCoordinateX = parseFloat(getTextValue(store.getObjects(datatypes[d], 'webvowl:coordinateX').clean()[0]), 10);
+      var datatypeCoordinateY = parseFloat(getTextValue(store.getObjects(datatypes[d], 'webvowl:coordinateY').clean()[0]), 10);
       var datatypeAttribute = {
         id: datatypes[d],
         label: datatypeLabelObject,
