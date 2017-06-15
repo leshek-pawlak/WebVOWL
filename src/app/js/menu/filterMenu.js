@@ -9,13 +9,15 @@ module.exports = function (graph) {
 	var Choices = require('choices.js/assets/scripts/dist/choices.js'),
 		filterMenu = {},
 		checkboxData = [],
-		selectedPropFilter = { 'name': null, 'value': null },
+		selectedProperties = [],
 		menuElement = d3.select("#filterOption a"),
 		nodeDegreeContainer = d3.select("#nodeDegreeFilteringOption"),
 		nameSelector = initChoices('#namePropFilter', 'Prop names '),
 		valueSelector = initChoices('#valuePropFilter', 'Prop values '),
 		graphDegreeLevel,
-		degreeSlider;
+		degreeSlider,
+		properties = [],
+		values = {};
 
 	function initChoices(selector, placeholder) {
 		return new Choices(selector, {
@@ -62,55 +64,52 @@ module.exports = function (graph) {
 		addRuleFilter('#propFilter');
 	};
 
-	function addToActiveFilters() {
-		// add filter to the list of active filters
-		var newActiveFilter = d3.select('#activePropFilters');
-		var container = newActiveFilter.append('div').classed('activeFilter', true).attr('id', 'filter_' + Date.now());
-		container.append('span').classed('name', true).text(selectedPropFilter.name);
-		container.append('span').classed('value', true).text(selectedPropFilter.value);
-		container.append('a').text('X').on('click', function() {
-			// remove cliked node from DOM
-			newActiveFilter.select('#' + this.parentNode.id).remove();
-		});
-		// reset select values
-		selectedPropFilter = { 'name': null, 'value': null };
-		nameSelector.property('value', '');
-		valueSelector.property('value', '');
+	function manageValueSelector() {
+		// add to value selector values from selectedProperties
+		var valueSelectorChoices = [];
+		for (var sp = 0; sp < selectedProperties.length; sp++) {
+			for (var spv = 0; spv < values[selectedProperties[sp]].length; spv++) {
+				valueSelectorChoices.push(values[selectedProperties[sp]][spv]);
+			}
+		}
+		valueSelector.setChoices(valueSelectorChoices, 'value', 'label', true);
+		// if selector is empty just disable it.
+		if (valueSelectorChoices.length > 0) {
+			valueSelector.enable();
+		} else {
+			valueSelector.disable();
+		}
 	}
 
 	function addRuleFilter(selector) {
-		var properties = [],
-			values = [];
-
 		// wait for the data in graph.options
 		setTimeout(function() {
 			var filterDimensions = graph.options().data().filterDimensions;
 			if (filterDimensions) {
 				for (var fd = 0; fd < filterDimensions.length; fd++) {
 					properties.push({ value: filterDimensions[fd].name, label: filterDimensions[fd].name });
-					values.push({
-						id: fd,
-						label: filterDimensions[fd].name,
-						disabled: true,
-						choices: []
-					});
+					values[filterDimensions[fd].name] = [];
 					for (var fdv = 0; fdv < filterDimensions[fd].values.length; fdv++) {
-						values[values.length - 1].choices.push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
+						values[filterDimensions[fd].name].push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
 					}
 				}
 			}
-			// console.log('values', values);
 			nameSelector.setChoices(properties, 'value', 'label', false);
 			nameSelector.passedElement.addEventListener('addItem', function(element) {
-				// console.log('change', element);
-				// selectedPropFilter[this.id.replace('PropFilter', '')] = value;
-				// if (selectedPropFilter.name && selectedPropFilter.value) {
-				// 	addToActiveFilters();
-				// }
-				// valueSelector.enable();
+				selectedProperties.push(element.detail.value);
+				manageValueSelector();
 			});
-			valueSelector.setChoices(values, 'value', 'label', false);
-			// valueSelector.disable();
+			nameSelector.passedElement.addEventListener('removeItem', function(element) {
+				// remove it from selectedProperties
+				var index = selectedProperties.indexOf(element.detail.value);
+				selectedProperties.splice(index, 1);
+				// if we delete nameSelector we should remove all selected values in second selector
+				for (var ns = 0; ns < values[element.detail.value].length; ns++) {
+					valueSelector.removeItemsByValue(values[element.detail.value][ns].value);
+				}
+				manageValueSelector();
+			});
+			valueSelector.disable();
 		}, 1000);
 	}
 
