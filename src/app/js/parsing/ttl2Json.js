@@ -51,7 +51,7 @@ module.exports = function() {
         domain: domain, // this iri of rule || iri of input class.
         range: range,
       }); // iri of output class || this iri of rule
-      graphJson.property.push({id: id, type: 'relations',});
+      graphJson.property.push({id: id, type: 'relations'});
     }
 
     function getLabels(iri, languageLabels) {
@@ -213,7 +213,7 @@ module.exports = function() {
         ruleAttribute.annotations = ruleAnnotations;
       }
       // add rule to "class" in the final json
-      graphJson.class.push({id: ruleId, type: 'rule',});
+      graphJson.class.push({id: ruleId, type: 'rule'});
       // add rule to "classAttribute" in the final json
       graphJson.classAttribute.push(ruleAttribute);
     }
@@ -285,13 +285,19 @@ module.exports = function() {
         }
         classAttribute.union = partOfUnion;
       }
+      // if it's external change some things
+      var isExternal = getTextValueFromTtl(classes[i], 'webvowl:isExternal');
+      if (isExternal) {
+        classAttribute.attributes = [ 'external' ];
+        classType = 'externalclass';
+      }
       // get annotations
       var classAnnotations = getAnnotations(classes[i], languageLabels);
       if (Object.keys(classAnnotations).length > 0) {
         classAttribute.annotations = classAnnotations;
       }
       // add class to "class" in the final json
-      graphJson.class.push({id: classes[i], type: classType,});
+      graphJson.class.push({id: classes[i], type: classType});
       // add class to "classAttribute" in the final json
       graphJson.classAttribute.push(classAttribute);
     }
@@ -324,7 +330,7 @@ module.exports = function() {
         datatypeAttribute.y = datatypeCoordinateY;
       }
       // add datatype to "datatype" in the final json
-      graphJson.datatype.push({id: datatypes[d], type: datatypeType,});
+      graphJson.datatype.push({id: datatypes[d], type: datatypeType});
       // add datatype to "datatypeAttribute" in the final json
       graphJson.datatypeAttribute.push(datatypeAttribute);
     }
@@ -346,7 +352,7 @@ module.exports = function() {
       // add domain
       var domainID = getTextValueFromTtl(properties[p], 'webvowl:domain');
       // add datatype to "datatype" in the final json
-      graphJson.property.push({id: properties[p], type: propertyType,});
+      graphJson.property.push({id: properties[p], type: propertyType});
       // add datatype to "datatypeAttribute" in the final json
       var propertyAttribute = {
         id: properties[p],
