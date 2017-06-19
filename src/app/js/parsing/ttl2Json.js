@@ -287,7 +287,7 @@ module.exports = function() {
       }
       // if it's external change some things
       var isExternal = getTextValueFromTtl(classes[i], 'webvowl:isExternal');
-      if (isExternal) {
+      if (isExternal === 'true') {
         classAttribute.attributes = [ 'external' ];
         classType = 'externalclass';
       }

@@ -148,6 +148,9 @@ module.exports = function (graph) {
 	 * For example the pin of the pick&pin module should be invisible in the exported graphic.
 	 */
 	function hideNonExportableElements() {
+    if (graph.options().graphStyle() === 'boxes') {
+      d3.selectAll(".hidden").classed("hidden-in-export", true);
+    }
 		d3.selectAll(".hidden-in-export").style("display", "none");
 	}
 
