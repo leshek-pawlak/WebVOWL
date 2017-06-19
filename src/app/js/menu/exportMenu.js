@@ -102,7 +102,7 @@ module.exports = function (graph) {
 		setStyleSensitively(".deprecated, .deprecatedproperty", [{name: "fill", value: "#ccc"}]);
 		setStyleSensitively(".external, .externalproperty", [{name: "fill", value: "#36c"}]);
 		setStyleSensitively("path, .nofill", [{name: "fill", value: "none"}]);
-		setStyleSensitively("marker path", [{name: "fill", value: "#000"}]);
+		setStyleSensitively("marker path", [{name: "fill", value: "#000"}, {name: "stroke-dasharray", value: "100"}]);
 		setStyleSensitively(".class, path, line, .fineline", [{name: "stroke", value: "#000"}]);
 		setStyleSensitively(".white, .subclass, .subclassproperty, .external + text", [{name: "fill", value: "#fff"}]);
 		setStyleSensitively(".class.hovered, .property.hovered, .cardinality.hovered, .cardinality.focused, circle.pin, .filled.hovered, .filled.focused", [{name: "fill", value: "#f00"}, {name: "cursor", value: "pointer"}]);
@@ -116,7 +116,6 @@ module.exports = function (graph) {
 		setStyleSensitively(".dotted", [{name: "stroke-dasharray", value: "3"}]);
 		setStyleSensitively("rect.focused, circle.focused", [{name: "stroke-width", value: "4px"}]);
 		setStyleSensitively(".nostroke", [{name: "stroke", value: "none"}]);
-		setStyleSensitively("marker path", [{name: "stroke-dasharray", value: "100"}]);
 	}
 
 	function setStyleSensitively(selector, styles) {
@@ -155,7 +154,7 @@ module.exports = function (graph) {
 	}
 
 	function removeVowlInlineStyles() {
-		d3.selectAll(".text, .subtext, .text.instance-count, .external + text .instance-count, .cardinality, .text, .embedded, .class, .object, .disjoint, .objectproperty, .disjointwith, .equivalentproperty, .transitiveproperty, .functionalproperty, .inversefunctionalproperty, .symmetricproperty, .allvaluesfromproperty, .somevaluesfromproperty, .label .datatype, .datatypeproperty, .rdf, .rdfproperty, .literal, .node .datatype, .deprecated, .deprecatedproperty, .external, .externalproperty, path, .nofill, .symbol, .values-from.filled, marker path, .class, path, line, .fineline, .white, .subclass, .subclassproperty, .external + text, .class.hovered, .property.hovered, .cardinality.hovered, .cardinality.focused, circle.pin, .filled.hovered, .filled.focused, .focused, path.hovered, .indirect-highlighting, .feature:hover, .values-from, .class, path, line, .fineline, .dashed, .anonymous, .dotted, rect.focused, circle.focused, .nostroke, marker path")
+		d3.selectAll(".text, .subtext, .external + text .instance-count, .cardinality, .embedded, .class, .object, .disjoint, .objectproperty, .disjointwith, .equivalentproperty, .transitiveproperty, .functionalproperty, .inversefunctionalproperty, .symmetricproperty, .allvaluesfromproperty, .somevaluesfromproperty, .label .datatype, .datatypeproperty, .rdf, .rdfproperty, .literal, .node .datatype, .deprecated, .deprecatedproperty, .external, .externalproperty, path, .nofill, .symbol, marker path, line, .fineline, .white, .subclass, .subclassproperty, .external + text, .property.hovered, circle.pin, .filled.hovered, .focused, .indirect-highlighting, .feature:hover, .values-from, .dashed, .anonymous, .dotted, .nostroke")
 			.each(function () {
 				var element = d3.select(this);
 
