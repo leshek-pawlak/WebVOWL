@@ -1148,6 +1148,16 @@ module.exports = function (graphContainerSelector) {
 			if (isEmbededInsideContainer) {
 				translateY += umlEmbeddedExtraFactor;
 			}
+			if (group.individuals().length > 0) {
+				// add extra space for individuals number
+				translateY += umlBoxTitleHeight;
+			}
+			if (group.type() === 'ExternalClass') {
+				// for externalClass move all texts to bottom
+				translateY += umlEmbeddedExtraFactor;
+				// and change color to white
+				propertyElement.select('text').style('fill', 'white');
+			}
 			// add gap between object and datatype properties.
 			if (!allAreDatatype && propertyElement.attr('class').indexOf('type-data') > -1) {
 				translateY += umlSpaceBetweenProperties;
@@ -1198,13 +1208,20 @@ module.exports = function (graphContainerSelector) {
 		var circleWidth = circle.attr('width') ? parseInt(circle.attr('width')) : container.node().getBoundingClientRect().width;
 		var circleHeight = circle.attr('height') ? parseInt(circle.attr('height')) : container.node().getBoundingClientRect().height;
 		var datatypeProperties = container.countDataypeProperties || 0;
-		// create factors which are needed to compute lines positions
 		var factor = umlBoxTitleHeight;
-		var factor2 = factor + (umlTextHeight * (textLength - datatypeProperties) + umlLineBetweenPropsFactor);
 		// add extra value for containers with embeded inside
 		if (isEmbededInsideContainer) {
 			factor += umlEmbeddedExtraFactor;
 		}
+		// add extra space because of ExternalClass extra line in label
+		if (circle.data()[0].type() === 'ExternalClass') {
+			factor += umlTextHeight;
+		}
+		// add extra space because of individuals number
+		if (circle.data()[0].individuals().length > 0) {
+			factor += umlBoxTitleHeight;
+		}
+		var factor2 = factor + (umlTextHeight * (textLength - datatypeProperties) + umlLineBetweenPropsFactor);
 		// calculate lines positions
 		var x = -(circleWidth / 2);
 		line
