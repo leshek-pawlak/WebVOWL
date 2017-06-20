@@ -10,9 +10,7 @@ module.exports = function (graph) {
 		elementTools = webvowl.util.elementTools(),
 	// Dimensions filter
 		filter,
-    allSegmentsCheckbox,
-    allSegmentsFilteringOptionId = "#allSegmentsFilteringOption",
-    allOptionsWithoutAllSegments = "#segmentsCheckboxes li:not(" + allSegmentsFilteringOptionId + ")",
+    allOptions = "#segmentsCheckboxes li, #segmentsCheckboxes ul",
 	// Required for reloading when the language changes
 		ontologyInfo,
 		lastSelectedElement;
@@ -33,9 +31,11 @@ module.exports = function (graph) {
 			.classed('dimensions-trigger', true)
 			.classed('dimensions-trigger-active', true)
 			.text(label);
-		segments.append("ul")
+		var subMenu = segments.append("ul")
 			.classed('dimensions-container', true)
 			.attr("id", selector);
+
+		addFilterItem(selector + "Segments", "(Select All)", subMenu);
 	}
 
 	function addTagFilterItem(tag, selector) {
@@ -65,12 +65,13 @@ module.exports = function (graph) {
 					.text(tag);
 	}
 
-	function addFilterItem(filter, identifier, pluralNameOfFilteredItems, selector) {
+	function addFilterItem(identifier, pluralNameOfFilteredItems, subMenu) {
 			var filterContainer,
 					filterCheckbox;
 
-			filterContainer = d3.select(selector)
-					.append("div")
+			filterContainer = subMenu
+					.append("li")
+					.classed("toggleOption", true)
 					.classed("checkboxContainer", true);
 
 			filterCheckbox = filterContainer.append("input")
@@ -79,15 +80,14 @@ module.exports = function (graph) {
 					.attr("type", "checkbox")
 					.property("checked", filter.enabled());
 
-			// Store for easier resetting
-			allSegmentsCheckbox = {checkbox: filterCheckbox, defaultState: filter.enabled()};
-
 			filterCheckbox.on("click", function () {
 					// There might be no parameters passed because of a manual
 					// invocation when resetting the filters
 					var isEnabled = filterCheckbox.property("checked");
-
-					d3.selectAll(allOptionsWithoutAllSegments + " input")
+					// get parent ID from clicked element
+					var parentId = filterCheckbox.attr('id').replace('SegmentsFilterCheckbox', '');
+					// for all the inputs under (Select All) set "checked"
+					d3.selectAll('#' + parentId + ' li:not(.checkboxContainer) input')
 							.property("checked", isEnabled)
 							.each(function () {
 									d3.select(this).on("click")();
@@ -102,9 +102,9 @@ module.exports = function (graph) {
 	}
 
 	function resetFilterDimensions() {
-		allSegmentsCheckbox.checkbox
-				.property("checked", allSegmentsCheckbox.defaultState)
-				.on("click")();
+		d3.selectAll('input.filterCheckbox')
+			.property("checked", filter.enabled())
+			.on("click")();
 	};
 
 	function initDimensionsCollapsing(subMenu) {
@@ -121,8 +121,8 @@ module.exports = function (graph) {
 				selectedTrigger.classed("dimensions-trigger-active", false);
 			} else {
 				// Collapse the other trigger ...
-				collapseContainers(d3.selectAll(".dimensions-trigger-active + ul"));
-				activeTriggers.classed("dimensions-trigger-active", false);
+				// collapseContainers(d3.selectAll(".dimensions-trigger-active + ul"));
+				// activeTriggers.classed("dimensions-trigger-active", false);
 				// ... and expand the selected one
 				expandContainers(d3.select(selectedTrigger.node().nextElementSibling));
 				selectedTrigger.classed("dimensions-trigger-active", true);
@@ -130,9 +130,10 @@ module.exports = function (graph) {
 		});
 	}
 	sidebar.init = function(tags) {
-		if (!tags) { return }
-		d3.selectAll(allOptionsWithoutAllSegments).remove();
+		d3.selectAll(allOptions).remove();
 		filter.clear();
+		d3.select('#dimensions-filter-trigger').classed('hidden', !tags);
+		if (!tags) { return }
 
 		tags.forEach(function (tag, key) {
 			var selector = 'filterDimension' + key;
@@ -151,7 +152,6 @@ module.exports = function (graph) {
 	sidebar.setup = function (tagFilter) {
 		filter = tagFilter;
 		setupCollapsing();
-		addFilterItem(tagFilter, "allSegments", "Show all", allSegmentsFilteringOptionId);
 	};
 
 	function setupCollapsing() {
