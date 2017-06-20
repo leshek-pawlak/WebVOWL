@@ -29,8 +29,12 @@ module.exports = function (graph) {
 	function addSubMenu(selector, label) {
 		var segments = d3.select("#segmentsCheckboxes");
 		segments.append("li")
+			.classed(selector + 'Label', true)
+			.classed('dimensions-trigger', true)
+			.classed('dimensions-trigger-active', true)
 			.text(label);
 		segments.append("ul")
+			.classed('dimensions-container', true)
 			.attr("id", selector);
 	}
 
@@ -103,29 +107,27 @@ module.exports = function (graph) {
 				.on("click")();
 	};
 
-	function initDimensionsList(tags) {
+	function initDimensionsCollapsing(subMenu) {
+		// Collapse all inactive triggers on startup
+		collapseContainers(d3.selectAll(".dimensions-trigger:not(.dimensions-trigger-active) + ul"));
 
+		subMenu.on("click", function () {
+			var selectedTrigger = d3.select(this),
+				activeTriggers = d3.selectAll(".dimensions-trigger-active");
 
-		// // Collapse all inactive triggers on startup
-		// collapseContainers(d3.selectAll(".dimensions-trigger:not(.dimensions-trigger-active) + div"));
-		//
-		// dimensions.on("click", function () {
-		// 	var selectedTrigger = d3.select(this),
-		// 		activeTriggers = d3.selectAll(".dimensions-trigger-active");
-		//
-		// 	if (selectedTrigger.classed("dimensions-trigger-active")) {
-		// 		// Collapse the active (which is also the selected) trigger
-		// 		collapseContainers(d3.select(selectedTrigger.node().nextElementSibling));
-		// 		selectedTrigger.classed("dimensions-trigger-active", false);
-		// 	} else {
-		// 		// Collapse the other trigger ...
-		// 		collapseContainers(d3.selectAll(".dimensions-trigger-active + div"));
-		// 		activeTriggers.classed("dimensions-trigger-active", false);
-		// 		// ... and expand the selected one
-		// 		expandContainers(d3.select(selectedTrigger.node().nextElementSibling));
-		// 		selectedTrigger.classed("dimensions-trigger-active", true);
-		// 	}
-		// });
+			if (selectedTrigger.classed("dimensions-trigger-active")) {
+				// Collapse the active (which is also the selected) trigger
+				collapseContainers(d3.select(selectedTrigger.node().nextElementSibling));
+				selectedTrigger.classed("dimensions-trigger-active", false);
+			} else {
+				// Collapse the other trigger ...
+				collapseContainers(d3.selectAll(".dimensions-trigger-active + ul"));
+				activeTriggers.classed("dimensions-trigger-active", false);
+				// ... and expand the selected one
+				expandContainers(d3.select(selectedTrigger.node().nextElementSibling));
+				selectedTrigger.classed("dimensions-trigger-active", true);
+			}
+		});
 	}
 	sidebar.init = function(tags) {
 		if (!tags) { return }
@@ -133,9 +135,11 @@ module.exports = function (graph) {
 		filter.clear();
 
 		tags.forEach(function (tag, key) {
-			addSubMenu('filterDimension' + key, tag.name);
+			var selector = 'filterDimension' + key;
+			addSubMenu(selector, tag.name);
+			initDimensionsCollapsing(d3.select('.' + selector + 'Label'));
 			tag.values.forEach(function (tagValue) {
-				addTagFilterItem(tagValue, '#filterDimension' + key);
+				addTagFilterItem(tagValue, '#' + selector);
 			});
 		});
 

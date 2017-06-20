@@ -314,10 +314,6 @@ ul#optionsMenu > li:hover .aboutMenu {
 .module {
 	min-width: 240px;
 }
-.toggleOption {
-	padding: 8px 5px;
-	min-width: 150px;
-}
 .slideOption {
 	position: relative;
 	padding: 8px 5px;
@@ -645,11 +641,11 @@ a#pause-button:not(.paused)::before {
 	cursor: pointer;
 	padding: .5em;
 }
-.accordion-trigger.accordion-trigger-active:before {
+.accordion-trigger.accordion-trigger-active:before, .dimensions-trigger.dimensions-trigger-active:before {
 	padding-right: 4px;
 	content: "\25BC"
 }
-.accordion-trigger:not(.accordion-trigger-active):before {
+.accordion-trigger:not(.accordion-trigger-active):before, .dimensions-trigger:not(.dimensions-trigger-active):before {
 	padding-right: 4px;
 	content: "\25BA"
 }
@@ -827,7 +823,24 @@ a#pause-button:not(.paused)::before {
 	-o-animation-timing-function: linear;
 	animation-timing-function: linear;
 }
-
+/* filter dimensions */
 #dimensionsFilter li {
 	list-style: none;
+}
+
+#segmentsCheckboxes {
+	padding-left: 10px;
+	ul {
+		padding-left: 20px;
+	}
+}
+
+.toggleOption {
+	padding: 8px 0;
+}
+
+.dimensions-trigger {
+	display: block;
+	cursor: pointer;
+	line-height: 20px;
 }
