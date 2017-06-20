@@ -134,8 +134,8 @@ module.exports = (function () {
 			}
 			drawTools.appendHexagonClass(parentElement, that.radius(), that.height(), that.hexagonData(), cssClasses, that.labelForCurrentLanguage(), that.backgroundColor());
 
-			textBlock = new CenteringTextElement(parentElement, that.backgroundColor());
-			textBlock.addText(that.labelForCurrentLanguage());
+			// textBlock = new CenteringTextElement(parentElement, that.backgroundColor());
+			// textBlock.addText(that.labelForCurrentLanguage());
 
 			that.addMouseListeners();
 
