@@ -5,132 +5,152 @@
  */
 module.exports = function (graph) {
 
-	var Choices = require('choices.js/assets/scripts/dist/choices.js'),
-		sidebar = {},
+	var sidebar = {},
 		languageTools = webvowl.util.languageTools(),
 		elementTools = webvowl.util.elementTools(),
 	// Dimensions filter
-		nameSelector,
-		valueSelector,
-		selectedProperties,
-		properties,
-		values,
 		filter,
+    allSegmentsCheckbox,
+    allSegmentsFilteringOptionId = "#allSegmentsFilteringOption",
+    allOptionsWithoutAllSegments = "#segmentsCheckboxes li:not(" + allSegmentsFilteringOptionId + ")",
 	// Required for reloading when the language changes
 		ontologyInfo,
 		lastSelectedElement;
 
-	function initChoices(selector, placeholder) {
-		return new Choices(selector, {
-	    removeItemButton: true,
-			placeholderValue: placeholder
-	  });
+	// adapted version of this example: http://www.normansblog.de/simple-jquery-accordion/
+	function collapseContainers(containers) {
+		containers.classed("hidden", true);
 	}
 
-	function getPossibleValues(selected) {
-		// add to value selector values from selectedProperties
-		var valueSelectorChoices = [];
-		for (var sp = 0; sp < selectedProperties.length; sp++) {
-			for (var spv = 0; spv < values[selectedProperties[sp]].length; spv++) {
-				if (selected.indexOf(values[selectedProperties[sp]][spv].value) === -1) {
-					valueSelectorChoices.push(values[selectedProperties[sp]][spv]);
-				}
-			}
-		}
-
-		return valueSelectorChoices;
+	function expandContainers(containers) {
+		containers.classed("hidden", false);
 	}
 
-	function manageValueSelector() {
-		// get already selected values
-		var selected = valueSelector.getValue(true);
-		var valueSelectorChoices = getPossibleValues(selected);
-		valueSelector.setChoices(valueSelectorChoices, 'value', 'label', true);
-		// if selector is empty just disable it.
-		if (valueSelectorChoices.length > 0 || selected.length > 0) {
-			valueSelector.enable();
-		} else {
-			valueSelector.disable();
-		}
+	function addSubMenu(selector, label) {
+		var segments = d3.select("#segmentsCheckboxes");
+		segments.append("li")
+			.text(label);
+		segments.append("ul")
+			.attr("id", selector);
 	}
 
-	function addDimensionsFilter(selector) {
-		selectedProperties = [];
-		properties = [];
-		values = {};
-		var filterDimensions = graph.options().data().filterDimensions;
-		if (filterDimensions) {
-			for (var fd = 0; fd < filterDimensions.length; fd++) {
-				properties.push({ value: filterDimensions[fd].name, label: filterDimensions[fd].name });
-				values[filterDimensions[fd].name] = [];
-				for (var fdv = 0; fdv < filterDimensions[fd].values.length; fdv++) {
-					values[filterDimensions[fd].name].push({ value: filterDimensions[fd].values[fdv], label: filterDimensions[fd].values[fdv] });
-				}
-			}
-		}
-		valueSelector.disable();
-		// set all values selected on the beginning
-		nameSelector.setValue(properties);
-		valueSelector.setChoices([], 'value', 'label', true);
-		valueSelector.setValue(getPossibleValues([]));
+	function addTagFilterItem(tag, selector) {
+			var filterContainer;
+			var filterCheckbox;
+			var tagCheckboxId = tag + "FilterTagCheckbox";
+
+			filterContainer = d3.select(selector)
+					.append("li")
+					.classed("toggleOption", true)
+					.append("div")
+					.classed("checkboxContainer", true);
+
+			filterCheckbox = filterContainer.append("input")
+					.classed("filterCheckbox", true)
+					.attr("id", tagCheckboxId)
+					.attr("type", "checkbox");
+
+			filterCheckbox.on("click", function () {
+					var isEnabled = filterCheckbox.property("checked");
+					filter[isEnabled ? "removeTag" : "addTag"](tag);
+					graph.update();
+			});
+
+			filterContainer.append("label")
+					.attr("for", tagCheckboxId)
+					.text(tag);
 	}
 
+	function addFilterItem(filter, identifier, pluralNameOfFilteredItems, selector) {
+			var filterContainer,
+					filterCheckbox;
+
+			filterContainer = d3.select(selector)
+					.append("div")
+					.classed("checkboxContainer", true);
+
+			filterCheckbox = filterContainer.append("input")
+					.classed("filterCheckbox", true)
+					.attr("id", identifier + "FilterCheckbox")
+					.attr("type", "checkbox")
+					.property("checked", filter.enabled());
+
+			// Store for easier resetting
+			allSegmentsCheckbox = {checkbox: filterCheckbox, defaultState: filter.enabled()};
+
+			filterCheckbox.on("click", function () {
+					// There might be no parameters passed because of a manual
+					// invocation when resetting the filters
+					var isEnabled = filterCheckbox.property("checked");
+
+					d3.selectAll(allOptionsWithoutAllSegments + " input")
+							.property("checked", isEnabled)
+							.each(function () {
+									d3.select(this).on("click")();
+							});
+
+					graph.update();
+			});
+
+			filterContainer.append("label")
+					.attr("for", identifier + "FilterCheckbox")
+					.text(pluralNameOfFilteredItems);
+	}
+
+	function resetFilterDimensions() {
+		allSegmentsCheckbox.checkbox
+				.property("checked", allSegmentsCheckbox.defaultState)
+				.on("click")();
+	};
+
+	function initDimensionsList(tags) {
+
+
+		// // Collapse all inactive triggers on startup
+		// collapseContainers(d3.selectAll(".dimensions-trigger:not(.dimensions-trigger-active) + div"));
+		//
+		// dimensions.on("click", function () {
+		// 	var selectedTrigger = d3.select(this),
+		// 		activeTriggers = d3.selectAll(".dimensions-trigger-active");
+		//
+		// 	if (selectedTrigger.classed("dimensions-trigger-active")) {
+		// 		// Collapse the active (which is also the selected) trigger
+		// 		collapseContainers(d3.select(selectedTrigger.node().nextElementSibling));
+		// 		selectedTrigger.classed("dimensions-trigger-active", false);
+		// 	} else {
+		// 		// Collapse the other trigger ...
+		// 		collapseContainers(d3.selectAll(".dimensions-trigger-active + div"));
+		// 		activeTriggers.classed("dimensions-trigger-active", false);
+		// 		// ... and expand the selected one
+		// 		expandContainers(d3.select(selectedTrigger.node().nextElementSibling));
+		// 		selectedTrigger.classed("dimensions-trigger-active", true);
+		// 	}
+		// });
+	}
+	sidebar.init = function(tags) {
+		if (!tags) { return }
+		d3.selectAll(allOptionsWithoutAllSegments).remove();
+		filter.clear();
+
+		tags.forEach(function (tag, key) {
+			addSubMenu('filterDimension' + key, tag.name);
+			tag.values.forEach(function (tagValue) {
+				addTagFilterItem(tagValue, '#filterDimension' + key);
+			});
+		});
+
+		resetFilterDimensions();
+	}
 	/**
 	 * Setup the menu bar.
 	 */
 	sidebar.setup = function (tagFilter) {
 		filter = tagFilter;
 		setupCollapsing();
+		addFilterItem(tagFilter, "allSegments", "Show all", allSegmentsFilteringOptionId);
 	};
 
-	sidebar.resetDimensions = function() {
-		if (nameSelector) {
-			nameSelector.clearStore();
-		} else {
-			nameSelector = initChoices('#nameDimensionFilter', 'Dimension names ');
-			nameSelector.passedElement.addEventListener('addItem', function(element) {
-				selectedProperties.push(element.detail.value);
-				manageValueSelector();
-			});
-			nameSelector.passedElement.addEventListener('removeItem', function(element) {
-				// remove it from selectedProperties
-				var index = selectedProperties.indexOf(element.detail.value);
-				selectedProperties.splice(index, 1);
-				// if we delete nameSelector we should remove all selected values in second selector
-				for (var ns = 0; ns < values[element.detail.value].length; ns++) {
-					filter.addTag(values[element.detail.value][ns].value);
-					valueSelector.removeItemsByValue(values[element.detail.value][ns].value);
-				}
-				manageValueSelector();
-				graph.update();
-			});
-		}
-		if (valueSelector) {
-			valueSelector.clearStore();
-		} else {
-			valueSelector = initChoices('#valueDimensionFilter', 'Dimension values ');
-			valueSelector.passedElement.addEventListener('addItem', function(element) {
-				filter.removeTag(element.detail.value);
-				graph.update();
-			});
-			valueSelector.passedElement.addEventListener('removeItem', function(element) {
-				filter.addTag(element.detail.value);
-				graph.update();
-			});
-		}
-		addDimensionsFilter('#dimensionsFilter');
-	}
-
 	function setupCollapsing() {
-		// adapted version of this example: http://www.normansblog.de/simple-jquery-accordion/
-		function collapseContainers(containers) {
-			containers.classed("hidden", true);
-		}
-
-		function expandContainers(containers) {
-			containers.classed("hidden", false);
-		}
-
 		var triggers = d3.selectAll(".accordion-trigger");
 
 		// Collapse all inactive triggers on startup

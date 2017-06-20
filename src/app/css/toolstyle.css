@@ -1,9 +1,4 @@
 /*----------------------------------------------
-        Choices.js styles
-----------------------------------------------*/
-@import '../../../node_modules/choices.js/assets/styles/css/choices.min.css';
-
-/*----------------------------------------------
         WebVOWL page
 ----------------------------------------------*/
 @import url(https://fonts.googleapis.com/css?family=Open+Sans);
@@ -500,13 +495,6 @@ a#pause-button:not(.paused)::before {
 #aboutMenu > a::before {
 	content: "\00A9";
 }
-#segmentsOption > a::before {
-	content: "\25A4";
-}
-
-#allSegmentsFilteringOption {
-	border-bottom: 2px solid black;
-}
 
 #detailsArea {
 	bottom: 0;
@@ -840,20 +828,6 @@ a#pause-button:not(.paused)::before {
 	animation-timing-function: linear;
 }
 
-/* overwrite choices.js styles */
-.choices {
-	font-size: 12px;
-	.choices__inner {
-		font-size: 12px;
-	}
-	.choices__input, .choices__inner {
-		border: none;
-		background-color: #34495e;
-		&::placeholder {
-			color: #ecf0f1;
-		}
-	}
-	&.is-disabled .choices__inner, &.is-disabled .choices__input {
-		background-color: #24323e;
-	}
+#dimensionsFilter li {
+	list-style: none;
 }

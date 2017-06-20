@@ -66,6 +66,14 @@
 				<p class="statisticDetails">Nodes: <span id="nodeCount"></span></p>
 				<p class="statisticDetails">Edges: <span id="edgeCount"></span></p>
 			</div> -->
+			<h3 class="accordion-trigger" id="dimensions-filter-trigger">Filter Dimensions</h3>
+			<div class="accordion-container" id="dimensions-filter">
+				<div id="dimensionsFilter">
+					<ul id="segmentsCheckboxes">
+						<li class="toggleOption" id="allSegmentsFilteringOption"></li>
+					</ul>
+				</div>
+			</div>
 			<h3 class="accordion-trigger" id="selection-details-trigger">Selection Details</h3>
 			<div class="accordion-container" id="selection-details">
 				<div id="propertySelectionInformation" class="hidden">
@@ -98,15 +106,6 @@
 					<p><span>Select an element in the visualization.</span></p>
 				</div>
 			</div>
-			<h3 class="accordion-trigger" id="dimensions-filter-trigger">Filter by dimensions</h3>
-			<div class="accordion-container" id="dimensions-filter">
-				<div class="dimensionsFilter" id="dimensionsFilter">
-					<div class="selectContainer">
-						<select multiple id="nameDimensionFilter"></select>
-						<select multiple id="valueDimensionFilter"></select>
-					</div>
-				</div>
-			</div>
 		</section>
 	</aside>
 	<nav id="optionsArea">
@@ -131,11 +130,6 @@
 					<li class="toggleOption" id="nodeScalingOption"></li>
 					<li class="toggleOption" id="compactNotationOption"></li>
 					<li class="toggleOption" id="colorExternalsOption"></li>
-				</ul>
-			</li>
-			<li id="segmentsOption"><a href="#">Groupings</a>
-				<ul id="segmentsCheckboxes" class="toolTipMenu filter">
-					<li class="toggleOption" id="allSegmentsFilteringOption"></li>
 				</ul>
 			</li>
 			<li id="filterOption"><a href="#">Filter</a>

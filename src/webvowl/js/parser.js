@@ -14,6 +14,7 @@ module.exports = function (graph) {
 		nodes,
 		properties,
 		filterTags,
+		filterDimensions,
 		classMap,
 		settingsData,
 		settingsImported = false,
@@ -135,6 +136,7 @@ module.exports = function (graph) {
 			return;
 		}
 		dictionary = [];
+		filterDimensions = ontologyData.filterDimensions;
 		if (ontologyData.settings) settingsData = ontologyData.settings;
 		else settingsData = undefined;
 
@@ -186,6 +188,13 @@ module.exports = function (graph) {
 	 */
 	parser.pinnedElements = function () {
 		return pinnedElements;
+	};
+
+	/**
+	 * @returns {Array} the preprocessed filterDimensions nodes
+	 */
+	parser.filterDimensions = function () {
+		return filterDimensions;
 	};
 
 	/**

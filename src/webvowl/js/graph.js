@@ -445,13 +445,6 @@ module.exports = function (graphContainerSelector) {
 				centerOnElementFromUrl();
 			});
 		}
-		if (graph.options().data()) {
-			sidebar.resetDimensions();
-		} else {
-			setTimeout(function() {
-				sidebar.resetDimensions();
-			}, 1000);
-		}
 	};
 
 
@@ -1353,8 +1346,7 @@ module.exports = function (graphContainerSelector) {
 		};
 
 		centerPositionOnStart = computeCenterPositionOnStart(parser.centralizedNode());
-
-		options.segmentsModule().initialize(parser.filterTags());
+		options.sidebar().init(parser.filterDimensions());
 		options.pickAndPinModule().setPinnedElements(parser.pinnedElements());
 
 		// Initialize filters with data to replicate consecutive filtering

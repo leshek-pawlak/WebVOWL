@@ -19,7 +19,6 @@ module.exports = function () {
 	// Modules for the webvowl app
 		exportMenu = require("./menu/exportMenu")(graph),
 		filterMenu = require("./menu/filterMenu")(graph),
-		segmentsMenu = require("./menu/segmentsMenu")(graph),
 		gravityMenu = require("./menu/gravityMenu")(graph),
 		modeMenu = require("./menu/modeMenu")(graph),
 		ontologyMenu = require("./menu/ontologyMenu")(graph),
@@ -161,7 +160,6 @@ module.exports = function () {
 		options.filterModules().push(compactNotationSwitch);
 		options.filterModules().push(colorExternalsSwitch);
 		options.filterModules().push(tagFilter);
-		options.segmentsModule(segmentsMenu);
 		options.pickAndPinModule(pickAndPin);
 
 		d3.select(window).on("resize", adjustSize);
@@ -169,13 +167,12 @@ module.exports = function () {
 		exportMenu.setup();
 		gravityMenu.setup();
 		filterMenu.setup(datatypeFilter, objectPropertyFilter, subclassFilter, disjointFilter, setOperatorFilter, nodeDegreeFilter);
-		segmentsMenu.setup(tagFilter);
 		modeMenu.setup(pickAndPin, nodeScalingSwitch, compactNotationSwitch, colorExternalsSwitch);
 		pauseMenu.setup();
 		styleMenu.setup();
 		sidebar.setup(tagFilter);
 		ontologyMenu.setup(loadOntologyFromText);
-		resetMenu.setup([gravityMenu, filterMenu, modeMenu, focuser, selectionDetailDisplayer, pauseMenu, segmentsMenu, styleMenu]);
+		resetMenu.setup([gravityMenu, filterMenu, modeMenu, focuser, selectionDetailDisplayer, pauseMenu, styleMenu]);
 		searchMenu.setup();
 		navigationMenu.setup();
 
