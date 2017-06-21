@@ -156,6 +156,9 @@ module.exports = function (graph) {
 		// check if requested url is a json;
 		var isJSON=requestedURL.toLowerCase().endsWith(".json");
 		var isTTL=requestedURL.toLowerCase().endsWith(".ttl");
+		if (!mimeType) {
+			mimeType = isTTL ? 'application/ttl' : 'application/json';
+		}
 		if (!isJSON && !isTTL){
 			ontologyMenu.notValidJsonURL();
 			graph.clearGraphData();
@@ -168,7 +171,7 @@ module.exports = function (graph) {
 		} else {
 			displayLoadingIndicators();
 			// requestToFile if returns 404 try with ttl type
-			d3.xhr(relativePath, mimeType, function (error, request) {
+			d3.xhr(pathWithoutHttp, mimeType, function (error, request) {
 				var loadingSuccessful = !error;
 				var errorInfo;
 				// check if error occurred or responseText is empty

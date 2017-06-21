@@ -165,9 +165,12 @@ circle.focused, path.hovered, .focused ~ .uml-line {
 circle.focused {
 	stroke-width: 4px;
 }
-.focused ~ text, .hexagon.focused {
+.focused ~ text {
   font-weight: bold;
   fill: #f00 !important;
+}
+.hexagon.focused {
+  stroke: #f00 !important;
 }
 .nostroke {
 	stroke: none;
