@@ -95,7 +95,7 @@ module.exports = function (graph) {
 		setStyleSensitively(".external + text .instance-count", [{name: "fill", value: "#aaa"}]);
 		setStyleSensitively(".cardinality", [{name: "font-size", value: "10px"}]);
 		setStyleSensitively(".text, .embedded", [{name: "pointer-events", value: "none"}]);
-		setStyleSensitively(".class, .object, .disjoint, .objectproperty, .disjointwith, .equivalentproperty, .transitiveproperty, .functionalproperty, .inversefunctionalproperty, .symmetricproperty, .allvaluesfromproperty, .somevaluesfromproperty", [{name: "fill", value: "#acf"}]);
+		setStyleSensitively(".class:not(.pin), .object, .disjoint, .objectproperty, .disjointwith, .equivalentproperty, .transitiveproperty, .functionalproperty, .inversefunctionalproperty, .symmetricproperty, .allvaluesfromproperty, .somevaluesfromproperty", [{name: "fill", value: "#acf"}]);
 		setStyleSensitively(".label .datatype, .datatypeproperty", [{name: "fill", value: "#9c6"}]);
 		setStyleSensitively(".rdf, .rdfproperty", [{name: "fill", value: "#c9c"}]);
 		setStyleSensitively(".literal, .node .datatype", [{name: "fill", value: "#fc3"}]);
@@ -103,14 +103,14 @@ module.exports = function (graph) {
 		setStyleSensitively(".external, .externalproperty", [{name: "fill", value: "#36c"}]);
 		setStyleSensitively("path, .nofill", [{name: "fill", value: "none"}]);
 		setStyleSensitively("marker path", [{name: "fill", value: "#000"}, {name: "stroke-dasharray", value: "100"}]);
-		setStyleSensitively(".class, path, line, .fineline", [{name: "stroke", value: "#000"}]);
+		setStyleSensitively(".class:not(.pin), path, line, .fineline", [{name: "stroke", value: "#000"}]);
 		setStyleSensitively(".white, .subclass, .subclassproperty, .external + text", [{name: "fill", value: "#fff"}]);
-		setStyleSensitively(".class.hovered, .property.hovered, .cardinality.hovered, .cardinality.focused, circle.pin, .filled.hovered, .filled.focused", [{name: "fill", value: "#f00"}, {name: "cursor", value: "pointer"}]);
+		setStyleSensitively(".class.hovered, .property.hovered, .cardinality.hovered, .cardinality.focused, .filled.hovered, .filled.focused", [{name: "fill", value: "#f00"}, {name: "cursor", value: "pointer"}]);
 		setStyleSensitively(".focused, path.hovered", [{name: "stroke", value: "#f00"}]);
 		setStyleSensitively(".indirect-highlighting, .feature:hover", [{name: "fill", value: "#f90"}]);
 		setStyleSensitively(".values-from", [{name: "stroke", value: "#69c"}]);
 		setStyleSensitively(".symbol, .values-from.filled", [{name: "fill", value: "#69c"}]);
-		setStyleSensitively(".class, path, line", [{name: "stroke-width", value: "2"}]);
+		setStyleSensitively(".class:not(.pin), path, line", [{name: "stroke-width", value: "2"}]);
 		setStyleSensitively(".fineline", [{name: "stroke-width", value: "1"}]);
 		setStyleSensitively(".dashed, .anonymous", [{name: "stroke-dasharray", value: "8"}]);
 		setStyleSensitively(".dotted", [{name: "stroke-dasharray", value: "3"}]);
@@ -135,7 +135,7 @@ module.exports = function (graph) {
 	}
 
 	function shouldntChangeInlineCss(element, style) {
-		return style === "fill" && hasBackgroundColorSet(element);
+		return style === "fill" && (hasBackgroundColorSet(element) || (element.attr('style') && element.attr('style').indexOf('fill') > -1));
 	}
 
 	function hasBackgroundColorSet(element) {
@@ -154,7 +154,7 @@ module.exports = function (graph) {
 	}
 
 	function removeVowlInlineStyles() {
-		d3.selectAll(".text, .subtext, .external + text .instance-count, .cardinality, .embedded, .class, .object, .disjoint, .objectproperty, .disjointwith, .equivalentproperty, .transitiveproperty, .functionalproperty, .inversefunctionalproperty, .symmetricproperty, .allvaluesfromproperty, .somevaluesfromproperty, .label .datatype, .datatypeproperty, .rdf, .rdfproperty, .literal, .node .datatype, .deprecated, .deprecatedproperty, .external, .externalproperty, path, .nofill, .symbol, marker path, line, .fineline, .white, .subclass, .subclassproperty, .external + text, .property.hovered, circle.pin, .filled.hovered, .focused, .indirect-highlighting, .feature:hover, .values-from, .dashed, .anonymous, .dotted, .nostroke")
+		d3.selectAll(".text, .subtext, .external + text .instance-count, .cardinality, .embedded, .class:not(.pin), .object, .disjoint, .objectproperty, .disjointwith, .equivalentproperty, .transitiveproperty, .functionalproperty, .inversefunctionalproperty, .symmetricproperty, .allvaluesfromproperty, .somevaluesfromproperty, .label .datatype, .datatypeproperty, .rdf, .rdfproperty, .literal, .node .datatype, .deprecated, .deprecatedproperty, .external, .externalproperty, path, .nofill, .symbol, marker path, line, .fineline, .white, .subclass, .subclassproperty, .external + text, .property.hovered, .filled.hovered, .focused, .indirect-highlighting, .feature:hover, .values-from, .dashed, .anonymous, .dotted, .nostroke")
 			.each(function () {
 				var element = d3.select(this);
 
