@@ -9,8 +9,9 @@ module.exports = function () {
         enabled = true,
         filteredNodes,
         filteredProperties,
-        tags = [];
-
+        tags = [],
+        tagsUnselected = [],
+        allTags = [];
 
     /**
      * If enabled, all elements which have one of the predefined label are filtered.
@@ -38,14 +39,65 @@ module.exports = function () {
 
     function hasNoTag(node) {
         var nodeTags = node.tags();
-
-        if(_.isEmpty(nodeTags)) return true;
+        // if tags is an array and nodeTags is empty return true.
+        // if tags is an object that means we need to hide this element.
+        if(_.isEmpty(nodeTags)) return _.isArray(tags) || _.isEmpty(tags);
 
         nodeTags = _.invokeMap(nodeTags, String.prototype.toLowerCase);
 
-        return !_.isEmpty(_.difference(nodeTags, tags));
+        // for tags an array
+        if (_.isArray(tags)) {
+          return !_.isEmpty(_.difference(nodeTags, tags));
+        }
 
+        // if tags is empty object show nodes without tags
+        if (_.isEmpty(tags)) {
+          return false;
+        }
+
+        // if tags are an object
+        var shouldBeShown = true;
+        _.forEach(tags, function(value, name) {
+          shouldBeShown = shouldBeShown && (_.isEmpty(value) || _.difference(nodeTags, value).length < nodeTags.length);
+        });
+
+        return shouldBeShown;
     }
+
+    function createTagsFromLogic() {
+      // console.log('allTags', allTags, 'tagsUnselected', tagsUnselected, 'tags', tags);
+      // Logic to implement and test:
+      // 1. When all checkboxes are selected - display all elements
+      // 2. Checked checkboxes from the same dimension treat like logical OR
+      // 3. Checked checkboxes from the other dimensions treat like logical AND
+      // 4. When none is selected display only elements with no tags
+      if(_.isEmpty(tagsUnselected) || allTags.length < 1) {
+        // if there is one or none dimensions, or all tags are selected
+        tags = tagsUnselected;
+      } else {
+        // if we have dimensions we need to know which value comes from which dimension
+        var tmpTags = {};
+        allTags.forEach(function(dimension) {
+          dimension.values.forEach(function(value) {
+            value = String.prototype.toLowerCase.apply(value);
+            if (tagsUnselected.indexOf(value) === -1) {
+              if (!tmpTags[dimension.name]) {
+                tmpTags[dimension.name] = [];
+              }
+              // push only checked filters
+              tmpTags[dimension.name].push(value);
+            }
+          });
+        });
+        tags = tmpTags;
+      }
+    }
+
+    filter.allTags = function(p) {
+      if (!arguments.length) return allTags;
+      allTags = p;
+      return filter;
+    };
 
     filter.enabled = function (p) {
         if (!arguments.length) return enabled;
@@ -53,29 +105,31 @@ module.exports = function () {
         return filter;
     };
 
-    filter.addTag = function(tag) {
+    filter.uncheck = function(tag) {
         if(!tag) return;
 
-        var tag = String.prototype.toLowerCase.apply(tag);
+        tag = String.prototype.toLowerCase.apply(tag);
 
-        if(_.indexOf(tags, tag) === -1) {
-            tags.push(tag);
+        if(_.indexOf(tagsUnselected, tag) === -1) {
+            tagsUnselected.push(tag);
         }
-
+        createTagsFromLogic();
     };
 
-    filter.removeTag = function (tagToRemove) {
+    filter.check = function (tagToRemove) {
         if(!tagToRemove) return;
 
-        var tagToRemove = String.prototype.toLowerCase.apply(tagToRemove);
+        tagToRemove = String.prototype.toLowerCase.apply(tagToRemove);
 
-        _.remove(tags, function (tag) {
-            return tag ===  tagToRemove;
+        _.remove(tagsUnselected, function (tag) {
+            return tag === tagToRemove;
         });
+        createTagsFromLogic();
     };
 
     filter.clear = function () {
       tags = [];
+      tagsUnselected = [];
     };
     // Functions a filter must have
     filter.filteredNodes = function () {

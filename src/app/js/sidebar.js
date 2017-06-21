@@ -38,8 +38,8 @@ module.exports = function (graph) {
 		addFilterItem(selector + "Segments", "(Select All)", subMenu);
 	}
 
-	function addTagFilterItem(tag, selector) {
-			var tagCheckboxId = tag + "FilterTagCheckbox";
+	function addTagFilterItem(tagValue, tagName, selector) {
+			var tagCheckboxId = tagValue + "FilterTagCheckbox";
 			var filterContainer = d3.select(selector)
 					.append("li")
 					.append("div")
@@ -52,13 +52,13 @@ module.exports = function (graph) {
 
 			filterCheckbox.on("click", function () {
 					var isEnabled = filterCheckbox.property("checked");
-					filter[isEnabled ? "removeTag" : "addTag"](tag);
+					filter[isEnabled ? "check" : "uncheck"](tagValue, tagName);
 					graph.update();
 			});
 
 			filterContainer.append("label")
 					.attr("for", tagCheckboxId)
-					.text(tag);
+					.text(tagValue);
 	}
 
 	function addFilterItem(identifier, pluralNameOfFilteredItems, subMenu) {
@@ -126,13 +126,13 @@ module.exports = function (graph) {
 		filter.clear();
 		d3.select('#dimensions-filter-trigger').classed('hidden', !tags);
 		if (!tags) { return }
-
+		filter.allTags(tags);
 		tags.forEach(function (tag, key) {
 			var selector = 'filterDimension' + key;
 			addSubMenu(selector, tag.name);
 			initDimensionsCollapsing(d3.select('.' + selector + 'Label'));
 			tag.values.forEach(function (tagValue) {
-				addTagFilterItem(tagValue, '#' + selector);
+				addTagFilterItem(tagValue, tag.name, '#' + selector);
 			});
 		});
 

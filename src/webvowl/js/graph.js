@@ -1214,11 +1214,11 @@ module.exports = function (graphContainerSelector) {
 			factor += umlEmbeddedExtraFactor;
 		}
 		// add extra space because of ExternalClass extra line in label
-		if (circle.data()[0].type() === 'ExternalClass') {
+		if (circle.datum().type() === 'ExternalClass') {
 			factor += umlTextHeight;
 		}
 		// add extra space because of individuals number
-		if (circle.data()[0].individuals().length > 0) {
+		if (circle.datum().individuals().length > 0) {
 			factor += umlTextHeight;
 		}
 		var factor2 = factor + (umlTextHeight * (textLength - datatypeProperties) + umlLineBetweenPropsFactor);
