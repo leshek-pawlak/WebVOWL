@@ -39,17 +39,13 @@ module.exports = function (graph) {
 	}
 
 	function addTagFilterItem(tag, selector) {
-			var filterContainer;
-			var filterCheckbox;
 			var tagCheckboxId = tag + "FilterTagCheckbox";
-
-			filterContainer = d3.select(selector)
+			var filterContainer = d3.select(selector)
 					.append("li")
-					.classed("toggleOption", true)
 					.append("div")
 					.classed("checkboxContainer", true);
 
-			filterCheckbox = filterContainer.append("input")
+			var filterCheckbox = filterContainer.append("input")
 					.classed("filterCheckbox", true)
 					.attr("id", tagCheckboxId)
 					.attr("type", "checkbox");
@@ -66,15 +62,11 @@ module.exports = function (graph) {
 	}
 
 	function addFilterItem(identifier, pluralNameOfFilteredItems, subMenu) {
-			var filterContainer,
-					filterCheckbox;
-
-			filterContainer = subMenu
+			var filterContainer = subMenu
 					.append("li")
-					.classed("toggleOption", true)
 					.classed("checkboxContainer", true);
 
-			filterCheckbox = filterContainer.append("input")
+			var filterCheckbox = filterContainer.append("input")
 					.classed("filterCheckbox", true)
 					.attr("id", identifier + "FilterCheckbox")
 					.attr("type", "checkbox")
@@ -102,7 +94,7 @@ module.exports = function (graph) {
 	}
 
 	function resetFilterDimensions() {
-		d3.selectAll('input.filterCheckbox')
+		d3.selectAll('#segmentsCheckboxes input.filterCheckbox')
 			.property("checked", filter.enabled())
 			.on("click")();
 	};
