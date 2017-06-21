@@ -833,6 +833,9 @@ a#pause-button:not(.paused)::before {
 	ul {
 		padding-left: 20px;
 	}
+	label {
+		cursor: pointer;
+	}
 }
 
 .toggleOption {
