@@ -1150,11 +1150,11 @@ module.exports = function (graphContainerSelector) {
 			}
 			if (group.individuals().length > 0) {
 				// add extra space for individuals number
-				translateY += umlBoxTitleHeight;
+				translateY += umlTextHeight;
 			}
 			if (group.type() === 'ExternalClass') {
 				// for externalClass move all texts to bottom
-				translateY += umlEmbeddedExtraFactor;
+				translateY += umlTextHeight;
 				// and change color to white
 				propertyElement.select('text').style('fill', 'white');
 			}
@@ -1219,7 +1219,7 @@ module.exports = function (graphContainerSelector) {
 		}
 		// add extra space because of individuals number
 		if (circle.data()[0].individuals().length > 0) {
-			factor += umlBoxTitleHeight;
+			factor += umlTextHeight;
 		}
 		var factor2 = factor + (umlTextHeight * (textLength - datatypeProperties) + umlLineBetweenPropsFactor);
 		// calculate lines positions
