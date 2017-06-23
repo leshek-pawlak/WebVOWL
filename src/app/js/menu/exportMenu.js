@@ -317,6 +317,7 @@ module.exports = function (graph) {
 		exportObj.propertyAttribute = jsonObj.propertyAttribute;
 		exportObj.datatype = jsonObj.datatype;
 		exportObj.datatypeAttribute = jsonObj.datatypeAttribute;
+		exportObj.filterDimensions = jsonObj.filterDimensions;
 
 		// make a string again;
 		var exportText = JSON.stringify(exportObj, null, '  ');
