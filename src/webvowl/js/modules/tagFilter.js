@@ -57,14 +57,18 @@ module.exports = function () {
         // if tags are not empty object
         var shouldBeShown = true;
         allTags.forEach(function(dimension) {
+          var values = _.invokeMap(dimension.values, String.prototype.toLowerCase);
           // if for some dimension is no selected option ...
           if (_.isUndefined(tags[dimension.name])) {
-            var values = _.invokeMap(dimension.values, String.prototype.toLowerCase);
             // ... and there is no "common" values then make is visible.
             shouldBeShown = _.intersection(nodeTags, values).length === 0;
           } else if (shouldBeShown) {
             // if where no change to false before it, make sure is this element fit to checked filters.
-            shouldBeShown = _.difference(nodeTags, tags[dimension.name]).length < nodeTags.length;
+            // create diff from current selected in this dimension and nodeTags. If the difference is smaller than nodeTags that means that something's selected.
+            var diff = _.difference(nodeTags, tags[dimension.name]);
+            // create intersection with dimension values and nodeTags. If it's empty that means there is no nodeTags for this dimension.
+            var intersection = _.intersection(nodeTags, values);
+            shouldBeShown = _.isEmpty(intersection) || diff.length < nodeTags.length;
           }
         });
 
@@ -78,6 +82,7 @@ module.exports = function () {
       // 2. Checked checkboxes from the same dimension treat like logical OR
       // 3. Checked checkboxes from the other dimensions treat like logical AND
       // 4. When none is selected display only elements with no tags
+      // 5. If node has no tag for the dimension then it cannot be hide by unselect all checkboxes in the dimension.
       if(_.isEmpty(tagsUnselected) || allTags.length < 1) {
         // if there is one or none dimensions, or all tags are selected
         tags = tagsUnselected;
@@ -109,16 +114,17 @@ module.exports = function () {
       } else if (_.isEmpty(tags)) {
         label = 'Nothing\'s selected. Only elements without tags are visible.';
       } else {
-        label = 'All elements without any tag are visible  ';
-        allTags.forEach(function(dimension) {
+        allTags.forEach(function(dimension, key) {
           var values = _.invokeMap(dimension.values, String.prototype.toLowerCase);
           var difference = _.difference(values, tagsUnselected);
-          if (_.isUndefined(tags[dimension.name])) {
-            label += '<span style="color: red;">AND</span> no tag elements from <span style="font-style: italic; color: white;">' + dimension.name + '</span> ';
-          } else if (difference.length === values.length) {
-            label += '<span style="color: red;">AND</span> all elements from <span style="font-style: italic; color: white;">' + dimension.name + '</span> ';
-          } else if (difference.length > 0) {
+          if (key > 0) {
             label += '<span style="color: red;">AND</span> ';
+          }
+          if (_.isUndefined(tags[dimension.name])) {
+            label += 'only no tag elements from <span style="font-style: italic; color: white;">' + dimension.name + '</span> ';
+          } else if (difference.length === values.length) {
+            label += 'all elements from <span style="font-style: italic; color: white;">' + dimension.name + '</span> ';
+          } else if (difference.length > 0) {
             difference.forEach(function (value, key) {
               if (key > 0) {
                 label += '<span style="color: orange;">OR</span> ';
@@ -133,7 +139,7 @@ module.exports = function () {
             label += 'from <span style="font-style: italic; color: white;">' + dimension.name + '</span> ';
           }
         });
-        label = label.replace(/.$/,".");
+        label += 'are visible.';
       }
 
       // set concatenate label in HTML
