@@ -465,18 +465,20 @@ module.exports = function (graph) {
 		listNodeArray(d3.select("#subproperties"), property.subproperties());
 		listNodeArray(d3.select("#superproperties"), property.superproperties());
 
-		showHideCardinality(property.cardinality() !== undefined, property.minCardinality() !== undefined, property.maxCardinality() !== undefined);
+		var isCardinality = false, isMaxCardinality = false, isMinCardinality = false;
 		if (property.minCardinality() !== undefined) {
+			isMinCardinality = true;
 			d3.select("#minCardinality span").text(property.minCardinality());
 		}
 		if (property.maxCardinality() !== undefined) {
+			isMaxCardinality = true;
 			d3.select("#maxCardinality span").text(property.maxCardinality());
-		} else {
-			d3.select("#maxCardinality span").text("*");
 		}
 		if (property.cardinality() !== undefined) {
+			isCardinality = true;
 			d3.select("#infoCardinality span").text(property.cardinality());
 		}
+		showHideCardinality(isCardinality, isMinCardinality, isMaxCardinality);
 
 		setIriLabel(d3.select("#domain"), property.domain().labelForCurrentLanguage(), property.domain().iri());
 		setIriLabel(d3.select("#range"), property.range().labelForCurrentLanguage(), property.range().iri());
