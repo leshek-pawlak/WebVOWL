@@ -440,6 +440,12 @@ module.exports = function (graph) {
 		d3.select("#noSelectionInformation").classed("hidden", !showAdvice);
 	}
 
+	function showHideCardinality(isCardinality, isMinCardinality, isMaxCardinality) {
+		d3.select("#infoCardinality").classed("hidden", !isCardinality);
+		d3.select("#minCardinality").classed("hidden", !isMinCardinality);
+		d3.select("#maxCardinality").classed("hidden", !isMaxCardinality);
+	}
+
 	function displayPropertyInformation(property) {
 		showPropertyInformations();
 
@@ -459,27 +465,17 @@ module.exports = function (graph) {
 		listNodeArray(d3.select("#subproperties"), property.subproperties());
 		listNodeArray(d3.select("#superproperties"), property.superproperties());
 
+		showHideCardinality(property.cardinality() !== undefined, property.minCardinality() !== undefined, property.maxCardinality() !== undefined);
 		if (property.minCardinality() !== undefined) {
-			d3.select("#infoCardinality").classed("hidden", true);
-			d3.select("#minCardinality").classed("hidden", false);
 			d3.select("#minCardinality span").text(property.minCardinality());
-			d3.select("#maxCardinality").classed("hidden", false);
-
-			if (property.maxCardinality() !== undefined) {
-				d3.select("#maxCardinality span").text(property.maxCardinality());
-			} else {
-				d3.select("#maxCardinality span").text("*");
-			}
-
-		} else if (property.cardinality() !== undefined) {
-			d3.select("#minCardinality").classed("hidden", true);
-			d3.select("#maxCardinality").classed("hidden", true);
-			d3.select("#infoCardinality").classed("hidden", false);
-			d3.select("#infoCardinality span").text(property.cardinality());
+		}
+		if (property.maxCardinality() !== undefined) {
+			d3.select("#maxCardinality span").text(property.maxCardinality());
 		} else {
-			d3.select("#infoCardinality").classed("hidden", true);
-			d3.select("#minCardinality").classed("hidden", true);
-			d3.select("#maxCardinality").classed("hidden", true);
+			d3.select("#maxCardinality span").text("*");
+		}
+		if (property.cardinality() !== undefined) {
+			d3.select("#infoCardinality span").text(property.cardinality());
 		}
 
 		setIriLabel(d3.select("#domain"), property.domain().labelForCurrentLanguage(), property.domain().iri());
