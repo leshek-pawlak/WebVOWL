@@ -86,13 +86,19 @@ module.exports = function() {
         var annotation = getTextForLanguage(annotationIRI[j], languageLabels);
         var lang = Object.keys(annotation)[0];
         var typeIRI = store.getObjects(annotationIRI[j], 'rdf:type').clean()[0];
-        var identifier = getTextValue(store.getObjects(typeIRI, 'rdfs:label').clean()[0]);
+        // get annotationIdentifier if exists
+        var identifier = getTextValueFromTtl(annotationIRI[j], 'webvowl:annotationIdentifier');
+        if (!identifier) {
+          // in the other case get identifier from type.
+          identifier = getTextValue(store.getObjects(typeIRI, 'rdfs:label').clean()[0]);
+        }
+        var type = getTextValue(typeIRI, '');
         annotations[identifier] = [
           {
             identifier: identifier,
             language: lang,
             value: annotation[lang],
-            type: 'label'
+            type: type === 'HTMLAnnotation' ? 'html' : 'label'
           }
         ];
       }
