@@ -398,11 +398,19 @@ module.exports = function() {
         for (var dv = 0; dv < dimensionValues.length; dv++) {
           possibleValues.push(getTextValueFromTtl(dimensionValues[dv], 'webvowl:dimensionValueLabel'));
         }
+        // alphabetical order
+        possibleValues.sort(function(a,b) {
+          return a > b;
+        });
         groupedFilterDimensions.push({
           name: getTextValueFromTtl(filterDimensions[fd], 'webvowl:dimensionName'),
-          values: possibleValues,
+          values: possibleValues
         });
       }
+      // alphabetical order
+      groupedFilterDimensions.sort(function(a,b) {
+        return a.name > b.name;
+      });
       graphJson.filterDimensions = groupedFilterDimensions;
     }
 
