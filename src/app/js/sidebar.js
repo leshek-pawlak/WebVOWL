@@ -29,7 +29,6 @@ module.exports = function (graph) {
 		segments.append("li")
 			.classed(selector + 'Label', true)
 			.classed('dimensions-trigger', true)
-			.classed('dimensions-trigger-active', true)
 			.text(label);
 		var subMenu = segments.append("ul")
 			.classed('dimensions-container', true)
