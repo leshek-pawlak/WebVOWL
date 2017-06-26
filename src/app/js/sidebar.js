@@ -372,7 +372,15 @@ module.exports = function (graph) {
 				annotations.push(annotationObject[annotation][0]);
 			}
 		}
-
+		// sort annotations to have Definition on first place.
+		annotations.sort(function(a,b) {
+			if (a.identifier === 'Definition') {
+				return -1;
+			} else if (b.identifier === 'Definition') {
+				return 1;
+			}
+			return 0;
+		});
 		container.selectAll(".annotation").remove();
 		container.selectAll(".annotation").data(annotations).enter().append("p")
 			.classed("annotation", true)
@@ -482,7 +490,7 @@ module.exports = function (graph) {
 		setTextAndVisibility(d3.select("#propDescription"), property.descriptionForCurrentLanguage());
 		setTextAndVisibility(d3.select("#propComment"), property.commentForCurrentLanguage());
 
-		listAnnotations(d3.select("#propertySelectionInformation"), property.annotations());
+		listAnnotations(d3.select("#propertySelectionInformation #propertyAnnotations"), property.annotations());
 	}
 
 	function showPropertyInformations() {
