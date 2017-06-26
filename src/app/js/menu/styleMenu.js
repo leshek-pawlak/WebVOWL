@@ -88,6 +88,12 @@ module.exports = function (graph) {
             // move text to the top of rect. like in UML style.
             textElement.attr('y', -(parseInt(element.attr('height')) / 2) + 5 + 'px');
           }
+          // rerender pins to pin them better
+          var datum = element.datum();
+          if (datum && datum.pinned()) {
+            datum.removePin();
+            datum.drawPin();
+          }
         } else {
           if (textElement.node() && textElement.attr('data-y')) {
             // restore old 'y' value from 'data-y'
