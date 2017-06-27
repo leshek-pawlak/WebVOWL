@@ -1025,7 +1025,7 @@ module.exports = function (graphContainerSelector) {
 		var circles = container.selectAll('circle:not(.pin):not(.symbol):not(.nofill)');
 		// get also .white embedded elements
 		var isEmbededInsideContainer = !!container.select('.embedded').node();
-		var circle = d3.select(circles[0][0]);
+		var circle = circles.node();
 		var txt = label + ' : ' + text;
 		for (var i = 0; i < circles[0].length; ++i) {
 			circle = d3.select(circles[0][i]);

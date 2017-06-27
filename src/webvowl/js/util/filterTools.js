@@ -25,7 +25,8 @@ module.exports = (function () {
 		});
 
 		properties.forEach(function (property) {
-			if ((checkProperties && shouldKeepNode(property)) || (!checkProperties && propertyHasVisibleNodes(removedNodes, property))) {
+			// if properties can also have tags check if should be visible. another way just check if their nodes are visible.
+			if (propertyHasVisibleNodes(removedNodes, property) && (!checkProperties || shouldKeepNode(property))) {
 				cleanedProperties.push(property);
 			} else if (elementTools.isDatatypeProperty(property)) {
 				// Remove floating datatypes/literals, because they belong to their datatype property
