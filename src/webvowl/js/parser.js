@@ -159,7 +159,7 @@ module.exports = function (graph) {
 		nodes = createNodeStructure(combinedClassesAndDatatypes, classMap);
 		properties = createPropertyStructure(combinedProperties, classMap, propertyMap);
 
-		filterTags = collectTags(classes);
+		filterTags = collectTags(classes.concat(datatypes));
 	};
 
 	/**

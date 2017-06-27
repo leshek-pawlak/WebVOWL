@@ -335,6 +335,15 @@ module.exports = function() {
       if (datatypeCoordinateY) {
         datatypeAttribute.y = datatypeCoordinateY;
       }
+      // get tags
+      var datatypeTags = store.getObjects(datatypes[d], 'webvowl:tag').clean();
+      if (datatypeTags.length > 0) {
+        var dtags = [];
+        for (var dt = 0; dt < datatypeTags.length; dt++) {
+          dtags.push(getTextValueFromTtl(datatypeTags[dt], 'webvowl:dimensionValueLabel'));
+        }
+        datatypeAttribute.tags = dtags;
+      }
       // add datatype to "datatype" in the final json
       graphJson.datatype.push({id: datatypes[d], type: datatypeType});
       // add datatype to "datatypeAttribute" in the final json
