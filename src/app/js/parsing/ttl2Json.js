@@ -389,6 +389,15 @@ module.exports = function() {
       if (minCardinality) {
         propertyAttribute.minCardinality = minCardinality;
       }
+      // get tags
+      var propertyTags = store.getObjects(properties[p], 'webvowl:tag').clean();
+      if (propertyTags.length > 0) {
+        var ptags = [];
+        for (var pt = 0; pt < propertyTags.length; pt++) {
+          ptags.push(getTextValueFromTtl(propertyTags[pt], 'webvowl:dimensionValueLabel'));
+        }
+        propertyAttribute.tags = ptags;
+      }
       // get annotations
       var propertyAnnotations = getAnnotations(properties[p], languageLabels);
       if (Object.keys(propertyAnnotations).length > 0) {

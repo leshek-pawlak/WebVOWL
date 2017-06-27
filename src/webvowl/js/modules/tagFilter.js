@@ -31,7 +31,7 @@ module.exports = function () {
     };
 
     function removeTags() {
-        var filteredData = filterTools.filterNodesAndTidy(nodes, properties, hasNoTag);
+        var filteredData = filterTools.filterNodesAndTidy(nodes, properties, hasNoTag, true);
 
         nodes = filteredData.nodes;
         properties = filteredData.properties;

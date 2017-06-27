@@ -11,7 +11,7 @@ module.exports = (function () {
 	 * @param shouldKeepNode function that returns true if the node should be kept
 	 * @returns {{nodes: Array, properties: Array}} the filtered nodes and properties
 	 */
-	tools.filterNodesAndTidy = function (nodes, properties, shouldKeepNode) {
+	tools.filterNodesAndTidy = function (nodes, properties, shouldKeepNode, checkProperties) {
 		var removedNodes = require("./set")(),
 			cleanedNodes = [],
 			cleanedProperties = [];
@@ -25,7 +25,7 @@ module.exports = (function () {
 		});
 
 		properties.forEach(function (property) {
-			if (propertyHasVisibleNodes(removedNodes, property)) {
+			if ((checkProperties && shouldKeepNode(property)) || (!checkProperties && propertyHasVisibleNodes(removedNodes, property))) {
 				cleanedProperties.push(property);
 			} else if (elementTools.isDatatypeProperty(property)) {
 				// Remove floating datatypes/literals, because they belong to their datatype property

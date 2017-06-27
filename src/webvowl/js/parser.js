@@ -159,7 +159,8 @@ module.exports = function (graph) {
 		nodes = createNodeStructure(combinedClassesAndDatatypes, classMap);
 		properties = createPropertyStructure(combinedProperties, classMap, propertyMap);
 
-		filterTags = collectTags(classes.concat(datatypes));
+		// get tags from classes, datatypes and properties
+		filterTags = collectTags(_.concat(classes, datatypes, combinedProperties));
 	};
 
 	/**
@@ -362,7 +363,8 @@ module.exports = function (graph) {
 						.superproperties(element.superproperty)
 						// .type(element.type) Ignore, because we predefined it
 						.iri(element.iri)
-						.backgroundColor(element.backgroundColor);
+						.backgroundColor(element.backgroundColor)
+						.tags(element.tags);
 
 					// adding property position
 					if (element.pos) {
