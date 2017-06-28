@@ -1018,6 +1018,7 @@ module.exports = function (graphContainerSelector) {
 		var container = domainElement.nodeElement();
 		var whiteCircle = getWhiteCircleSybling(container);
 		var label = link.label().property().labelForCurrentLanguage();
+		var contentStyles = link.label().property().contentStyles();
 		var text = link.range().labelForCurrentLanguage();
 		if (options.cardinalityVisible() && link.label().property().generateCardinalityText()) {
 			text += ' [' + link.label().property().generateCardinalityText() + ']';
@@ -1075,10 +1076,13 @@ module.exports = function (graphContainerSelector) {
 		g.append("rect")
 			.attr('width', getTextWidth(txt))
 			.attr('height', umlTextHeight);
-		g.append("text")
+		var textElement = g.append("text")
 			.text(txt)
 			.classed("class-property", true)
 			.classed("text", true);
+		if (contentStyles) {
+			textElement.attr('style', contentStyles);
+		}
 		// if it's datatype
 		if (isDatatype) {
 			drawDatatypeProperties(domainElement, circle);

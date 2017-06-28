@@ -60,7 +60,15 @@ module.exports = function() {
       for (var i = 0; i < labels.length; i++) {
         var text = getTextValueFromTtl(labels[i], 'webvowl:content');
         var language = store.getObjects(labels[i], 'webvowl:contentLanguage').clean()[0];
-        labelObject[languageLabels[language]] = text;
+        var style = getTextValueFromTtl(labels[i], 'webvowl:contentStyle');
+        if (style) {
+          labelObject[languageLabels[language]] = {
+            text: text,
+            style: style,
+          };
+        } else {
+          labelObject[languageLabels[language]] = text;
+        }
       }
 
       return labelObject;

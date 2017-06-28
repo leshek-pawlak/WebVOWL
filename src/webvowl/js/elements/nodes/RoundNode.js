@@ -238,6 +238,11 @@ module.exports = (function () {
 
 			textBlock.addText(that.labelForCurrentLanguage(), "", suffixForFollowingEquivalents, graph.options().forceFullLabels(), graph.options().labelMaxTextLineLength());
 			textBlock.addEquivalents(equivalentsString);
+			// put contentStyles into html
+			if (that.contentStyles()) {
+				textBlock._textBlock().attr('style', that.contentStyles());
+			}
+
 			if (!graph.options().compactNotation()) {
 				textBlock.addSubText(that.indicationString());
 			}

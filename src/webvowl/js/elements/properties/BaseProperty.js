@@ -277,6 +277,10 @@ module.exports = (function () {
 			textElement.addEquivalents(equivalentsString);
 			textElement.addText(this.labelForCurrentLanguage(), null, cardinalityText, graph.options().forceFullLabels(), graph.options().labelMaxTextLineLength());
 			textElement.addSubText(this.indicationString());
+			// put contentStyles into html
+			if (this.contentStyles()) {
+				textElement._textBlock().attr('style', this.contentStyles());
+			}
 
 			var textBox = textElement._textBlock().node().getBBox();
 			that.width(textBox.width + labelPadding);

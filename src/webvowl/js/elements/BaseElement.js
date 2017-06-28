@@ -1,6 +1,7 @@
 /**
  * The base element for all visual elements of webvowl.
  */
+var _ = require("lodash");
 module.exports = (function () {
 
 	var Base = function (graph) {
@@ -20,6 +21,7 @@ module.exports = (function () {
 			equivalentBase,
 			visualAttributes = [],
 			tags,
+			contentStyles,
 		// Style attributes
 			focused = false,
 			indications = [],
@@ -106,6 +108,7 @@ module.exports = (function () {
 		this.label = function (p) {
 			if (!arguments.length) return label;
 			label = p;
+			findContentStyles(this, label);
 			return this;
 		};
 
@@ -118,6 +121,12 @@ module.exports = (function () {
 		this.styleClass = function (p) {
 			if (!arguments.length) return styleClass;
 			styleClass = p;
+			return this;
+		};
+
+		this.contentStyles = function (p) {
+			if (!arguments.length) return contentStyles;
+			contentStyles = p;
 			return this;
 		};
 
@@ -184,6 +193,16 @@ module.exports = (function () {
 		return this.labelForCurrentLanguage() + " (" + this.type() + ")";
 	};
 
+	function findContentStyles(that, label) {
+		if (_.isObject(label)) {
+			_.forIn(label, function(value) {
+				if (_.isObject(value)) {
+					that.label(value.text);
+					that.contentStyles(value.style);
+				}
+			});
+		}
+	}
 
 	return Base;
 }());
