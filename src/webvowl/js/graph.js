@@ -930,10 +930,10 @@ module.exports = function (graphContainerSelector) {
 		// sort links by type and then alphabetically in the boxes
 		if (options.graphStyle() === 'boxes') {
 			linkGroups.sort(function(x,y) {
-				var xLabel = typeof x.label().property().label() === 'object' ? x.label().property().label() : { 'undefined': "Z" };
-				var yLabel = typeof y.label().property().label() === 'object' ? y.label().property().label() : { 'undefined': "Z" };
+				var xLabel = typeof x.label().property().label() === 'object' ? x.label().property().labelForCurrentLanguage() : "Z";
+				var yLabel = typeof y.label().property().label() === 'object' ? y.label().property().labelForCurrentLanguage() : "Z";
 				// first objectProperties. then datatypeProperties
-				return d3.descending(x.property().type(), y.property().type()) || d3.ascending(xLabel.undefined, yLabel.undefined);
+				return d3.descending(x.property().type(), y.property().type()) || d3.ascending(xLabel, yLabel);
 			});
 			linkGroups.each(function (link) {
 				if (link.range().type().indexOf('rdfs') > -1 || link.range().referenceClass) {
