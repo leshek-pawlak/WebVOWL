@@ -98,7 +98,7 @@ module.exports = function() {
             identifier: identifier,
             language: lang,
             value: annotation[lang],
-            type: type === 'HTMLAnnotation' ? 'html' : 'label'
+            type: 'html'
           }
         ];
       }

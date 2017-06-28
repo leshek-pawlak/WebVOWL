@@ -398,7 +398,7 @@ module.exports = function (graph) {
 			.append("span")
 			.each(function (d) {
 				if (d.type === 'html') {
-					d3.select(this).appendHTML(d.value);
+					d3.select(this).html(d.value);
 				} else {
 					appendIriLabel(d3.select(this), d.value, d.type === "iri" ? d.value : undefined);
 				}
