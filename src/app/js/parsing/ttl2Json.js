@@ -268,7 +268,7 @@ module.exports = function() {
       if (classTags.length > 0) {
         var tags = [];
         for (var ct = 0; ct < classTags.length; ct++) {
-          tags.push(getTextValueFromTtl(classTags[ct], 'webvowl:dimensionValueLabel'));
+          tags.push(getTextValue(classTags[ct], ''));
         }
         classAttribute.tags = tags;
       }
@@ -340,7 +340,7 @@ module.exports = function() {
       if (datatypeTags.length > 0) {
         var dtags = [];
         for (var dt = 0; dt < datatypeTags.length; dt++) {
-          dtags.push(getTextValueFromTtl(datatypeTags[dt], 'webvowl:dimensionValueLabel'));
+          dtags.push(getTextValue(datatypeTags[dt], ''));
         }
         datatypeAttribute.tags = dtags;
       }
@@ -394,7 +394,7 @@ module.exports = function() {
       if (propertyTags.length > 0) {
         var ptags = [];
         for (var pt = 0; pt < propertyTags.length; pt++) {
-          ptags.push(getTextValueFromTtl(propertyTags[pt], 'webvowl:dimensionValueLabel'));
+          ptags.push(getTextValue(propertyTags[pt], ''));
         }
         propertyAttribute.tags = ptags;
       }
@@ -414,11 +414,14 @@ module.exports = function() {
         var possibleValues = [];
         var dimensionValues = store.getObjects(filterDimensions[fd], 'webvowl:hasDimensionValue').clean();
         for (var dv = 0; dv < dimensionValues.length; dv++) {
-          possibleValues.push(getTextValueFromTtl(dimensionValues[dv], 'webvowl:dimensionValueLabel'));
+          possibleValues.push({
+            key: getTextValue(dimensionValues[dv], ''),
+            value: getTextValueFromTtl(dimensionValues[dv], 'webvowl:dimensionValueLabel')
+          });
         }
         // alphabetical order
         possibleValues.sort(function(a,b) {
-          return a > b;
+          return a.value > b.value;
         });
         groupedFilterDimensions.push({
           name: getTextValueFromTtl(filterDimensions[fd], 'webvowl:dimensionName'),

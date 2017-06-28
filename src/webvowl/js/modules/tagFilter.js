@@ -37,12 +37,28 @@ module.exports = function () {
         properties = filteredData.properties;
     }
 
+    function getDimansionValuesAndLabels(dimensionValues) {
+      // get values and labels from dimension values.
+      var values = [], labels = {};
+      if (_.isObject(dimensionValues[0])) {
+        dimensionValues.forEach(function(value) {
+          values.push(value.key);
+          labels[value.key] = value.value;
+        });
+      } else {
+        values = dimensionValues;
+        dimensionValues.forEach(function(value) {
+          labels[value] = value;
+        });
+      }
+
+      return { labels: labels, values: values };
+    }
+
     function hasNoTag(node) {
         var nodeTags = node.tags();
         // nodes with no tags are always visible.
         if(_.isEmpty(nodeTags)) return true;
-
-        nodeTags = _.invokeMap(nodeTags, String.prototype.toLowerCase);
 
         // for tags an array
         if (_.isArray(tags)) {
@@ -57,7 +73,8 @@ module.exports = function () {
         // if tags are not empty object
         var shouldBeShown = true;
         allTags.forEach(function(dimension) {
-          var values = _.invokeMap(dimension.values, String.prototype.toLowerCase);
+          var obj = getDimansionValuesAndLabels(dimension.values);
+          var values = obj.values;
           // if for some dimension is no selected option ...
           if (_.isUndefined(tags[dimension.name])) {
             // ... and there is no "common" values then make is visible.
@@ -91,7 +108,9 @@ module.exports = function () {
         var tmpTags = {};
         allTags.forEach(function(dimension) {
           dimension.values.forEach(function(value) {
-            value = String.prototype.toLowerCase.apply(value);
+            if (_.isObject(value)) {
+              value = value.key;
+            }
             if (tagsUnselected.indexOf(value) === -1) {
               if (!tmpTags[dimension.name]) {
                 tmpTags[dimension.name] = [];
@@ -115,7 +134,8 @@ module.exports = function () {
         label = 'Nothing\'s selected. Only elements without tags are visible.';
       } else {
         allTags.forEach(function(dimension, key) {
-          var values = _.invokeMap(dimension.values, String.prototype.toLowerCase);
+          var obj = getDimansionValuesAndLabels(dimension.values);
+          var values = obj.values, labels = obj.labels;
           var difference = _.difference(values, tagsUnselected);
           if (key > 0) {
             label += '<span style="color: red;">AND</span> ';
@@ -129,7 +149,7 @@ module.exports = function () {
               if (key > 0) {
                 label += '<span style="color: orange;">OR</span> ';
               }
-              label += '<span style="font-style: italic; color: white;">' + value + '</span> ';
+              label += '<span style="font-style: italic; color: white;">' + labels[value] + '</span> ';
             });
             if (difference.length > 1) {
               label += 'elements ';
@@ -159,25 +179,35 @@ module.exports = function () {
     };
 
     filter.uncheck = function(tag) {
-        if(!tag) return;
+      var uncheck;
+      if(!tag) {
+        return;
+      } else if (_.isObject(tag)) {
+        uncheck = tag.key;
+      } else {
+        uncheck = tag;
+      }
 
-        tag = String.prototype.toLowerCase.apply(tag);
-
-        if(_.indexOf(tagsUnselected, tag) === -1) {
-            tagsUnselected.push(tag);
-        }
-        createTagsFromLogic();
+      if(_.indexOf(tagsUnselected, uncheck) === -1) {
+          tagsUnselected.push(uncheck);
+      }
+      createTagsFromLogic();
     };
 
     filter.check = function (tagToRemove) {
-        if(!tagToRemove) return;
+      var check;
+      if(!tagToRemove) {
+        return;
+      } else if (_.isObject(tagToRemove)) {
+        check = tagToRemove.key;
+      } else {
+        check = tagToRemove;
+      }
 
-        tagToRemove = String.prototype.toLowerCase.apply(tagToRemove);
-
-        _.remove(tagsUnselected, function (tag) {
-            return tag === tagToRemove;
-        });
-        createTagsFromLogic();
+      _.remove(tagsUnselected, function (tag) {
+          return tag === check;
+      });
+      createTagsFromLogic();
     };
 
     filter.clear = function () {

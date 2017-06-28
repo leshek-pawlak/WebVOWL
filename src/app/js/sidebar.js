@@ -3,6 +3,7 @@
  * @param graph the graph that belongs to these controls
  * @returns {{}}
  */
+var _ = require("lodash");
 module.exports = function (graph) {
 
 	var sidebar = {},
@@ -37,8 +38,15 @@ module.exports = function (graph) {
 		addFilterItem(selector + "Segments", "(Select All)", subMenu);
 	}
 
-	function addTagFilterItem(tagValue, tagName, selector) {
-			var tagCheckboxId = tagValue + "FilterTagCheckbox";
+	function addTagFilterItem(tag, tagName, selector) {
+			var tagKey, tagValue;
+			if(_.isObject(tag)) {
+				tagKey = tag.key;
+				tagValue = tag.value;
+			} else {
+				tagKey = tagValue = tag;
+			}
+			var tagCheckboxId = tagKey + "FilterTagCheckbox";
 			var filterContainer = d3.select(selector)
 					.append("li")
 					.append("div")
@@ -51,7 +59,7 @@ module.exports = function (graph) {
 
 			filterCheckbox.on("click", function () {
 					var isEnabled = filterCheckbox.property("checked");
-					filter[isEnabled ? "check" : "uncheck"](tagValue, tagName);
+					filter[isEnabled ? "check" : "uncheck"](tag);
 					graph.update();
 			});
 
