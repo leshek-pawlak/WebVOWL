@@ -6,8 +6,8 @@ module.exports = function() {
   // export function
   function parseTtl(ttl) {
     return new Promise(function(resolve, reject) {
-      var pathToWebvowlTtl = location.origin + location.pathname + 'webvowl.ttl';
-      d3.xhr(pathToWebvowlTtl, 'application/ttl', function(error, request) {
+      var basePath = location.href.substring(0,location.href.lastIndexOf("/")) + '/';
+      d3.xhr(basePath + 'webvowl.ttl', 'application/ttl', function(error, request) {
         if (!error) {
           resolve(createStructure(ttl, request.responseText));
         } else {

@@ -119,12 +119,11 @@ module.exports = function () {
 	}
 
 	app.loadOptionsFile = function() {
-    var pathToWebvowlTtl = location.origin + location.pathname + 'webvowl.ttl';
-    d3.xhr(pathToWebvowlTtl, 'application/ttl', function (error, request) {
+    var basePath = location.href.substring(0,location.href.lastIndexOf("/")) + '/';
+    d3.xhr(basePath + 'webvowl.ttl', 'application/ttl', function (error, request) {
       if (!error) {
 				var dictionaryTtl = request.responseText;
-				var pathToOptionsTtl = location.origin + location.pathname + 'options.ttl';
-				d3.xhr(pathToOptionsTtl, 'application/ttl', function (error, request) {
+				d3.xhr(basePath + 'options.ttl', 'application/ttl', function (error, request) {
 					if (!error) {
 						var options = getOptionsFromTtl(request.responseText, dictionaryTtl);
 						overrideOptions(options);
