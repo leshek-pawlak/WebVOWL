@@ -299,6 +299,11 @@ webvowl:Individual
   rdf:type owl:Class ;
   rdfs:label "Individual"^^xsd:string ;
 .
+webvowl:IriAnnotation
+  rdf:type owl:Class ;
+  rdfs:label "IRI Annotation"^^xsd:string ;
+  rdfs:subClassOf webvowl:Annotation ;
+.
 webvowl:Label
   rdf:type owl:Class ;
   rdfs:label "Label"^^xsd:string ;
@@ -373,10 +378,28 @@ webvowl:annotation
         ) ;
     ] ;
 .
+webvowl:annotationIdentifier
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain webvowl:Annotation ;
+  rdfs:label "Annotation Identifier"^^xsd:string ;
+  rdfs:range xsd:string ;
+.
 webvowl:author
   rdf:type owl:DatatypeProperty ;
   rdfs:domain webvowl:Header ;
   rdfs:label "Author"^^xsd:string ;
+  rdfs:range xsd:string ;
+.
+webvowl:backgroundColor
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          webvowl:Class
+          owl:Class
+        ) ;
+    ] ;
+  rdfs:label "Color"^^xsd:string ;
   rdfs:range xsd:string ;
 .
 webvowl:cardinality
@@ -426,18 +449,6 @@ webvowl:classType
   rdfs:label "Class Type"^^xsd:string ;
   rdfs:range webvowl:Type ;
 .
-webvowl:color
-  rdf:type owl:DatatypeProperty ;
-  rdfs:domain [
-      rdf:type owl:Class ;
-      owl:unionOf (
-          webvowl:Class
-          owl:Class
-        ) ;
-    ] ;
-  rdfs:label "Color"^^xsd:string ;
-  rdfs:range xsd:string ;
-.
 webvowl:content
   rdf:type owl:DatatypeProperty ;
   rdfs:domain [
@@ -465,6 +476,13 @@ webvowl:contentLanguage
     ] ;
   rdfs:label "Content Language"^^xsd:string ;
   rdfs:range webvowl:Language ;
+.
+webvowl:contentStyle
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Contains CSS style annotations for the content (e.g. font-style:italic;color:red; )"^^xsd:string ;
+  rdfs:domain webvowl:Label ;
+  rdfs:label "Content Style"^^xsd:string ;
+  rdfs:range xsd:string ;
 .
 webvowl:coordinateX
   rdf:type owl:DatatypeProperty ;
@@ -1013,6 +1031,18 @@ owl:Class
               ) ;
           ]
           [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "isExt"^^xsd:string ;
+                    ] ;
+                  sp:predicate webvowl:isExternal ;
+                  sp:subject spin:_this ;
+                ]
+              ) ;
+          ]
+          [
             rdf:type sp:Bind ;
             sp:expression [
                 rdf:type sp:iri ;
@@ -1049,16 +1079,26 @@ owl:Class
           [
             rdf:type sp:Filter ;
             sp:expression [
-                rdf:type sp:contains ;
+                rdf:type sp:or ;
                 sp:arg1 [
-                    rdf:type xsd:string ;
-                    sp:arg1 spin:_this ;
+                    rdf:type sp:contains ;
+                    sp:arg1 [
+                        rdf:type xsd:string ;
+                        sp:arg1 spin:_this ;
+                      ] ;
+                    sp:arg2 [
+                        rdf:type xsd:string ;
+                        sp:arg1 [
+                            sp:varName "fo"^^xsd:string ;
+                          ] ;
+                      ] ;
                   ] ;
                 sp:arg2 [
-                    rdf:type xsd:string ;
+                    rdf:type sp:eq ;
                     sp:arg1 [
-                        sp:varName "fo"^^xsd:string ;
+                        sp:varName "isExt"^^xsd:string ;
                       ] ;
+                    sp:arg2 "true"^^xsd:boolean ;
                   ] ;
               ] ;
           ]
@@ -1425,6 +1465,41 @@ owl:Class
         ) ;
       rdfs:comment "Create subClass Property for Class"^^xsd:string ;
     ] ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object "true"^^xsd:boolean ;
+            sp:predicate webvowl:isReferenceClass ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object "#d0d0d0"^^xsd:string ;
+            sp:predicate webvowl:backgroundColor ;
+            sp:subject spin:_this ;
+          ]
+        ) ;
+      sp:where (
+          [
+            sp:object webvowl:Class ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:NotExists ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "v"^^xsd:string ;
+                    ] ;
+                  sp:predicate webvowl:isBusinessEntity ;
+                  sp:subject spin:_this ;
+                ]
+              ) ;
+          ]
+        ) ;
+      rdfs:comment "Annotate all non Business Entites as Reference Class"^^xsd:string ;
+    ] ;
 .
 owl:DatatypeProperty
   spin:rule [
@@ -1535,6 +1610,43 @@ owl:DatatypeProperty
             sp:predicate webvowl:content ;
             sp:subject [
                 sp:varName "definitionIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "seeAlsoIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:annotation ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:HTMLAnnotation ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "seeAlsoIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object "All Element Details" ;
+            sp:predicate webvowl:annotationIdentifier ;
+            sp:subject [
+                sp:varName "seeAlsoIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "seeAlsoIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "seeAlsoContent"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "seeAlsoIri"^^xsd:string ;
               ] ;
           ]
           [
@@ -1676,6 +1788,52 @@ owl:DatatypeProperty
                     ] ;
                   sp:variable [
                       sp:varName "definitionIri"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "seeAlso"^^xsd:string ;
+                    ] ;
+                  sp:predicate rdfs:seeAlso ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 "SeeAlso" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "seeAlsoIri"^^xsd:string ;
+                    ] ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:concat ;
+                      sp:arg1 "<a href=\"" ;
+                      sp:arg2 [
+                          rdf:type xsd:string ;
+                          sp:arg1 [
+                              sp:varName "seeAlso"^^xsd:string ;
+                            ] ;
+                        ] ;
+                      sp:arg3 "\">Link to GDSR Entry</a>" ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "seeAlsoContent"^^xsd:string ;
                     ] ;
                 ]
               ) ;
@@ -2471,6 +2629,43 @@ owl:ObjectProperty
                 sp:varName "definitionIri"^^xsd:string ;
               ] ;
           ]
+          [
+            sp:object [
+                sp:varName "seeAlsoIri"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:annotation ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object webvowl:HTMLAnnotation ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "seeAlsoIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object "All Element Details" ;
+            sp:predicate webvowl:annotationIdentifier ;
+            sp:subject [
+                sp:varName "seeAlsoIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object webvowl:undef ;
+            sp:predicate webvowl:contentLanguage ;
+            sp:subject [
+                sp:varName "seeAlsoIri"^^xsd:string ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "seeAlsoContent"^^xsd:string ;
+              ] ;
+            sp:predicate webvowl:content ;
+            sp:subject [
+                sp:varName "seeAlsoIri"^^xsd:string ;
+              ] ;
+          ]
         ) ;
       sp:where (
           [
@@ -2555,6 +2750,52 @@ owl:ObjectProperty
                     ] ;
                   sp:variable [
                       sp:varName "definitionIri"^^xsd:string ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            rdf:type sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "seeAlso"^^xsd:string ;
+                    ] ;
+                  sp:predicate rdfs:seeAlso ;
+                  sp:subject spin:_this ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:iri ;
+                      sp:arg1 [
+                          rdf:type sp:concat ;
+                          sp:arg1 [
+                              rdf:type xsd:string ;
+                              sp:arg1 spin:_this ;
+                            ] ;
+                          sp:arg2 "SeeAlso" ;
+                        ] ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "seeAlsoIri"^^xsd:string ;
+                    ] ;
+                ]
+                [
+                  rdf:type sp:Bind ;
+                  sp:expression [
+                      rdf:type sp:concat ;
+                      sp:arg1 "<a href=\"" ;
+                      sp:arg2 [
+                          rdf:type xsd:string ;
+                          sp:arg1 [
+                              sp:varName "seeAlso"^^xsd:string ;
+                            ] ;
+                        ] ;
+                      sp:arg3 "\">Link to GDSR Entry</a>" ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "seeAlsoContent"^^xsd:string ;
                     ] ;
                 ]
               ) ;
