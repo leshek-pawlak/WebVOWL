@@ -845,5 +845,11 @@ a#pause-button:not(.paused)::before {
 .dimensions-trigger {
 	display: block;
 	cursor: pointer;
-	line-height: 20px;
+	line-height: 30px;
+	.checkboxContainer {
+		line-height: 20px;
+	}
+}
+.dimensions-container {
+	margin-top: -5px;
 }

@@ -122,48 +122,6 @@ module.exports = function () {
         });
         tags = tmpTags;
       }
-      createLabel();
-    }
-
-    // function to create concatenated label for filter dimensions
-    function createLabel() {
-      var label = '';
-      if (_.isEmpty(tagsUnselected)) {
-        label = 'All elements are visible. No filtering.';
-      } else if (_.isEmpty(tags)) {
-        label = 'Nothing\'s selected. Only elements without tags are visible.';
-      } else {
-        allTags.forEach(function(dimension, key) {
-          var obj = getDimansionValuesAndLabels(dimension.values);
-          var values = obj.values, labels = obj.labels;
-          var difference = _.difference(values, tagsUnselected);
-          if (key > 0) {
-            label += '<span style="color: red;">AND</span> ';
-          }
-          if (_.isUndefined(tags[dimension.name])) {
-            label += 'only no tag elements from <span style="font-style: italic; color: white;">' + dimension.name + '</span> ';
-          } else if (difference.length === values.length) {
-            label += 'all elements from <span style="font-style: italic; color: white;">' + dimension.name + '</span> ';
-          } else if (difference.length > 0) {
-            difference.forEach(function (value, key) {
-              if (key > 0) {
-                label += '<span style="color: orange;">OR</span> ';
-              }
-              label += '<span style="font-style: italic; color: white;">' + labels[value] + '</span> ';
-            });
-            if (difference.length > 1) {
-              label += 'elements ';
-            } else {
-              label += 'element ';
-            }
-            label += 'from <span style="font-style: italic; color: white;">' + dimension.name + '</span> ';
-          }
-        });
-        label += 'are visible.';
-      }
-
-      // set concatenate label in HTML
-      d3.select('#dimentionsFilterLabel').html(label);
     }
 
     filter.allTags = function(p) {
