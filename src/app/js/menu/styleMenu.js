@@ -15,6 +15,8 @@ module.exports = function (graph) {
      * @param choosedView save as style
      */
     styleMenu.setup = function () {
+      var input = d3.select('#styleRadios input[value="'+ graph.options().graphStyle() +'"]');
+      if (!input.node()) { return; }
       // set only once value from options.json file. not from options.js.
       if (!styleMenu.defaultGraphStyle) {
         styleMenu.defaultGraphStyle = graph.options().graphStyle();
@@ -26,7 +28,7 @@ module.exports = function (graph) {
         radio.on("click", function() { changeView(radio.attr('value')); });
       });
 
-      d3.select('#styleRadios input[value="'+ graph.options().graphStyle() +'"]').property('checked', true).on("click")();
+      input.property('checked', true).on("click")();
 
       if (d3.selectAll('circle')[0].length > 0) {
         prepareCircles();

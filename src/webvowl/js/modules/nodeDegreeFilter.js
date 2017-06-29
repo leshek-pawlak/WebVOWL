@@ -25,7 +25,7 @@ module.exports = function (menu, graph) {
 			degreeSetter(defaultDegree);
 			menu.highlightForDegreeSlider(defaultDegree > 0);
 		} else {
-			console.error("No degree setter function set.");
+			console.warn("No degree setter function set.");
 		}
 	};
 
@@ -54,7 +54,7 @@ module.exports = function (menu, graph) {
 			if (degreeGetter instanceof Function) {
 				filterByNodeDegreeAndApply(degreeGetter());
 			} else {
-				console.error("No degree query function set.");
+				console.warn("No degree query function set.");
 			}
 		}
 

@@ -96,6 +96,7 @@ module.exports = function (graph) {
 	}
 
 	function applyColorModeSwitchState(element, colorExternalsMode) {
+		if (!element.node()) { return; }
 		var isActive = element.datum().active;
 		var activeColorMode = getColorModeByState(isActive);
 

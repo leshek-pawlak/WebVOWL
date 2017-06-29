@@ -83,6 +83,7 @@ module.exports = function (graph) {
 	}
 
 	function addNodeDegreeFilter(nodeDegreeFilter, container) {
+		if (!container.node()) { return; }
 		nodeDegreeFilter.setMaxDegreeSetter(function (maxDegree) {
 			degreeSlider.attr("max", maxDegree);
 			setSliderValue(degreeSlider, Math.min(maxDegree, degreeSlider.property("value")));

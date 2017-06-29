@@ -4,6 +4,7 @@
  * @param graph the associated webvowl graph
  * @returns {{}}
  */
+var _ = require('lodash/core');
 module.exports = function (graph) {
 	var navigationMenu = {},
 		allMenuEntries = [],
@@ -181,6 +182,7 @@ module.exports = function (graph) {
 		// assumptions:
 		// about is always first element, we take its top pos
 		// we neglect the last 2 value because it is the arrow object
+		if (_.isEmpty(visibleEntries)) { return; }
 		var i;
 		var firstOne = visibleEntries.indexOf(1);
 		if (firstOne===-1){
@@ -282,8 +284,10 @@ module.exports = function (graph) {
 	};
 
 	function fillFromBeginning() {
-		visibleEntries[0]=1;
-		allMenuEntries[0].style.display="block";
+		if (allMenuEntries[0]) {
+			visibleEntries[0]=1;
+			allMenuEntries[0].style.display="block";
+		}
 	}
 
 	function checkArrowRequirement(){

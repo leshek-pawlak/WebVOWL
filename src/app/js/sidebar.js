@@ -413,7 +413,7 @@ module.exports = function (graph) {
 		lastSelectedElement = selectedElement;
 
 		// Click event was prevented when dragging
-		if (d3.event && d3.event.defaultPrevented) {
+		if (d3.event && d3.event.defaultPrevented || !d3.select("#selection-details-trigger").node()) {
 			return;
 		}
 

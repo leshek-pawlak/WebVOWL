@@ -23,6 +23,7 @@ module.exports = function (graph) {
 	};
 
 	searchMenu.requestDictionaryUpdate = function () {
+		if (!dropDownContainer.node()) { return; }
 		dictionaryUpdateRequired = true;
 		// clear possible pre searched entries
 		var htmlCollection = dropDownContainer.node().children;

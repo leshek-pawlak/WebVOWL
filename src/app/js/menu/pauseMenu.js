@@ -33,6 +33,7 @@ module.exports = function (graph) {
 	};
 
 	pauseMenu.setPauseValue = function (value) {
+		if (!pauseButton.node()) { return; }
 		pauseButton.datum().paused = value;
 		graph.paused(value);
 		pauseButton.classed("highlighted", value);
@@ -51,6 +52,7 @@ module.exports = function (graph) {
 	}
 
 	function updatePauseButtonText() {
+		if (!pauseButton.node()) { return; }
 		if (pauseButton.datum().paused) {
 			pauseButton.text("Resume");
 		} else {
