@@ -85,12 +85,12 @@ module.exports = function (grunt) {
 				}
 			},
 			dev: {
-				src: "src/index.html",
+				src: "src/*.html",
 				dest: deployPath
 			},
 			release: {
 				// required for removing the benchmark ontology from the selection menu
-				src: "src/index.html",
+				src: "src/*.html",
 				dest: deployPath
 			}
 		},

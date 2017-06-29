@@ -491,6 +491,10 @@ a#pause-button:not(.paused)::before {
 #aboutMenu > a::before {
 	content: "\00A9";
 }
+#styleOption > a::before {
+	content: "\2580";
+  vertical-align: sub;
+}
 
 #detailsArea {
 	bottom: 0;
