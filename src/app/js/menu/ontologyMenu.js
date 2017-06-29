@@ -84,7 +84,7 @@ module.exports = function (graph) {
 	 * changes the url and this will load an other ontology.
 	 */
 	function updateNavigationHrefs() {
-		d3.selectAll("#optionsMenu > li > a").attr("href", location.hash || "#");
+		d3.selectAll("#optionsMenu > li > a:not(#helpButton)").attr("href", location.hash || "#");
 	}
 
 	ontologyMenu.setIriText=function(text){
